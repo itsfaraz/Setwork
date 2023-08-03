@@ -15,12 +15,14 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
+import com.designlife.justdo.common.domain.calendar.IDateGenerator
 import com.designlife.justdo.common.presentation.components.CommonCustomHeader
 import com.designlife.justdo.common.utils.AppServiceLocator
 import com.designlife.justdo.common.utils.constants.Constants
 import com.designlife.justdo.common.utils.enums.ScreenType
 import com.designlife.justdo.container.presentation.components.CategoryComponent
 import com.designlife.justdo.container.presentation.components.CustomColorPicker
+import com.designlife.justdo.container.presentation.components.RepeatComponent
 import com.designlife.justdo.container.presentation.events.ContainerEvents
 import com.designlife.justdo.container.presentation.viewmodel.ContainerViewModel
 import com.designlife.justdo.container.presentation.viewmodel.ContainerViewModelFactory
@@ -35,9 +37,9 @@ class ContainerFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-
         val categoryRepository = AppServiceLocator.provideCategoryRepository(requireActivity().applicationContext)
-        val factory = ContainerViewModelFactory(categoryRepository)
+        val repeatRepository = AppServiceLocator.provideRepeatRepository()
+        val factory = ContainerViewModelFactory(categoryRepository,repeatRepository)
         viewmodel = ViewModelProvider(requireActivity(),factory)[ContainerViewModel::class.java]
 
         
@@ -65,6 +67,9 @@ class ContainerFragment : Fragment() {
                 val selectedPaletteColor = viewmodel.selectedPaletteColor.value
                 val newCategoryName = viewmodel.categoryName.value
                 val isEditMode = viewmodel.editMode.value
+                val repeatList = viewmodel.repeatList.value
+                val selectedRepeatIndex = viewmodel.selectedRepeatIndex.value
+
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
@@ -79,17 +84,9 @@ class ContainerFragment : Fragment() {
                             headerTitle = if (screenType == ScreenType.CATEGORY) "New Category" else "Repeat",
                             autoSave = true,
                             onCloseEvent = {
-//                            Save On Back
-                                if (screenType == ScreenType.CATEGORY){
-//                                saveCategory
-                                }else{
-//                                saveRepeat
-                                }
                                 findNavController().navigateUp()
                             },
-                            onSaveEvent = {
-                                // auto save mode
-                            }
+                            onSaveEvent = { /* auto save mode */ }
                         )
                         when(screenType){
                             ScreenType.CATEGORY -> {
@@ -116,7 +113,14 @@ class ContainerFragment : Fragment() {
                                 )
                             }
                             ScreenType.REPEAT -> {
-
+                                RepeatComponent(
+                                    repeatList = repeatList,
+                                    selectedIndex = selectedRepeatIndex,
+                                    onRepeatModeChange = {
+                                        viewmodel.onEvent(ContainerEvents.OnRepeatTypeSelected(it))
+                                        findNavController().navigateUp()
+                                    }
+                                )
                             }
                         }
                     }

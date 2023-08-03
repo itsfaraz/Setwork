@@ -51,13 +51,13 @@ import com.designlife.justdo.ui.theme.taskItemStyle
 fun CustomRadioItem(
     title : String,
     isSelected : Boolean,
-    isCategory : Boolean = false,
+    isRepeatMode : Boolean = false,
     isDummyCategory : Boolean = false,
     categoryName : String = "",
     onCategoryNameChange : (value : String) -> Unit = {},
     colorCode : Color = PrimaryBackgroundColor,
-    colorPickerEvent : () -> Unit,
-    colorPickerSelectedColor : Color,
+    colorPickerEvent : () -> Unit = {},
+    colorPickerSelectedColor : Color = TaskItemLabelColor,
     onCategoryInsertEvent : () -> Unit = {},
     onSelectedEvent : () -> Unit
 ) {
@@ -70,20 +70,22 @@ fun CustomRadioItem(
             .fillMaxWidth()
     ) {
 
-        Box(modifier = Modifier
-            .padding(horizontal = 10.dp)
-            .size(20.dp)
-            .clickable {
-                if (isDummyCategory) {
-                    colorPickerEvent()
+        if (!isRepeatMode){
+            Box(modifier = Modifier
+                .padding(horizontal = 10.dp)
+                .size(20.dp)
+                .clickable {
+                    if (isDummyCategory) {
+                        colorPickerEvent()
+                    }
                 }
-            }
-            .background(
-                color = if (isDummyCategory) colorPickerSelectedColor else colorCode,
-                shape = RoundedCornerShape(100)
-            )
-        ) {
+                .background(
+                    color = if (isDummyCategory) colorPickerSelectedColor else colorCode,
+                    shape = RoundedCornerShape(100)
+                )
+            ) {
 
+            }
         }
         Row(
             modifier = Modifier.fillMaxWidth(),

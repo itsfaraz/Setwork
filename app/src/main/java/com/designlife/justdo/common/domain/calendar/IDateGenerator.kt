@@ -85,7 +85,9 @@ class IDateGenerator : DateGenerator {
 
     companion object {
         val daysList =  listOf<String>( "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")
+        private val fullDayNameList =  listOf<String>( "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday")
         val monthsList =  listOf<String>( "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+        private val fillMonthNamesList =  listOf<String>( "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
 
         var prevIndex = 0;
         var nextIndex = 0;
@@ -110,6 +112,22 @@ class IDateGenerator : DateGenerator {
             calendar.time = date
             val day = calendar.get(Calendar.DAY_OF_MONTH)
             return Pair(day, daysList[calendar.get(Calendar.DAY_OF_WEEK)-1])
+        }
+
+        public fun getFullDayInfo(date : Date) : Pair<String,Int>{
+            val calendar = Calendar.getInstance()
+            calendar.time = date
+            val dayName = fullDayNameList[calendar.get(Calendar.DAY_OF_WEEK)-1]
+            val week = calendar.get(Calendar.WEEK_OF_MONTH)
+            return Pair(dayName,week)
+        }
+
+        public fun getDayMonthInfo(date : Date) : Pair<Int,String>{
+            val calendar = Calendar.getInstance()
+            calendar.time = date
+            val day = calendar.get(Calendar.DAY_OF_MONTH)
+            val month = fillMonthNamesList[calendar.get(Calendar.MONTH)]
+            return Pair(day,month)
         }
 
         fun getMonthFromDate(date: Date): String {
@@ -207,6 +225,40 @@ class IDateGenerator : DateGenerator {
             if (day in 0..6 || day in 25..31)
                 return true
             return false
+        }
+
+        fun getDayFromDate(date : Date) : Int{
+            val calendar = Calendar.getInstance()
+            calendar.time = date
+            return calendar.get(Calendar.DAY_OF_MONTH)
+        }
+
+        fun getLastDayOfMonthFromDate(date : Date) : Int{
+            val calendar = Calendar.getInstance()
+            calendar.time = date
+            return calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
+        }
+
+        fun checkIsWorkingDay(date : Date) : Boolean{
+            val calendar = Calendar.getInstance()
+            calendar.time = date
+            val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
+            return dayOfWeek != Calendar.SUNDAY && dayOfWeek != Calendar.SATURDAY
+        }
+
+        fun checkDays(orignalDate : Date,newDate : Date) : Boolean{
+            val calendar = Calendar.getInstance()
+            calendar.time = orignalDate
+            val day1 = calendar.get(Calendar.DAY_OF_MONTH)
+            calendar.time = newDate
+            val day2 = calendar.get(Calendar.DAY_OF_MONTH)
+            return daysList[day1%7].equals(daysList[day2%7])
+        }
+
+        fun getMonthNo(date : Date) : Int{
+            val calendar = Calendar.getInstance()
+            calendar.time = date
+            return calendar.get(Calendar.MONTH)
         }
 
     }

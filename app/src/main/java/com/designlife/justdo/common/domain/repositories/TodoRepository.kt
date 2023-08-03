@@ -16,6 +16,14 @@ class TodoRepository(private val todoDao: TodoDao) {
         return todoDao.insertTodo(TodoConverters.getTodoEntity(todo))
     }
 
+    suspend fun insertAllTodo(todoList: List<Todo>){
+        return todoDao.insertAllTodo(
+            todoList.map {
+                TodoConverters.getTodoEntity(it)
+            }
+        )
+    }
+
     fun getAllTodo() : Flow<List<Todo>> {
        return todoDao.getAllTodos().map { rawTodoList ->
            rawTodoList.map{ rawTodo ->

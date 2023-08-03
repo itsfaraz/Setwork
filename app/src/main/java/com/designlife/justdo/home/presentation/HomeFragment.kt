@@ -44,7 +44,9 @@ import com.designlife.justdo.common.domain.repositories.TodoRepository
 import com.designlife.justdo.common.presentation.components.BottomSheetComponent
 import com.designlife.justdo.common.utils.AppServiceLocator
 import com.designlife.justdo.common.utils.constants.Constants.EDIT_MODE
+import com.designlife.justdo.common.utils.constants.Constants.SCREEN_TYPE
 import com.designlife.justdo.common.utils.enums.BottomSheetItem
+import com.designlife.justdo.common.utils.enums.ScreenType
 import com.designlife.justdo.container.presentation.viewmodel.ContainerViewModel
 import com.designlife.justdo.container.presentation.viewmodel.ContainerViewModelFactory
 import com.designlife.justdo.home.domain.usecase.LoadIntialDatesUseCase
@@ -190,6 +192,7 @@ class HomeFragment : Fragment() {
                                 BottomSheetItem.CATEGORY -> {
                                     val bundle = bundleOf()
                                     bundle.putBoolean(EDIT_MODE,true)
+                                    bundle.putInt(SCREEN_TYPE,ScreenType.CATEGORY.ordinal)
                                     findNavController().navigate(
                                         R.id.containerFragment,
                                         bundle

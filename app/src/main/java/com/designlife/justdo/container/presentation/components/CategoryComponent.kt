@@ -33,7 +33,6 @@ fun CategoryComponent(
             CustomRadioItem(
                 title = "Add",
                 isSelected = false,
-                isCategory = true,
                 isDummyCategory = true,
                 categoryName = categoryName,
                 onCategoryNameChange = {onCategoryNameChange(it)},
@@ -45,7 +44,7 @@ fun CategoryComponent(
                 onCategoryInsertEvent = {
                     // Add New Category
                     if (categoryName.isNotBlank() && colorPickerSelectedColor != TaskItemLabelColor)
-                        onNewCategoryEvent(Category(categoryName,0,0,colorPickerSelectedColor))
+                        onNewCategoryEvent(Category(name = categoryName, totalTodo = 0, totalCompleted = 0, color = colorPickerSelectedColor))
                 }
             ){}
             Spacer(modifier = Modifier.height(20.dp))
@@ -56,7 +55,6 @@ fun CategoryComponent(
             CustomRadioItem(
                 title = item.name.camelCase(),
                 isSelected = index == selectedCategory,
-                isCategory = true,
                 isDummyCategory = false,
                 colorCode = item.color,
                 colorPickerSelectedColor = colorPickerSelectedColor,

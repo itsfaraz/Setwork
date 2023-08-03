@@ -9,10 +9,11 @@ val Purple700 = Color(0xFF3700B3)
 val Teal200 = Color(0xFF03DAC5)
 
 
-val ButtonPrimary = Color(0xFF5779F4)
+
+val ButtonPrimary = Color(0xFF7388FB)
 val PrimaryCardColor = Color(0xFFA5D8CA)
 val ButtonHighLightPrimary = Color(0xFFB3AFAF)
-val PrimaryColor1 = Color(0xFFD3F0E8)
+val PrimaryColor1 = Color(0xFF92FFF5)
 val PrimaryBackgroundCategoryColor = Color(0xFFDBE1DF)
 val PrimaryBackgroundColor = Color(0xFFF3F3F3)
 val TaskItemLabelColor = Color(0xFFA0A0A0)

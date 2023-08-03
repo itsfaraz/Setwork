@@ -6,16 +6,21 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.designlife.justdo.common.domain.calendar.IDateGenerator
 import com.designlife.justdo.common.domain.entities.Category
+import com.designlife.justdo.common.domain.repeat.RepeatRepository
 import com.designlife.justdo.common.domain.repositories.CategoryRepository
+import com.designlife.justdo.common.utils.enums.RepeatType
 import com.designlife.justdo.common.utils.enums.ScreenType
 import com.designlife.justdo.container.presentation.events.ContainerEvents
 import com.designlife.justdo.ui.theme.TaskItemLabelColor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.Date
 
 class ContainerViewModel(
-    private val categoryRepository: CategoryRepository
+    private val categoryRepository: CategoryRepository,
+    private val repeatRepository: RepeatRepository
 ) : ViewModel() {
 
     private val _screenType : MutableState<ScreenType> = mutableStateOf(ScreenType.CATEGORY)
@@ -26,6 +31,10 @@ class ContainerViewModel(
 
     private val _selectedCategory : MutableState<Int> = mutableStateOf(0)
     val selectedCategory = _selectedCategory
+
+
+    private val _selectedRepeatIndex : MutableState<Int> = mutableStateOf(0)
+    val selectedRepeatIndex = _selectedRepeatIndex
 
     private val _colorPickerToggle : MutableState<Boolean> = mutableStateOf(false)
     val colorPickerToggle = _colorPickerToggle
@@ -38,6 +47,9 @@ class ContainerViewModel(
 
     private val _categoryName : MutableState<String> = mutableStateOf("")
     val categoryName = _categoryName
+
+    private val _repeatList : MutableState< List<Pair<String,RepeatType>>> = mutableStateOf(listOf());
+    val repeatList = _repeatList
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
@@ -67,6 +79,9 @@ class ContainerViewModel(
                 // clear variables
                 clearVariables()
             }
+            is ContainerEvents.OnRepeatTypeSelected -> {
+                _selectedRepeatIndex.value = event.index
+            }
         }
     }
 
@@ -85,6 +100,10 @@ class ContainerViewModel(
     public fun initialSetup(screenType : ScreenType,editMode : Boolean){
         _screenType.value =  screenType
         _editMode.value = editMode
+    }
+
+    public fun setupRepeatList(currentDate : Date){
+        _repeatList.value = repeatRepository.getRepeatList(currentDate)
     }
 
 }

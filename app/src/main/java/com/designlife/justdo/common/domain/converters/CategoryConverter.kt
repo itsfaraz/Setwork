@@ -6,6 +6,7 @@ import com.designlife.justdo.common.domain.entities.Category
 object CategoryConverter {
     fun getCategoryEntity(category: Category) : com.designlife.justdo.common.data.entities.Category{
         return com.designlife.justdo.common.data.entities.Category(
+            categoryId = category.id,
             name = category.name,
             totalTodo = category.totalTodo,
             totalCompleted = category.totalCompleted,
@@ -16,6 +17,7 @@ object CategoryConverter {
 
     fun getCategory(category: com.designlife.justdo.common.data.entities.Category) : Category {
         return Category(
+            id = category.categoryId,
             name = category.name,
             totalTodo = category.totalTodo,
             totalCompleted = category.totalCompleted,

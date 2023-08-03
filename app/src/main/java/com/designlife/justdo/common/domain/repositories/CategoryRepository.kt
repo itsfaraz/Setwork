@@ -22,4 +22,11 @@ class CategoryRepository(
         return categoryDao.insertCategory(CategoryConverter.getCategoryEntity(category))
     }
 
+    suspend fun getCategoryById(categoryId : Long) : Category{
+        return CategoryConverter.getCategory(categoryDao.getCategoryById(categoryId))
+    }
+
+    suspend fun updateCategory(category : Category){
+        return categoryDao.updateCategory(CategoryConverter.getCategoryEntity(category))
+    }
 }
