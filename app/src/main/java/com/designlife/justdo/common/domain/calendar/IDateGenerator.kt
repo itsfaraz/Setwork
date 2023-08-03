@@ -200,6 +200,15 @@ class IDateGenerator : DateGenerator {
             return dateFormat.format(calendar.time)
         }
 
+        fun isTodayInEnd(currentDate : Date) : Boolean{
+            val calendar = Calendar.getInstance()
+            calendar.time = currentDate
+            val day  = calendar.get(Calendar.DAY_OF_MONTH)
+            if (day in 0..6 || day in 25..31)
+                return true
+            return false
+        }
+
     }
 
 }

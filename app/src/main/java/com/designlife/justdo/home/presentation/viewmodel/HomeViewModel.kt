@@ -17,6 +17,7 @@ import com.designlife.justdo.home.domain.usecase.LoadPreviousDatesSetUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Calendar
 import java.util.Date
 
 class HomeViewModel(
@@ -58,7 +59,7 @@ class HomeViewModel(
     private var previousIndex : Int = _currentDateIndex.value
 
     init {
-        viewModelScope.launch(Dispatchers.Default) {
+        viewModelScope.launch(Dispatchers.IO) {
             dateGenerator.getDateList().collect{
                 _dateList.value = it
             }
@@ -138,5 +139,4 @@ class HomeViewModel(
             }
         }
     }
-
 }

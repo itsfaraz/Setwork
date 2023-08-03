@@ -69,7 +69,7 @@ import java.util.Date
 class HomeFragment : Fragment() {
 
     private lateinit var viewModel: HomeViewModel
-    private var initiallScroll = false
+    private var scrollCount = 0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -109,10 +109,16 @@ class HomeFragment : Fragment() {
                 val currentYear = viewModel.currentYear.value
                 val currentDate = viewModel.currentDate.value
                 val todayDateIndex = dateList.indexOf(currentDate)
+                val isTodayInEnd = IDateGenerator.isTodayInEnd(currentDate) // Scroll 2 times
+
                 LaunchedEffect(todayDateIndex){
-                    if (!initiallScroll){
+                    if (scrollCount != 2){
                         scrollToRollCurrentDate(todayDateIndex,listState,scope)
-                        initiallScroll = true
+                        if (isTodayInEnd){
+                            scrollCount++;
+                        }else{
+                            scrollCount = 2;
+                        }
                     }
                 }
                 Box(
