@@ -6,6 +6,6 @@ import java.util.Date
 interface DateGenerator {
     fun setupDates()
     fun getDateList() : StateFlow<List<Date>>
-    suspend fun loadPreviousMonth() : List<Date>
-    suspend fun loadNextMonth() : List<Date>
+    fun loadPreviousMonth() : List<Date>
+    fun loadNextMonth() : List<Date>
 }

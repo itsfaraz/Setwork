@@ -7,7 +7,7 @@ class LoadNextDatesSetUseCase(
     private val dateGenerator: DateGenerator
 ) {
 
-    suspend operator fun invoke() : List<Date>{
+    operator fun invoke() : List<Date>{
         return dateGenerator.loadNextMonth()
     }
 

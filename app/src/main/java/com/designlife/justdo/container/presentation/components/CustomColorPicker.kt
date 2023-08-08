@@ -47,12 +47,12 @@ fun CustomColorPicker(
             .padding(horizontal = 80.dp)
             .height(180.dp)
             .fillMaxWidth()
-            .background(color = Color.White),
+            .background(color = Color.White, shape = RoundedCornerShape(20.dp)),
         shape = RoundedCornerShape(20.dp),
         elevation = 12.dp
     ) {
         LazyVerticalGrid(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().background(shape =  RoundedCornerShape(20.dp), color =  Color.White),
             columns = GridCells.Fixed(4),
             horizontalArrangement = Arrangement.Center,
             verticalArrangement = Arrangement.Center

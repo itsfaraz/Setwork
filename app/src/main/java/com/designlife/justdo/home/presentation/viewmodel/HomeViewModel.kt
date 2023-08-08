@@ -14,6 +14,7 @@ import com.designlife.justdo.common.domain.repositories.TodoRepository
 import com.designlife.justdo.home.domain.usecase.LoadIntialDatesUseCase
 import com.designlife.justdo.home.domain.usecase.LoadNextDatesSetUseCase
 import com.designlife.justdo.home.domain.usecase.LoadPreviousDatesSetUseCase
+import com.designlife.justdo.home.presentation.events.HomeEvents
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -56,8 +57,6 @@ class HomeViewModel(
     private var _sheetVisibility : MutableState<Boolean> = mutableStateOf(false)
     val sheetVisibility  = _sheetVisibility
 
-    private var previousIndex : Int = _currentDateIndex.value
-
     init {
         viewModelScope.launch(Dispatchers.IO) {
             dateGenerator.getDateList().collect{
@@ -66,6 +65,13 @@ class HomeViewModel(
         }
     }
 
+    fun onEvent(event : HomeEvents){
+        when(event){
+            is HomeEvents.OnIndexSelected -> {
+                _selectedIndex.value = event.index
+            }
+        }
+    }
 
     public fun fetchDateDataByDate(index : Int){
         // call use case and perform operation
@@ -87,38 +93,28 @@ class HomeViewModel(
     }
 
     fun loadNextMonth(){
-        viewModelScope.launch(Dispatchers.Default) {
-            val list = mutableListOf<Date>()
-            list.addAll(_dateList.value)
-            list.addAll(loadNextDatesSetUseCase())
-            _dateList.value = list
-            setNextMonthIndex()
-        }
+        val list = mutableListOf<Date>()
+        list.addAll(_dateList.value)
+        list.addAll(loadNextDatesSetUseCase())
+        setNextMonthIndex(list.size)
+        _dateList.value = list
     }
 
-    private fun setNextMonthIndex() {
-        IDateGenerator.nextIndex = _dateList.value.size
-        _currentDateIndex.value = IDateGenerator.nextIndex
+    private fun setNextMonthIndex(listSize : Int) {
+        _currentDateIndex.value =  listSize-25
 
     }
 
     private fun setPreviousMonthIndex() {
-        IDateGenerator.prevIndex = 5
-        _currentDateIndex.value = IDateGenerator.prevIndex
+        _currentDateIndex.value = 5
     }
 
     fun loadPreviousMonth(){
-        viewModelScope.launch(Dispatchers.Default) {
-            val prevMonth = loadPreviousDatesSetUseCase()
-            val list = ArrayList<Date>(prevMonth)
-            list.addAll(_dateList.value)
-            _dateList.value = list
-            setPreviousMonthIndex()
-        }
-    }
-
-    fun setSelectedIndex(index: Int) {
-        _selectedIndex.value = index
+        val prevMonth = loadPreviousDatesSetUseCase()
+        val list = ArrayList<Date>(prevMonth)
+        list.addAll(_dateList.value)
+        setPreviousMonthIndex()
+        _dateList.value = list
     }
 
     fun updateSheetVisibility(value : Boolean) {

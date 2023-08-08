@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ExperimentalMaterialApi
@@ -55,6 +56,7 @@ import com.designlife.justdo.home.domain.usecase.LoadPreviousDatesSetUseCase
 import com.designlife.justdo.home.presentation.components.CategoryComponent
 import com.designlife.justdo.home.presentation.components.DateComponent
 import com.designlife.justdo.home.presentation.components.HeaderComponent
+import com.designlife.justdo.home.presentation.events.HomeEvents
 import com.designlife.justdo.home.presentation.viewmodel.HomeViewModel
 import com.designlife.justdo.home.presentation.viewmodel.HomeViewModelFactory
 import com.designlife.justdo.ui.theme.ButtonPrimary
@@ -71,7 +73,8 @@ import java.util.Date
 class HomeFragment : Fragment() {
 
     private lateinit var viewModel: HomeViewModel
-    private var scrollCount = 0
+    private lateinit var listState : LazyListState
+    private lateinit var scope : CoroutineScope
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -86,7 +89,17 @@ class HomeFragment : Fragment() {
         viewModel.loadInitialDates()
         viewModel.fetchAllTodo()
         viewModel.fetchAllCategory()
+        initialSlide()
 
+    }
+
+    private fun initialSlide() {
+        CoroutineScope(Dispatchers.Default).launch {
+            delay(800)
+            scope.launch(Dispatchers.Main) {
+                scrollToRollCurrentDate(viewModel.dateList.value.indexOf(viewModel.currentDate.value),listState)
+            }
+        }
     }
 
     @OptIn(ExperimentalMaterialApi::class)
@@ -96,12 +109,12 @@ class HomeFragment : Fragment() {
     ): View {
         return ComposeView(requireContext()).apply {
             setContent {
+                listState = rememberLazyListState()
+                scope = rememberCoroutineScope()
                 val bottomSheetState = rememberModalBottomSheetState(
                     initialValue = ModalBottomSheetValue.Hidden
                 )
                 var sheetLayoutVisible = viewModel.sheetVisibility.value
-                val listState = rememberLazyListState()
-                val scope = rememberCoroutineScope()
                 val currentDateIndex = viewModel.currentDateIndex.value
                 val selectedIndex = viewModel.selectedIndex.value
                 val dateList = viewModel.dateList.value
@@ -111,18 +124,6 @@ class HomeFragment : Fragment() {
                 val currentYear = viewModel.currentYear.value
                 val currentDate = viewModel.currentDate.value
                 val todayDateIndex = dateList.indexOf(currentDate)
-                val isTodayInEnd = IDateGenerator.isTodayInEnd(currentDate) // Scroll 2 times
-
-                LaunchedEffect(todayDateIndex){
-                    if (scrollCount != 2){
-                        scrollToRollCurrentDate(todayDateIndex,listState,scope)
-                        if (isTodayInEnd){
-                            scrollCount++;
-                        }else{
-                            scrollCount = 2;
-                        }
-                    }
-                }
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.BottomEnd
@@ -138,7 +139,11 @@ class HomeFragment : Fragment() {
                         HeaderComponent(
                             headerText = "All Tasks",
                             onEventClick = {
-                                scrollToRollCurrentDate(todayDateIndex,listState, scope)
+                                scope.launch(Dispatchers.Main) {
+                                    viewModel.onEvent(HomeEvents.OnIndexSelected(todayDateIndex))
+                                    listState.scrollToItem(todayDateIndex)
+//                                    scrollToRollCurrentDate(todayDateIndex,listState)
+                                }
                             },
                             currentDate = Date(System.currentTimeMillis()),
                         )
@@ -150,7 +155,7 @@ class HomeFragment : Fragment() {
                             currentYear = currentYear,
                             dateList = dateList,
                             onEventClick = {
-                                viewModel.setSelectedIndex(it)
+                                viewModel.onEvent(HomeEvents.OnIndexSelected(it))
                                 viewModel.fetchDateDataByDate(it)
                             },
                             onChangeVisibleDate = {
@@ -158,12 +163,16 @@ class HomeFragment : Fragment() {
                                 viewModel.onMonthChange(it)
                             },
                             loadPreviousTrigger = {
-                                viewModel.loadPreviousMonth()
-                                scrollToRollCurrentDate(currentDateIndex,listState,scope)
+                                scope.launch(Dispatchers.Main) {
+                                    viewModel.loadPreviousMonth()
+                                    scrollToRollCurrentDate(viewModel.currentDateIndex.value,listState)
+                                }
                             },
                             loadNextTrigger = {
-                                viewModel.loadNextMonth()
-                                scrollToRollCurrentDate(currentDateIndex,listState,scope)
+                                scope.launch(Dispatchers.Main) {
+                                    viewModel.loadNextMonth()
+                                    scrollToRollCurrentDate(viewModel.currentDateIndex.value,listState)
+                                }
                             },
                             selectedIndex = selectedIndex
                         )
@@ -171,6 +180,7 @@ class HomeFragment : Fragment() {
                         CategoryComponent(categoryList = categoryList){
 
                         }
+                        Spacer(modifier = Modifier.height(40.dp))
                     }
                     FloatingActionButton(
                         modifier = Modifier
@@ -216,10 +226,8 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun scrollToRollCurrentDate(currentDateIndex: Int,listState : LazyListState,scope : CoroutineScope) {
-        scope.launch(Dispatchers.Main) {
-            listState.animateScrollToItem(currentDateIndex)
-        }
+    private suspend fun scrollToRollCurrentDate(currentDateIndex: Int,listState : LazyListState) {
+        listState.animateScrollToItem(currentDateIndex)
     }
 }
 

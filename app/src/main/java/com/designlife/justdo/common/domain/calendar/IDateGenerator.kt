@@ -14,7 +14,6 @@ import java.util.Locale
 class IDateGenerator : DateGenerator {
 
     private val _allDateList : MutableStateFlow<ArrayList<Date>> = MutableStateFlow(arrayListOf())
-//    public val allDates : StateFlow<List<Date>> = _allDateList
     private var previousMonth = getCurrentMonth()
     private var nextMonth = getCurrentMonth()
     private var prevYear = getCurrentYear()
@@ -25,7 +24,7 @@ class IDateGenerator : DateGenerator {
         return _allDateList
     }
 
-    override suspend fun loadPreviousMonth() : List<Date>{
+    override fun loadPreviousMonth() : List<Date>{
         val preservedMonth = previousMonth
         previousMonth -= 1 % 12
         if (previousMonth == 0){
@@ -38,13 +37,10 @@ class IDateGenerator : DateGenerator {
             val dayIndex = (firstDayIndex + (days-1)) % daysList.size
             previousMonthList.add(getDateBy(days, previousMonth, prevYear))
         }
-//        previousMonthList.addAll(_allDateList.value)
-//        _allDateList.value.clear()
-//        _allDateList.value.addAll(previousMonthList)
         return previousMonthList
     }
 
-    override suspend fun loadNextMonth() : List<Date>{
+    override fun loadNextMonth() : List<Date>{
         val preservedMonth = nextMonth
         nextMonth += 1
         if (nextMonth == 13){
@@ -78,7 +74,6 @@ class IDateGenerator : DateGenerator {
 
         }
         _allDateList.value = datesList
-        prevIndex = getCurrentDay() -1
     }
 
 
@@ -88,9 +83,6 @@ class IDateGenerator : DateGenerator {
         private val fullDayNameList =  listOf<String>( "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday")
         val monthsList =  listOf<String>( "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
         private val fillMonthNamesList =  listOf<String>( "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
-
-        var prevIndex = 0;
-        var nextIndex = 0;
 
         private fun getNoLength(value : Int) : Int{
             return (Math.log(value as Double)+1).toInt()
