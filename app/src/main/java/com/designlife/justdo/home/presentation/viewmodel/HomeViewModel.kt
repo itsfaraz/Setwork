@@ -97,20 +97,19 @@ class HomeViewModel(
                 _todoIndex.value = if (index >= 0) index else 0
             }
             is HomeEvents.HighlightDateByTodo -> {
-                try{
-                    val date = _todoList.value[event.visibleIndex].date
-                    val dateEpoch = IDateGenerator.getEpochForDate(date)
-                    _dateList.value.forEachIndexed{ index: Int, date: Date ->
-                        val epoch = IDateGenerator.getEpochForDate(date)
-                        if (dateEpoch == epoch){
+                viewModelScope.launch(Dispatchers.Default) {
+                    try{
+                        val date = _todoList.value[event.visibleIndex].date
+                        val dateEpoch = IDateGenerator.getEpochForDate(date)
+                        val index = _dateList.value.indexOf(IDateGenerator.getDateFromDate(date))
+                        if(index != -1){
                             _selectedIndex.value = index
                             _currentDateIndex.value = index
-                            return
                         }
+                        Log.d(TAG, "onEvent: Selected Index : ${_selectedIndex.value}")
+                    }catch (e : Exception){
+                        Log.e(TAG, "onEvent: $e")
                     }
-                    Log.d(TAG, "onEvent: Selected Index : ${_selectedIndex.value}")
-                }catch (e : Exception){
-                    Log.e(TAG, "onEvent: $e")
                 }
             }
             is HomeEvents.OnCategorySortSelected -> {
