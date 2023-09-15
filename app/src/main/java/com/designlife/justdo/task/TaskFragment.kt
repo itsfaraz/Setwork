@@ -157,21 +157,24 @@ class TaskFragment : Fragment(), TaskListener {
                                 )
                             }
                             item{
-                                Spacer(modifier = Modifier.height(14.dp))
-                                TaskItemView(
-                                    hasIcon = true,
-                                    color = ButtonPrimary,
-                                    icon = R.drawable.ic_note,
-                                    labelText = "Note",
-                                    isNote = true,
-                                    isClickable = isOverview,
-                                    placeholder = "Note to remember ...",
-                                    isOverview = isOverview,
-                                    inputText = noteText,
-                                    onInputChange = {
-                                        viewmodel.onEvent(TaskEvents.OnNoteChange(it))
-                                    }
-                                )
+                                val conditionalVisibility = !(isOverview && noteText.isEmpty())
+                                if (conditionalVisibility){
+                                    Spacer(modifier = Modifier.height(14.dp))
+                                    TaskItemView(
+                                        hasIcon = true,
+                                        color = ButtonPrimary,
+                                        icon = R.drawable.ic_note,
+                                        labelText = "Note",
+                                        isNote = true,
+                                        isClickable = isOverview,
+                                        placeholder = "Note to remember ...",
+                                        isOverview = isOverview,
+                                        inputText = noteText,
+                                        onInputChange = {
+                                            viewmodel.onEvent(TaskEvents.OnNoteChange(it))
+                                        }
+                                    )
+                                }
                             }
                             item{
                                 Spacer(modifier = Modifier.height(14.dp))
