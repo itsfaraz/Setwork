@@ -22,6 +22,8 @@ import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,7 +39,7 @@ import androidx.navigation.fragment.findNavController
 import com.designlife.justdo.R
 import com.designlife.justdo.common.domain.calendar.IDateGenerator
 import com.designlife.justdo.common.domain.repositories.appstore.AppStoreRepository
-import com.designlife.justdo.common.presentation.components.BottomSheetComponent
+import com.designlife.justdo.common.presentation.components.BottomSheet
 import com.designlife.justdo.common.presentation.components.ProgressBar
 import com.designlife.justdo.common.utils.AppServiceLocator
 import com.designlife.justdo.common.utils.constants.Constants.EDIT_MODE
@@ -57,6 +59,7 @@ import com.designlife.justdo.home.presentation.events.HomeEvents
 import com.designlife.justdo.home.presentation.viewmodel.HomeViewModel
 import com.designlife.justdo.home.presentation.viewmodel.HomeViewModelFactory
 import com.designlife.justdo.ui.theme.*
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -137,6 +140,10 @@ class HomeFragment : Fragment() {
                 val selectedDateTodoIndex = viewModel.todoIndex.value
                 val selectedCategoryIndex = viewModel.selectedCategoryIndex.value
                 val progressBar = viewModel.progressBarVisibility.value
+                val sheetVisibility = viewModel.sheetVisibility.value
+                val isBottomSheetToggled = remember {
+                    mutableStateOf(false)
+                }
                 Box(
                     modifier = Modifier.fillMaxSize(),
                 ) {
@@ -151,7 +158,7 @@ class HomeFragment : Fragment() {
                             .fillMaxSize()
                             .background(
                                 brush = Brush.verticalGradient(
-                                    colors = listOf(PrimaryColorHome2,PrimaryColorHome1)
+                                    colors = listOf(PrimaryColorHome2, PrimaryColorHome1)
                                 )
                             )
                         ) {
@@ -224,41 +231,37 @@ class HomeFragment : Fragment() {
                                 .wrapContentSize(),
                             onClick = {
                                 viewModel.updateSheetVisibility(true)
-                                scope.launch(Dispatchers.Main) {
-                                    bottomSheetState.animateTo(ModalBottomSheetValue.Expanded)
-                                }
                             },
                             backgroundColor = ButtonPrimary
                         ) {
                             Icon(imageVector = Icons.Default.Add, contentDescription = "FAB", tint = PrimaryColorHome2)
                         }
-                        if (sheetLayoutVisible){
-                            BottomSheetComponent(sheetState = bottomSheetState,sheetLayoutVisible, onSelectSheetItem = {
-                                when(it){
-                                    BottomSheetItem.CATEGORY -> {
-                                        val bundle = bundleOf()
-                                        bundle.putBoolean(EDIT_MODE,true)
-                                        bundle.putInt(SCREEN_TYPE,ScreenType.CATEGORY.ordinal)
-                                        findNavController().navigate(
-                                            R.id.containerFragment,
-                                            bundle
-                                        )
-                                    }
-                                    BottomSheetItem.NOTE -> {}
-                                    BottomSheetItem.TASK -> {
-                                        val bundle = bundleOf()
-                                        bundle.putBoolean(TASK_VIEW,false)
-                                        findNavController().navigate(
-                                            R.id.taskFragment,
-                                            bundle
-                                        )
-                                    }
+                        if (sheetVisibility){
+                            val dialog = BottomSheet.dialog(
+                                context = requireActivity(),
+                                onCloseEvent = {
+                                    isBottomSheetToggled.value = false
+                                    viewModel.updateSheetVisibility(false)
+                                },
+                                onTaskEvent = {
+
+                                    val bundle = bundleOf()
+                                    bundle.putBoolean(TASK_VIEW,false)
+                                    findNavController().navigate(
+                                        R.id.taskFragment,
+                                        bundle
+                                    )
+                                },
+                                onNoteEvent = {
+
+                                },
+                                onDeckEvent = {
+
                                 }
-                            }) {
-                                viewModel.updateSheetVisibility(false)
-                                scope.launch {
-                                    bottomSheetState.hide()
-                                }
+                            )
+                            if (!isBottomSheetToggled.value){
+                                dialog.show()
+                                isBottomSheetToggled.value = true
                             }
                         }
                     }
