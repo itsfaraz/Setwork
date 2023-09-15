@@ -40,6 +40,7 @@ fun TaskItemView(
     placeholder : String = "",
     isNote : Boolean = false,
     isClickable : Boolean = false,
+    isOverview : Boolean = false,
     onInputChange : (value : String) -> Unit,
     onClickEvent : () -> Unit = {}
 ) {
@@ -97,7 +98,7 @@ fun TaskItemView(
                 )
             }
         }
-        if (isClickable){
+        if (isClickable && !isOverview){
             Icon(painter = painterResource(id = R.drawable.ic_arrow_right), contentDescription = "Item Icon", modifier = Modifier.size(15.dp), tint = TaskItemLabelColor)
         }
     }

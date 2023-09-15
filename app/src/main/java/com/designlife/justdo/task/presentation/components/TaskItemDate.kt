@@ -38,6 +38,7 @@ fun TaskItemDate(
     timeText : String,
     @DrawableRes icon : Int,
     labelText : String,
+    isClickable : Boolean,
     onDateChange : () -> Unit,
     onTimeChange : () -> Unit,
 ) {
@@ -69,14 +70,16 @@ fun TaskItemDate(
             ) {
                 Text(
                     modifier = Modifier.wrapContentWidth().clickable {
-                        onDateChange()
+                        if (isClickable)
+                            onDateChange()
                     },
                     text = dateText,
                     style = taskItemStyle
                 )
                 Text(
                     modifier = Modifier.padding(end = 4.dp).wrapContentWidth().clickable {
-                        onTimeChange()
+                        if(isClickable)
+                            onTimeChange()
                     },
                     text = timeText,
                     style = taskItemStyle

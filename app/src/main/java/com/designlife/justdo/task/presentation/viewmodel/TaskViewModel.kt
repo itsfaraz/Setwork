@@ -88,8 +88,17 @@ class TaskViewModel(
             is TaskEvents.MarkTaskDone -> {
                 updateTodoDone(event.todoId)
             }
+            is TaskEvents.DeleteTaskEvent -> {
+                deleteTodoById(event.todoId)
+            }
         }
 
+    }
+
+    private fun deleteTodoById(todoId: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            todoRepository.deleteTodo(todoId)
+        }
     }
 
     private fun updateTodoDone(todoId: Int) {

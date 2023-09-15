@@ -7,6 +7,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import com.designlife.justdo.common.data.entities.Todo
 import kotlinx.coroutines.flow.Flow
+import retrofit2.http.DELETE
 
 @Dao
 interface TodoDao {
@@ -30,5 +31,9 @@ interface TodoDao {
     @Transaction
     @Query("UPDATE TODO SET isCompleted=:isCompleted WHERE todoId=:todoId")
     suspend fun updateTodoById(todoId : Long,isCompleted : Boolean = true)
+
+    @Transaction
+    @Query("DELETE FROM TODO WHERE todoId=:todoId")
+    suspend fun deleteTodoById(todoId : Long)
 
 }

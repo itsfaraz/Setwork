@@ -202,10 +202,12 @@ class HomeViewModel(
     }
 
     fun fetchAllCategory() {
+
         viewModelScope.launch(Dispatchers.IO) {
             categoryRepository.getAllCategory().collect{
                 _categoryList.value = it
                 fillColorMap(it)
+
             }
         }
     }
@@ -219,12 +221,15 @@ class HomeViewModel(
     }
 
     fun fetchAllTodo() {
+
         viewModelScope.launch(Dispatchers.IO) {
             todoRepository.getAllTodo().collect{
                 val sortedList =  it.sortedBy { it.date }
                 _todoList.value = sortedList
                 todoUnSortedList = sortedList
+                archiveTodos(sortedList)
                 currentTodoIndex(sortedList)
+
             }
         }
     }
@@ -245,6 +250,19 @@ class HomeViewModel(
         }
 
         return _todoList.value.indexOf(dateTodo)
+    }
+
+    fun archiveTodos(todoList : List<Todo>) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val currentTime = System.currentTimeMillis()
+            val todoIds = mutableListOf<Int>()
+            todoList.forEach { todo ->
+                if (todo.date.time <= currentTime && !todo.isCompleted){
+                    todoIds.add(todo.todoId)
+                }
+            }
+            todoRepository.updateArchiveTodo(todoIds)
+        }
     }
 
     private fun todoSort(todos: List<Todo>): List<Todo> {

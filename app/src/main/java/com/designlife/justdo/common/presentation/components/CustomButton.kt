@@ -24,7 +24,7 @@ fun CustomButton(
     Button(
         onClick = { onButtonEvent() },
         modifier = Modifier
-            .width(62.dp)
+            .width(if (isDangerButton) 70.dp else 62.dp)
             .height(32.dp),
         colors = ButtonDefaults.buttonColors(
             backgroundColor = if(isDangerButton) DangerButton else ButtonPrimary,

@@ -40,4 +40,15 @@ class TodoRepository(private val todoDao: TodoDao) {
         todoDao.updateTodoById(todoId.toLong(),true)
     }
 
+
+    suspend fun updateArchiveTodo(todoIds : List<Int>) : Unit {
+        todoIds.forEach {id ->
+            todoDao.updateTodoById(id.toLong(),true)
+        }
+    }
+
+    suspend fun deleteTodo(todoId : Int) : Unit {
+        todoDao.deleteTodoById(todoId.toLong())
+    }
+
 }

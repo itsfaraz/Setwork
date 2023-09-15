@@ -82,7 +82,6 @@ class ContainerFragment : Fragment() {
                     ) {
                         CommonCustomHeader(
                             headerTitle = if (screenType == ScreenType.CATEGORY) "New Category" else "Repeat",
-                            autoSave = true,
                             onCloseEvent = {
                                 findNavController().navigateUp()
                             },

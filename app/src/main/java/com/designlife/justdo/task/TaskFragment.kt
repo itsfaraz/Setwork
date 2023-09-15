@@ -81,10 +81,8 @@ class TaskFragment : Fragment(), TaskListener {
         shareViewModel = ViewModelProvider(requireActivity(),shareViewModelFactory)[ContainerViewModel::class.java]
         val factory = TaskViewModelFactory(repeatRepository,todoRepository,categoryRepository,taskNotificationRepository,shareViewModel)
         viewmodel = ViewModelProvider(this,factory)[TaskViewModel::class.java]
-
         shareViewModel.setupRepeatList(IDateGenerator.getToday())
         navigationArgsDateSet()
-
     }
 
     private fun navigationArgsDateSet() {
@@ -100,7 +98,6 @@ class TaskFragment : Fragment(), TaskListener {
                     }
                 }
             }
-
         }
     }
 
@@ -130,9 +127,10 @@ class TaskFragment : Fragment(), TaskListener {
                             .background(color = PrimaryBackgroundColor),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        CommonCustomHeader(headerTitle = if (isOverview) "Task Overview" else "New Task", autoSave = viewmodel.isCompleted.value, onCloseEvent = { findNavController().navigateUp()}, isOverview = isOverview) {
+                        CommonCustomHeader(headerTitle = if (isOverview) "Task Overview" else "New Task", forTask = true, hasDone = viewmodel.isCompleted.value, onCloseEvent = { findNavController().navigateUp()}, isOverview = isOverview) {
                             if (isOverview){
-                                viewmodel.onEvent(TaskEvents.MarkTaskDone(taskId))
+//                                viewmodel.onEvent(TaskEvents.MarkTaskDone(taskId))
+                                viewmodel.onEvent(TaskEvents.DeleteTaskEvent(taskId))
                             }else{
                                 viewmodel.onEvent(TaskEvents.CreateTask(getRepeatType(shareViewModel.selectedRepeatIndex.value),selectedCategory))
                             }
@@ -152,6 +150,7 @@ class TaskFragment : Fragment(), TaskListener {
                                     placeholder = "New Task Title",
                                     isClickable = isOverview,
                                     inputText = inputText,
+                                    isOverview = isOverview,
                                     onInputChange = {
                                         viewmodel.onEvent(TaskEvents.OnTitleChange(it))
                                     }
@@ -167,6 +166,7 @@ class TaskFragment : Fragment(), TaskListener {
                                     isNote = true,
                                     isClickable = isOverview,
                                     placeholder = "Note to remember ...",
+                                    isOverview = isOverview,
                                     inputText = noteText,
                                     onInputChange = {
                                         viewmodel.onEvent(TaskEvents.OnNoteChange(it))
@@ -180,6 +180,7 @@ class TaskFragment : Fragment(), TaskListener {
                                     timeText = selectedTimeText,
                                     icon = R.drawable.ic_schedule,
                                     labelText = "Date",
+                                    isClickable = !isOverview,
                                     onDateChange = {
                                         val year = calendar[Calendar.YEAR]
                                         val month = calendar[Calendar.MONTH]
@@ -218,6 +219,7 @@ class TaskFragment : Fragment(), TaskListener {
                                     isNote = false,
                                     inputText = selectedRepeatMode.first,
                                     onInputChange = {},
+                                    isOverview = isOverview,
                                     isClickable = true
                                 ){
                                     if(!isOverview){
@@ -240,6 +242,7 @@ class TaskFragment : Fragment(), TaskListener {
                                     isNote = false,
                                     inputText = selectedCategory.name.camelCase(),
                                     onInputChange = {},
+                                    isOverview = isOverview,
                                     isClickable = true
                                 ){
                                     if (!isOverview){

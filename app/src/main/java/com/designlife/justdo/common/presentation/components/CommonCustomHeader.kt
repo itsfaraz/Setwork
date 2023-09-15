@@ -31,7 +31,8 @@ import com.designlife.justdo.ui.theme.headerStyle
 @Composable
 fun CommonCustomHeader(
     headerTitle : String,
-    autoSave : Boolean = false,
+    hasDone : Boolean = false,
+    forTask : Boolean = false,
     isOverview : Boolean = false,
     onCloseEvent : () -> Unit,
     onButtonClickEvent : () -> Unit
@@ -69,9 +70,9 @@ fun CommonCustomHeader(
                     style = headerStyle
                 )
             }
-            if (!autoSave){
+            if (forTask){
                 Row(modifier = Modifier.padding(end = 10.dp).wrapContentWidth()) {
-                    CustomButton(buttonText = if (isOverview) "Done" else "Save", isDangerButton = isOverview) {
+                    CustomButton(buttonText = if (isOverview || hasDone) "Delete" else "Save", isDangerButton = isOverview) {
                         onButtonClickEvent()
                     }
                 }

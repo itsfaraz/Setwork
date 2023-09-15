@@ -62,8 +62,11 @@ import com.designlife.justdo.ui.theme.*
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.util.Date
 
 class HomeFragment : Fragment() {
@@ -83,12 +86,22 @@ class HomeFragment : Fragment() {
         val categoryRepository = AppServiceLocator.provideCategoryRepository(requireActivity().applicationContext)
         val factory = HomeViewModelFactory(dateGenerator,todoRepository,categoryRepository,loadDatesUseCase,loadNextDatesUseCase,loadPreviousDatesUseCase)
         viewModel = ViewModelProvider(this,factory)[HomeViewModel::class.java]
+
         appStoreRepository = AppServiceLocator.provideAppStoreRepository(requireContext())
         checkNotificationView()
-        viewModel.loadInitialDates()
-        viewModel.fetchAllTodo()
-        viewModel.fetchAllCategory()
-        initialSlide()
+        CoroutineScope(Dispatchers.Main).launch {
+            viewModel.onEvent(HomeEvents.OnProgressBarToggle(true))
+            scope.launch {
+                viewModel.loadInitialDates()
+            }
+            scope.launch {
+                viewModel.fetchAllTodo()
+            }
+            scope.launch {
+                viewModel.fetchAllCategory()
+            }
+            initialSlide()
+        }
     }
 
     private fun checkNotificationView() {
@@ -101,16 +114,20 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun initialSlide() {
-        CoroutineScope(Dispatchers.Default).launch {
+    private suspend fun initialSlide() {
             delay(800)
-            scope.launch(Dispatchers.Main) {
+            val job : Job = scope.launch(Dispatchers.Default) {
                 val index = viewModel.dateList.value.indexOf(viewModel.currentDate.value)
                 viewModel.onEvent(HomeEvents.OnIndexSelected(index))
-                scrollToRollItem(viewModel.todoIndex.value+1 ,todoListState)
-                scrollToRollItem(index,dateListState)
+                scope.launch {
+                    scrollToRollItem(viewModel.todoIndex.value+1 ,todoListState)
+                }
+                scope.launch {
+                    scrollToRollItem(index,dateListState)
+                }
             }
-        }
+            job.join()
+            viewModel.onEvent(HomeEvents.OnProgressBarToggle(false))
     }
 
     @OptIn(ExperimentalMaterialApi::class)
