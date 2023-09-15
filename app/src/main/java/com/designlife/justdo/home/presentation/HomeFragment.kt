@@ -66,7 +66,7 @@ import java.util.Date
 class HomeFragment : Fragment() {
 
     private lateinit var viewModel: HomeViewModel
-    private lateinit var listState : LazyListState
+    private lateinit var dateListState : LazyListState
     private lateinit var todoListState : LazyListState
     private lateinit var scope : CoroutineScope
     private lateinit var appStoreRepository: AppStoreRepository
@@ -105,7 +105,7 @@ class HomeFragment : Fragment() {
                 val index = viewModel.dateList.value.indexOf(viewModel.currentDate.value)
                 viewModel.onEvent(HomeEvents.OnIndexSelected(index))
                 scrollToRollItem(viewModel.todoIndex.value+1 ,todoListState)
-                scrollToRollItem(index,listState)
+                scrollToRollItem(index,dateListState)
             }
         }
     }
@@ -117,7 +117,7 @@ class HomeFragment : Fragment() {
     ): View {
         return ComposeView(requireContext()).apply {
             setContent {
-                listState = rememberLazyListState()
+                dateListState = rememberLazyListState()
                 scope = rememberCoroutineScope()
                 val bottomSheetState = rememberModalBottomSheetState(
                     initialValue = ModalBottomSheetValue.Hidden
@@ -160,7 +160,7 @@ class HomeFragment : Fragment() {
                                 onEventClick = {
                                     scope.launch(Dispatchers.Main) {
                                         viewModel.onEvent(HomeEvents.OnIndexSelected(todayDateIndex))
-                                        listState.scrollToItem(todayDateIndex)
+                                        dateListState.scrollToItem(todayDateIndex)
                                         viewModel.onEvent(HomeEvents.HighlightTodoByDate(todayDateIndex))
                                         todoListState.scrollToItem(viewModel.todoIndex.value)
                                     }
@@ -169,7 +169,7 @@ class HomeFragment : Fragment() {
                             )
                             Spacer(modifier = Modifier.height(40.dp))
                             DateComponent(
-                                listState = listState,
+                                listState = dateListState,
                                 currentDate = currentDate,
                                 currentMonth = currentMonth,
                                 currentYear = currentYear,
@@ -188,13 +188,13 @@ class HomeFragment : Fragment() {
                                 loadPreviousTrigger = {
                                     scope.launch(Dispatchers.Main) {
                                         viewModel.loadPreviousMonth()
-                                        scrollToRollItem(viewModel.currentDateIndex.value,listState)
+                                        scrollToRollItem(viewModel.currentDateIndex.value,dateListState)
                                     }
                                 },
                                 loadNextTrigger = {
                                     scope.launch(Dispatchers.Main) {
                                         viewModel.loadNextMonth()
-                                        scrollToRollItem(viewModel.currentDateIndex.value,listState)
+                                        scrollToRollItem(viewModel.currentDateIndex.value,dateListState)
                                     }
                                 },
                                 selectedIndex = selectedIndex
@@ -211,7 +211,7 @@ class HomeFragment : Fragment() {
                                 onFirstIndexChangeEvent = {date ->
                                     viewModel.onEvent(HomeEvents.HighlightDateByTodo(date))
                                     scope.launch(Dispatchers.Main) {
-                                        scrollToRollItem(viewModel.currentDateIndex.value,listState)
+                                        scrollToRollItem(viewModel.currentDateIndex.value,dateListState)
                                     }
                                 },
                             ){todoId ->
