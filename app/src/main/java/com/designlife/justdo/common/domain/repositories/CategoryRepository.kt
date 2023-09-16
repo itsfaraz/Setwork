@@ -29,4 +29,15 @@ class CategoryRepository(
     suspend fun updateCategory(category : Category){
         return categoryDao.updateCategory(CategoryConverter.getCategoryEntity(category))
     }
+
+
+    private suspend fun updateCategoryCountById(categoryId: Long, completedCount : Int){
+        categoryDao.updateCategoryCountById(categoryId, completedCount)
+    }
+
+    suspend fun updateCategoryCount(categoryMap : Map<Long,Int>){
+        categoryMap.keys.forEach {key ->
+            updateCategoryCountById(key,categoryMap.get(key)!!)
+        }
+    }
 }

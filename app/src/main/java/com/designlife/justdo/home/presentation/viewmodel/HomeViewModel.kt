@@ -17,8 +17,14 @@ import com.designlife.justdo.home.domain.usecase.LoadNextDatesSetUseCase
 import com.designlife.justdo.home.domain.usecase.LoadPreviousDatesSetUseCase
 import com.designlife.justdo.home.presentation.events.HomeEvents
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import java.util.Calendar
 import java.util.Date
 
@@ -76,6 +82,8 @@ class HomeViewModel(
     private var _progressBarVisibility : MutableState<Boolean> = mutableStateOf(false)
     val progressBarVisibility  = _progressBarVisibility
 
+    private val mutex = Mutex()
+
     init {
         viewModelScope.launch(Dispatchers.IO) {
             dateGenerator.getDateList().collect{
@@ -113,7 +121,6 @@ class HomeViewModel(
                         _selectedIndex.value = index
                         _currentDateIndex.value = index
                     }
-                    Log.d(TAG, "onEvent: Selected Index : ${_selectedIndex.value}")
                 }catch (e : Exception){
                     Log.e(TAG, "onEvent: $e")
                 }
@@ -221,15 +228,17 @@ class HomeViewModel(
     }
 
     fun fetchAllTodo() {
-
         viewModelScope.launch(Dispatchers.IO) {
+//            var isDone : Boolean = false
             todoRepository.getAllTodo().collect{
                 val sortedList =  it.sortedBy { it.date }
                 _todoList.value = sortedList
                 todoUnSortedList = sortedList
-                archiveTodos(sortedList)
                 currentTodoIndex(sortedList)
-
+//                if (!isDone && sortedList.isNotEmpty()){
+//                    archiveTodos(sortedList)
+//                    isDone = true
+//                }
             }
         }
     }
@@ -252,16 +261,36 @@ class HomeViewModel(
         return _todoList.value.indexOf(dateTodo)
     }
 
-    fun archiveTodos(todoList : List<Todo>) {
+    public fun archiveTodos(todoList: List<Todo>) {
         viewModelScope.launch(Dispatchers.IO) {
             val currentTime = System.currentTimeMillis()
             val todoIds = mutableListOf<Int>()
+            val categoryMap = mutableMapOf<Long,Int>()
+            Log.i("TODO_DATA", "archiveTodos: ${todoList}")
             todoList.forEach { todo ->
                 if (todo.date.time <= currentTime && !todo.isCompleted){
                     todoIds.add(todo.todoId)
+                    categoryMap.put(todo.categoryId,categoryMap.getOrDefault(todo.categoryId,0)+1)
                 }
             }
             todoRepository.updateArchiveTodo(todoIds)
+            updateCategories(categoryMap)
+        }
+    }
+
+    private suspend fun updateCategories(categoryMap: MutableMap<Long, Int>) {
+        if (categoryMap.isNotEmpty()){
+            val existingCategoryMap = categoryRepository.getAllCategory().firstOrNull()
+            existingCategoryMap?.let { it ->
+                if (it.isNotEmpty()){
+                    it.forEach {category ->
+                        if (categoryMap.containsKey(category.id)){
+                            categoryMap.put(category.id,category.totalCompleted + categoryMap.get(category.id)!!)
+                        }
+                    }
+                    categoryRepository.updateCategoryCount(categoryMap)
+                }
+            }
         }
     }
 

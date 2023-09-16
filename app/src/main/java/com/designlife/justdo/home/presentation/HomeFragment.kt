@@ -290,6 +290,11 @@ class HomeFragment : Fragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.archiveTodos(viewModel.todoList.value)
+    }
+
     private fun navigateToTaskViewById(todoId: Int) {
         val bundle = bundleOf()
         bundle.putBoolean(TASK_VIEW,true)

@@ -25,4 +25,8 @@ interface CategoryDao {
     @Transaction
     @Update
     suspend fun updateCategory(category: Category)
+
+    @Transaction
+    @Query("UPDATE Category SET totalCompleted=:completedCount WHERE categoryId=:categoryId ")
+    suspend fun updateCategoryCountById(categoryId : Long,completedCount : Int) : Unit
 }
