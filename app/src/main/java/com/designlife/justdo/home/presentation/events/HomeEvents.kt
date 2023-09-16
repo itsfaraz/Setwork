@@ -11,4 +11,7 @@ sealed class HomeEvents{
     data class OnCategorySortSelected(val categoryIndex : Int) : HomeEvents()
     data class OnProgressBarToggle(val toggleValue : Boolean) : HomeEvents()
     data class OnViewChange(val view : ViewType) : HomeEvents()
+    data class OnSearchToggle(val toggleValue : Boolean) : HomeEvents()
+    data class OnSearchUpdate(val searchText : String) : HomeEvents()
+    object OnClearSearch : HomeEvents()
 }

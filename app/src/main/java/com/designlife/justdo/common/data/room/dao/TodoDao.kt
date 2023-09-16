@@ -7,11 +7,9 @@ import androidx.room.Query
 import androidx.room.Transaction
 import com.designlife.justdo.common.data.entities.Todo
 import kotlinx.coroutines.flow.Flow
-import retrofit2.http.DELETE
 
 @Dao
 interface TodoDao {
-
     @Transaction
     @Insert
     suspend fun insertTodo(todo: Todo) : Long

@@ -47,7 +47,7 @@ fun HeaderDropDownComponent(
     val typeList = listOf<String>("All Tasks","All Notes","All Decks")
 
     Box(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.wrapContentWidth(),
         contentAlignment = Alignment.TopStart
     ) {
 

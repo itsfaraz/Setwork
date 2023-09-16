@@ -21,4 +21,8 @@
             android:name="ScreentType"
             app:argType="com.designlife.justdo.common.utils.enums.ScreenType" />
     </fragment>
+    <fragment
+        android:id="@+id/noteFragment"
+        android:name="com.designlife.justdo.note.NoteFragment"
+        android:label="NoteFragment" />
 </navigation>

@@ -56,6 +56,7 @@ import com.designlife.justdo.home.domain.usecase.LoadPreviousDatesSetUseCase
 import com.designlife.justdo.home.presentation.components.CategoryComponent
 import com.designlife.justdo.home.presentation.components.DateComponent
 import com.designlife.justdo.home.presentation.components.HeaderComponent
+import com.designlife.justdo.home.presentation.components.SearchBarComponent
 import com.designlife.justdo.home.presentation.components.TodoItemList
 import com.designlife.justdo.home.presentation.events.HomeEvents
 import com.designlife.justdo.home.presentation.viewmodel.HomeViewModel
@@ -160,6 +161,8 @@ class HomeFragment : Fragment() {
                 val selectedCategoryIndex = viewModel.selectedCategoryIndex.value
                 val progressBar = viewModel.progressBarVisibility.value
                 val sheetVisibility = viewModel.sheetVisibility.value
+                val searchToggle = viewModel.searchToggle.value
+                val searchText = viewModel.searchText.value
                 val isBottomSheetToggled = remember {
                     mutableStateOf(false)
                 }
@@ -194,10 +197,29 @@ class HomeFragment : Fragment() {
                                 },
                                 currentDate = Date(System.currentTimeMillis()),
                                 viewType = viewType,
+                                searchIconVisibility = viewType != ViewType.TASK && !searchToggle,
+                                onSearchIconClick = {
+                                    viewModel.onEvent(HomeEvents.OnSearchToggle(true))
+                                },
                                 onViewChange = {
                                     viewModel.onEvent(HomeEvents.OnViewChange(it))
+                                    viewModel.onEvent(HomeEvents.OnClearSearch)
+                                    viewModel.onEvent(HomeEvents.OnSearchToggle(false))
                                 }
                             )
+                            Spacer(modifier = Modifier.height(if (searchToggle) 20.dp else 0.dp))
+                            AnimatedVisibility(visible = searchToggle) {
+                                SearchBarComponent(
+                                    searchText = searchText,
+                                    onSearchUpdates = {
+                                        viewModel.onEvent(HomeEvents.OnSearchUpdate(it))
+                                    },
+                                    onClearSearch = {
+                                        viewModel.onEvent(HomeEvents.OnClearSearch)
+                                        viewModel.onEvent(HomeEvents.OnSearchToggle(false))
+                                    }
+                                )
+                            }
                             Spacer(modifier = Modifier.height(if (viewType == ViewType.TASK) 40.dp else 0.dp))
                             AnimatedVisibility(visible = viewType == ViewType.TASK) {
                                 DateComponent(
@@ -279,7 +301,7 @@ class HomeFragment : Fragment() {
                                     )
                                 },
                                 onNoteEvent = {
-
+                                    findNavController().navigate(R.id.noteFragment)
                                 },
                                 onDeckEvent = {
 

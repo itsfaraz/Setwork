@@ -6,6 +6,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import com.designlife.justdo.R
 import com.designlife.justdo.home.presentation.events.HomeEvents
@@ -77,4 +78,20 @@ val taskItemStyle =  TextStyle(
     fontFamily = fontFamily,
     fontSize = 13.sp,
     fontWeight = FontWeight.Medium
+)
+
+
+val noteTitleStyle =  TextStyle(
+    color = Color.Black,
+    fontFamily = fontFamily,
+    fontSize = 22.sp,
+    fontWeight = FontWeight.SemiBold
+)
+
+val noteContentStyle =  TextStyle(
+    color = Color.Black,
+    fontFamily = fontFamily,
+    fontSize = 20.sp,
+    fontWeight = FontWeight.Normal,
+    textAlign = TextAlign.Start
 )

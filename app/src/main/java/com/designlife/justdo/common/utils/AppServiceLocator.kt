@@ -5,6 +5,7 @@ import com.designlife.justdo.common.data.datastore.appStore
 import com.designlife.justdo.common.data.room.dao.AppDatabase
 import com.designlife.justdo.common.domain.repeat.RepeatRepository
 import com.designlife.justdo.common.domain.repositories.CategoryRepository
+import com.designlife.justdo.common.domain.repositories.NoteRepository
 import com.designlife.justdo.common.domain.repositories.TodoRepository
 import com.designlife.justdo.common.domain.repositories.appstore.IAppStoreRepository
 import java.util.Date
@@ -12,6 +13,7 @@ import java.util.Date
 object AppServiceLocator {
     private var categoryRepository : CategoryRepository? = null
     private var todoRepository : TodoRepository? = null
+    private var noteRepository : NoteRepository? = null
     private var repeatRepository : RepeatRepository? = null
     private var appStoreRepository : IAppStoreRepository? = null
 
@@ -52,6 +54,16 @@ object AppServiceLocator {
     private fun createAppStoreRepository(context: Context): IAppStoreRepository {
         appStoreRepository = IAppStoreRepository(context.appStore)
         return appStoreRepository!!
+    }
+
+    public fun provideNoteRepository(context : Context) : NoteRepository{
+        return noteRepository ?: createNoteRepository(context);
+    }
+
+    private fun createNoteRepository(context: Context): NoteRepository {
+        val noteDao = AppDatabase.getDatabase(context).noteDao()
+        noteRepository = NoteRepository(noteDao)
+        return noteRepository!!
     }
 
 }

@@ -85,6 +85,13 @@ class HomeViewModel(
 
     private var _viewType : MutableState<ViewType> = mutableStateOf(ViewType.TASK)
     val viewType = _viewType
+
+    private var _searchToggle : MutableState<Boolean> = mutableStateOf(false)
+    val searchToggle  = _searchToggle
+
+    private val _searchText : MutableState<String> = mutableStateOf("")
+    val searchText = _searchText
+
     init {
         viewModelScope.launch(Dispatchers.IO) {
             dateGenerator.getDateList().collect{
@@ -137,6 +144,15 @@ class HomeViewModel(
             is HomeEvents.OnViewChange -> {
                 _viewType.value = event.view
             }
+            is HomeEvents.OnSearchToggle -> {
+                _searchToggle.value = event.toggleValue
+            }
+            is HomeEvents.OnSearchUpdate -> {
+                _searchText.value = event.searchText
+            }
+            is HomeEvents.OnClearSearch -> {
+                _searchText.value = ""
+            }
         }
     }
 
@@ -145,24 +161,6 @@ class HomeViewModel(
         if (_isSorted){
             todoList.value = todoList.value.filter { it.categoryId == _categoryList.value[_selectedCategoryIndex.value].id}
         }
-    }
-
-    private fun searchDateIndex(list: List<Date>, date: Date): Int {
-        var left = 0
-        var right = list.size-1
-        while (left < right){
-            var mid = left + ((right-left)/2)
-            val midEpoch = IDateGenerator.getEpochForDate(list[mid])
-            val dateEpoch = IDateGenerator.getEpochForDate(date)
-            if (midEpoch == dateEpoch){
-                return mid
-            }else if (midEpoch > dateEpoch){
-                left = mid+1
-            }else if (midEpoch < dateEpoch){
-                right = mid-1
-            }
-        }
-        return -1
     }
 
     public fun fetchDateDataByDate(index : Int){

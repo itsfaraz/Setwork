@@ -6,15 +6,17 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.designlife.justdo.common.data.entities.Category
 import com.designlife.justdo.common.data.entities.CategoryWithTodos
+import com.designlife.justdo.common.data.entities.Note
 import com.designlife.justdo.common.data.entities.Todo
 
-@Database(entities = [Category::class,Todo::class], version = 1)
+@Database(entities = [Category::class,Todo::class, Note::class], version = 1)
 abstract class AppDatabase : RoomDatabase() {
 
 
 
     abstract fun todoDao() : TodoDao
     abstract fun categoryDao() : CategoryDao
+    abstract fun noteDao() : NoteDao
 
     companion object{
         private val DB_NAME = "JUSTDO"
