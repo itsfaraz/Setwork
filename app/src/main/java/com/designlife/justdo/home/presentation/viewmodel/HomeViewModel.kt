@@ -12,6 +12,7 @@ import com.designlife.justdo.common.domain.entities.Category
 import com.designlife.justdo.common.domain.entities.Todo
 import com.designlife.justdo.common.domain.repositories.CategoryRepository
 import com.designlife.justdo.common.domain.repositories.TodoRepository
+import com.designlife.justdo.common.utils.enums.ViewType
 import com.designlife.justdo.home.domain.usecase.LoadIntialDatesUseCase
 import com.designlife.justdo.home.domain.usecase.LoadNextDatesSetUseCase
 import com.designlife.justdo.home.domain.usecase.LoadPreviousDatesSetUseCase
@@ -82,8 +83,8 @@ class HomeViewModel(
     private var _progressBarVisibility : MutableState<Boolean> = mutableStateOf(false)
     val progressBarVisibility  = _progressBarVisibility
 
-    private val mutex = Mutex()
-
+    private var _viewType : MutableState<ViewType> = mutableStateOf(ViewType.TASK)
+    val viewType = _viewType
     init {
         viewModelScope.launch(Dispatchers.IO) {
             dateGenerator.getDateList().collect{
@@ -132,6 +133,9 @@ class HomeViewModel(
             }
             is HomeEvents.OnProgressBarToggle -> {
                 _progressBarVisibility.value = event.toggleValue
+            }
+            is HomeEvents.OnViewChange -> {
+                _viewType.value = event.view
             }
         }
     }

@@ -25,6 +25,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.designlife.justdo.common.utils.enums.ViewType
 import com.designlife.justdo.ui.theme.ButtonPrimary
 import com.designlife.justdo.ui.theme.Shapes
 import com.designlife.justdo.ui.theme.cutBottomRoundedCorners
@@ -37,7 +38,9 @@ fun HeaderComponent(
     headerText : String,
     onEventClick : () -> Unit,
     currentDate : Date,
-    currentDayButton : Boolean = false
+    currentDayButton : Boolean = false,
+    viewType : ViewType,
+    onViewChange : (viewType : ViewType) -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -74,10 +77,14 @@ fun HeaderComponent(
                 )
             }
             Spacer(modifier = Modifier.width(12.dp))
-            Text(
-                text = headerText,
-                style = headerStyle,
-                modifier = Modifier.fillMaxWidth()
+//            Text(
+//                text = headerText,
+//                style = headerStyle,
+//                modifier = Modifier.fillMaxWidth()
+//            )
+            HeaderDropDownComponent(
+                viewType = viewType,
+                onViewChange = {onViewChange(it)}
             )
         }
     }

@@ -1,5 +1,6 @@
 package com.designlife.justdo.home.presentation.events
 
+import com.designlife.justdo.common.utils.enums.ViewType
 import java.util.Date
 
 sealed class HomeEvents{
@@ -9,4 +10,5 @@ sealed class HomeEvents{
     data class HighlightDateByTodo(val visibleIndex : Int) : HomeEvents()
     data class OnCategorySortSelected(val categoryIndex : Int) : HomeEvents()
     data class OnProgressBarToggle(val toggleValue : Boolean) : HomeEvents()
+    data class OnViewChange(val view : ViewType) : HomeEvents()
 }

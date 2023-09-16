@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -48,6 +49,7 @@ import com.designlife.justdo.common.utils.constants.Constants.TASK_VIEW
 import com.designlife.justdo.common.utils.constants.Constants.TASK_VIEW_ID
 import com.designlife.justdo.common.utils.enums.BottomSheetItem
 import com.designlife.justdo.common.utils.enums.ScreenType
+import com.designlife.justdo.common.utils.enums.ViewType
 import com.designlife.justdo.home.domain.usecase.LoadIntialDatesUseCase
 import com.designlife.justdo.home.domain.usecase.LoadNextDatesSetUseCase
 import com.designlife.justdo.home.domain.usecase.LoadPreviousDatesSetUseCase
@@ -161,6 +163,7 @@ class HomeFragment : Fragment() {
                 val isBottomSheetToggled = remember {
                     mutableStateOf(false)
                 }
+                val viewType = viewModel.viewType.value
                 Box(
                     modifier = Modifier.fillMaxSize(),
                 ) {
@@ -190,39 +193,45 @@ class HomeFragment : Fragment() {
                                     }
                                 },
                                 currentDate = Date(System.currentTimeMillis()),
+                                viewType = viewType,
+                                onViewChange = {
+                                    viewModel.onEvent(HomeEvents.OnViewChange(it))
+                                }
                             )
-                            Spacer(modifier = Modifier.height(40.dp))
-                            DateComponent(
-                                listState = dateListState,
-                                currentDate = currentDate,
-                                currentMonth = currentMonth,
-                                currentYear = currentYear,
-                                dateList = dateList,
-                                onEventClick = {
-                                    viewModel.onEvent(HomeEvents.HighlightTodoByDate(it))
-                                    scope.launch(Dispatchers.Main) {
-                                        scrollToRollItem(viewModel.todoIndex.value,todoListState)
-                                        viewModel.onEvent(HomeEvents.OnIndexSelected(it))
-                                    }
-                                },
-                                onChangeVisibleDate = {
-                                    viewModel.onYearChange(it)
-                                    viewModel.onMonthChange(it)
-                                },
-                                loadPreviousTrigger = {
-                                    scope.launch(Dispatchers.Main) {
-                                        viewModel.loadPreviousMonth()
-                                        scrollToRollItem(viewModel.currentDateIndex.value,dateListState)
-                                    }
-                                },
-                                loadNextTrigger = {
-                                    scope.launch(Dispatchers.Main) {
-                                        viewModel.loadNextMonth()
-                                        scrollToRollItem(viewModel.currentDateIndex.value,dateListState)
-                                    }
-                                },
-                                selectedIndex = selectedIndex
-                            )
+                            Spacer(modifier = Modifier.height(if (viewType == ViewType.TASK) 40.dp else 0.dp))
+                            AnimatedVisibility(visible = viewType == ViewType.TASK) {
+                                DateComponent(
+                                    listState = dateListState,
+                                    currentDate = currentDate,
+                                    currentMonth = currentMonth,
+                                    currentYear = currentYear,
+                                    dateList = dateList,
+                                    onEventClick = {
+                                        viewModel.onEvent(HomeEvents.HighlightTodoByDate(it))
+                                        scope.launch(Dispatchers.Main) {
+                                            scrollToRollItem(viewModel.todoIndex.value,todoListState)
+                                            viewModel.onEvent(HomeEvents.OnIndexSelected(it))
+                                        }
+                                    },
+                                    onChangeVisibleDate = {
+                                        viewModel.onYearChange(it)
+                                        viewModel.onMonthChange(it)
+                                    },
+                                    loadPreviousTrigger = {
+                                        scope.launch(Dispatchers.Main) {
+                                            viewModel.loadPreviousMonth()
+                                            scrollToRollItem(viewModel.currentDateIndex.value,dateListState)
+                                        }
+                                    },
+                                    loadNextTrigger = {
+                                        scope.launch(Dispatchers.Main) {
+                                            viewModel.loadNextMonth()
+                                            scrollToRollItem(viewModel.currentDateIndex.value,dateListState)
+                                        }
+                                    },
+                                    selectedIndex = selectedIndex
+                                )
+                            }
                             Spacer(modifier = Modifier.height(40.dp))
                             CategoryComponent(categoryList = categoryList, selectedCategoryIndex = selectedCategoryIndex){ categoryIndex ->
                                 viewModel.onEvent(HomeEvents.OnCategorySortSelected(categoryIndex))
