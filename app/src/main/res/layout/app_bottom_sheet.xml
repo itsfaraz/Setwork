@@ -19,7 +19,7 @@
                 android:layout_width="match_parent"
                 android:layout_marginHorizontal="100dp"
                 android:id="@+id/sheet_close_btn"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="8dp"
                 android:background="@drawable/bottom_sheet_button"
                 android:gravity="center_horizontal"
                 android:layout_height="5dp">
@@ -27,7 +27,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="30dp"
                 android:orientation="vertical"
                 android:layout_below="@+id/sheet_close_btn"
                 android:layout_height="wrap_content">
@@ -35,18 +35,18 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:orientation="horizontal"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="15dp"
                     android:id="@+id/note_event"
                     android:layout_gravity="center"
                     android:layout_height="wrap_content">
 
                     <ImageView
-                        android:layout_width="12dp"
-                        android:layout_marginLeft="10dp"
+                        android:layout_width="14dp"
+                        android:layout_marginLeft="15dp"
                         android:layout_gravity="center"
                         android:src="@drawable/ic_note"
                         app:tint="@color/gray"
-                        android:layout_height="12dp"/>
+                        android:layout_height="14dp"/>
 
                     <TextView
                         android:layout_width="match_parent"
@@ -61,17 +61,17 @@
                     android:layout_width="match_parent"
                     android:orientation="horizontal"
                     android:id="@+id/task_event"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="15dp"
                     android:layout_gravity="center"
                     android:layout_height="wrap_content">
 
                     <ImageView
-                        android:layout_width="12dp"
+                        android:layout_width="14dp"
                         app:tint="@color/gray"
-                        android:layout_marginLeft="10dp"
+                        android:layout_marginLeft="15dp"
                         android:layout_gravity="center"
                         android:src="@drawable/ic_event"
-                        android:layout_height="12dp"/>
+                        android:layout_height="14dp"/>
 
                     <TextView
                         android:layout_width="match_parent"
@@ -85,19 +85,19 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:orientation="horizontal"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="15dp"
                     android:id="@+id/deck_event"
-                    android:layout_marginBottom="60dp"
+                    android:layout_marginBottom="80dp"
                     android:layout_gravity="center"
                     android:layout_height="wrap_content">
 
                     <ImageView
-                        android:layout_width="12dp"
+                        android:layout_width="14dp"
                         app:tint="@color/gray"
-                        android:layout_marginLeft="10dp"
+                        android:layout_marginLeft="15dp"
                         android:layout_gravity="center"
                         android:src="@drawable/ic_deck"
-                        android:layout_height="12dp"/>
+                        android:layout_height="14dp"/>
 
                     <TextView
                         android:layout_width="match_parent"
