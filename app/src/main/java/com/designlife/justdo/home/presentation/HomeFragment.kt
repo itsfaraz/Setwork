@@ -118,6 +118,7 @@ class HomeFragment : Fragment() {
     }
 
     private suspend fun initialSlide() {
+        if (::scope.isInitialized){
             delay(800)
             val job : Job = scope.launch(Dispatchers.Default) {
                 val index = viewModel.dateList.value.indexOf(viewModel.currentDate.value)
@@ -125,12 +126,10 @@ class HomeFragment : Fragment() {
                 scope.launch {
                     scrollToRollItem(viewModel.todoIndex.value+1 ,todoListState)
                 }
-                scope.launch {
-                    scrollToRollItem(index,dateListState)
-                }
             }
             job.join()
-            viewModel.onEvent(HomeEvents.OnProgressBarToggle(false))
+        }
+        viewModel.onEvent(HomeEvents.OnProgressBarToggle(false))
     }
 
     @OptIn(ExperimentalMaterialApi::class)
