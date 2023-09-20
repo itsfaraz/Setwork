@@ -5,6 +5,7 @@ import com.designlife.justdo.common.data.datastore.appStore
 import com.designlife.justdo.common.data.room.dao.AppDatabase
 import com.designlife.justdo.common.domain.repeat.RepeatRepository
 import com.designlife.justdo.common.domain.repositories.CategoryRepository
+import com.designlife.justdo.common.domain.repositories.DeckRepository
 import com.designlife.justdo.common.domain.repositories.NoteRepository
 import com.designlife.justdo.common.domain.repositories.TodoRepository
 import com.designlife.justdo.common.domain.repositories.appstore.IAppStoreRepository
@@ -14,6 +15,7 @@ object AppServiceLocator {
     private var categoryRepository : CategoryRepository? = null
     private var todoRepository : TodoRepository? = null
     private var noteRepository : NoteRepository? = null
+    private var deckRepository : DeckRepository? = null
     private var repeatRepository : RepeatRepository? = null
     private var appStoreRepository : IAppStoreRepository? = null
 
@@ -66,4 +68,13 @@ object AppServiceLocator {
         return noteRepository!!
     }
 
+    public fun provideDeckRepository(context : Context) : DeckRepository{
+        return deckRepository ?: createDeckRepository(context);
+    }
+
+    private fun createDeckRepository(context: Context): DeckRepository {
+        val deckDao = AppDatabase.getDatabase(context).deckDao()
+        deckRepository = DeckRepository(deckDao)
+        return deckRepository!!
+    }
 }

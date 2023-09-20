@@ -11,6 +11,9 @@ val Shapes = Shapes(
     large = RoundedCornerShape(0.dp)
 )
 
+fun Shapes.cutTopRoundedCorners(radius : Dp) : RoundedCornerShape{
+    return RoundedCornerShape(topStart = radius,topEnd = radius, bottomStart = 0.dp, bottomEnd = 0.dp)
+}
 fun Shapes.cutBottomRoundedCorners(radius : Dp) : RoundedCornerShape{
     return RoundedCornerShape(topStart = 0.dp,topEnd = 0.dp, bottomStart = radius, bottomEnd = radius)
 }

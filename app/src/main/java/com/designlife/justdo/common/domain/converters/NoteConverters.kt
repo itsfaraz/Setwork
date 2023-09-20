@@ -7,7 +7,6 @@ import com.designlife.justdo.common.domain.entities.Todo
 import java.util.Date
 
 object NoteConverters {
-
     fun getNoteEntity(note: Note) : com.designlife.justdo.common.data.entities.Note{
         return com.designlife.justdo.common.data.entities.Note(
             title = note.title,

@@ -111,10 +111,18 @@ val noteItemContentStyle =  TextStyle(
     textAlign = TextAlign.Start
 )
 
-val folderTextStyle =  TextStyle(
+val folderTextStyle = TextStyle(
     color = Color.White,
     fontFamily = fontFamily,
     fontSize = 12.sp,
     fontWeight = FontWeight.Normal,
     textAlign = TextAlign.Start
+)
+
+val cardTextStyle = TextStyle(
+    color = Color.Black,
+    fontFamily = fontFamily,
+    fontSize = 18.sp,
+    fontWeight = FontWeight.Normal,
+    textAlign = TextAlign.Center
 )

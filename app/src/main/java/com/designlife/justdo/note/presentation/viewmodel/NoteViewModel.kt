@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.designlife.justdo.common.domain.entities.Note
 import com.designlife.justdo.common.domain.repositories.NoteRepository
 import com.designlife.justdo.note.presentation.events.NoteEvents
-import com.designlife.justdo.task.presentation.events.TaskEvents
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.Date
@@ -103,7 +102,7 @@ class NoteViewModel(
                 createdTime = Date(_createdTime.value),
                 lastModified = Date(System.currentTimeMillis())
             )
-            noteRepository.updateTodo(_noteId.value,note)
+            noteRepository.updateNote(_noteId.value,note)
         }
     }
 

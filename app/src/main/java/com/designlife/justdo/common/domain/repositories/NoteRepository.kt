@@ -1,17 +1,10 @@
 package com.designlife.justdo.common.domain.repositories
 
 import com.designlife.justdo.common.data.room.dao.NoteDao
-import com.designlife.justdo.common.data.room.dao.TodoDao
 import com.designlife.justdo.common.domain.converters.NoteConverters
-import com.designlife.justdo.common.domain.converters.TodoConverters
 import com.designlife.justdo.common.domain.entities.Note
-import com.designlife.justdo.common.domain.entities.Todo
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 
 class NoteRepository(private val noteDao: NoteDao) {
 
@@ -31,7 +24,7 @@ class NoteRepository(private val noteDao: NoteDao) {
         return NoteConverters.getNote(noteDao.getNoteById(noteId))
     }
 
-    suspend fun updateTodo(noteId: Long,note: Note) : Unit {
+    suspend fun updateNote(noteId: Long, note: Note) : Unit {
         noteDao.updateNoteById(
             noteId = noteId,
             title = note.title,

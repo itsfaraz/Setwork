@@ -5,7 +5,6 @@ import com.designlife.justdo.common.domain.calendar.IDateGenerator
 import com.designlife.justdo.common.domain.entities.Todo
 
 object TodoConverters {
-
     fun getTodoEntity(todo: Todo) : com.designlife.justdo.common.data.entities.Todo{
         return com.designlife.justdo.common.data.entities.Todo(
             title = todo.title,
@@ -32,5 +31,4 @@ object TodoConverters {
             repeatIndex = todo.repeatIndex
         )
     }
-
 }

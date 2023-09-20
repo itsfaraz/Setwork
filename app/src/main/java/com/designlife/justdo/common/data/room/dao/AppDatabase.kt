@@ -4,19 +4,22 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
+import com.designlife.justdo.common.data.converter.Converter
 import com.designlife.justdo.common.data.entities.Category
 import com.designlife.justdo.common.data.entities.CategoryWithTodos
+import com.designlife.justdo.common.data.entities.Deck
 import com.designlife.justdo.common.data.entities.Note
 import com.designlife.justdo.common.data.entities.Todo
 
-@Database(entities = [Category::class,Todo::class, Note::class], version = 1)
+@Database(entities = [Category::class,Todo::class, Note::class, Deck::class], version = 1)
+@TypeConverters(Converter::class)
 abstract class AppDatabase : RoomDatabase() {
-
-
 
     abstract fun todoDao() : TodoDao
     abstract fun categoryDao() : CategoryDao
     abstract fun noteDao() : NoteDao
+    abstract fun deckDao() : DeckDao
 
     companion object{
         private val DB_NAME = "JUSTDO"

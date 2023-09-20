@@ -334,7 +334,7 @@ class HomeFragment : Fragment() {
                                     )
                                 },
                                 onDeckEvent = {
-
+                                    findNavController().navigate(R.id.deckFragment)
                                 }
                             )
                             if (!isBottomSheetToggled.value){

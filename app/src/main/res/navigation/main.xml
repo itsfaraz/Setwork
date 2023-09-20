@@ -30,4 +30,8 @@
             app:argType="integer"
             android:defaultValue="-1" />
     </fragment>
+    <fragment
+        android:id="@+id/deckFragment"
+        android:name="com.designlife.justdo.deck.DeckFragment"
+        android:label="DeckFragment" />
 </navigation>
