@@ -99,7 +99,12 @@ class DeckFragment : Fragment() {
                                         listState.animateScrollToItem(if(index+1 == cardList.size) 0 else index+1)
                                     }
                                 },
-                                onExpandEvent = {}
+                                onExpandEvent = { index ->
+                                    scope.launch {
+                                        editListState.animateScrollToItem(listState.firstVisibleItemIndex)
+                                    }
+                                    viewModel.onEvent(DeckEvents.OnDeckToggle)
+                                }
                             )
 
                         }
@@ -127,6 +132,7 @@ class DeckFragment : Fragment() {
                                 viewModel.onEvent(DeckEvents.OnCreateCard)
                                 scope.launch {
                                     listState.animateScrollToItem(viewModel.cardList.value.size)
+                                    editListState.animateScrollToItem(viewModel.cardList.value.size)
                                 }
                             }
                         }

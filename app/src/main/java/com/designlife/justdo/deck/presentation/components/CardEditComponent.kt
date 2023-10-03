@@ -1,8 +1,11 @@
 package com.designlife.justdo.deck.presentation.components
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.animateValueAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -36,13 +39,16 @@ import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
@@ -54,6 +60,7 @@ import com.designlife.justdo.common.domain.entities.FlashCard
 import com.designlife.justdo.ui.theme.TaskItemLabelColor
 import com.designlife.justdo.ui.theme.cardTextStyle
 import com.designlife.justdo.ui.theme.headerStyle
+import com.designlife.justdo.ui.theme.highlightTextStyle
 
 @Composable
 fun CardEditComponent(
@@ -70,23 +77,53 @@ fun CardEditComponent(
         (LocalConfiguration.current.screenWidthDp * density).toInt()
     }
     val itemHeight = remember {
-        mutableStateOf(0.9F) // // Adjust this fraction as needed
+        mutableStateOf(1F) // // Adjust this fraction as needed
     }
     val itemWidthFraction = 0.33f
-    val cardExpandState = remember {
-        mutableStateOf(false)
-    }
     val frontTextScrollState = rememberScrollState()
     val backTextScrollState = rememberScrollState()
-    val rotationState = animateFloatAsState(
-        targetValue = if (cardExpandState.value) 180F else 0F
+//    val rotationState = animateFloatAsState(
+//        targetValue = if (cardExpandState.value) 180F else 0F
+//    )
+
+
+    var rotated by remember { mutableStateOf(false) }
+
+    val rotationState by animateFloatAsState(
+        targetValue = if (rotated) 180f else 0f,
+        animationSpec = tween(500)
     )
 
+    val animateFront by animateFloatAsState(
+        targetValue = if (!rotated) 1f else 0f,
+        animationSpec = tween(600)
+    )
+
+    val animateBack by animateFloatAsState(
+        targetValue = if (rotated) 1f else 0f,
+        animationSpec = tween(600)
+    )
+
+    val animateColor by animateColorAsState(
+        targetValue = if (rotated) deckTheme else Color.White,
+        animationSpec = tween(500)
+    )
 
     Box(
         modifier = Modifier
             .padding(horizontal = 5.dp)
             .width((screenWidth * itemWidthFraction).dp)
+            .graphicsLayer {
+                rotationY = rotationState
+                cameraDistance = 8 * density
+            }
+            .clickable {
+                if (editState) {
+                    rotated = false
+                } else {
+                    rotated = !rotated
+                }
+            }
             .fillMaxHeight(itemHeight.value)
             .background(color = Color.Transparent, shape = RoundedCornerShape(8.dp)),
         contentAlignment = Alignment.BottomCenter
@@ -102,7 +139,7 @@ fun CardEditComponent(
                 )
                 .width((screenWidth * itemWidthFraction).dp)
                 .fillMaxHeight(itemHeight.value),
-            backgroundColor = Color.White,
+            backgroundColor = animateColor,
             elevation = 15.dp,
             shape = RoundedCornerShape(8.dp)
         ) {
@@ -111,26 +148,28 @@ fun CardEditComponent(
                     .fillMaxWidth()
                     .fillMaxHeight()
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(40.dp)
-                        .background(color = deckTheme)
-                        .padding(horizontal = 4.dp),
-                    horizontalArrangement = Arrangement.End,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    IconButton(
-                        modifier = Modifier.size(22.dp),
-                        onClick = {
-                            onEditStateChange(true)
-                        }
+                if (!rotated){
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(40.dp)
+                            .background(color = deckTheme)
+                            .padding(horizontal = 4.dp),
+                        horizontalArrangement = Arrangement.End,
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = "Close Icon",
-                            tint = Color.White
-                        )
+                        IconButton(
+                            modifier = Modifier.size(22.dp),
+                            onClick = {
+                                onEditStateChange(true)
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = "Close Icon",
+                                tint = Color.White
+                            )
+                        }
                     }
                 }
                 Column(
@@ -138,22 +177,22 @@ fun CardEditComponent(
                         .padding(bottom = 20.dp)
                         .fillMaxWidth()
                         .fillMaxHeight()
-                        .padding(horizontal = 6.dp)
+                        .padding(horizontal = 6.dp),
+                    verticalArrangement = if (editState) Arrangement.SpaceEvenly else Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ){
                     if (editState){
                         BasicTextField(
                             modifier = Modifier
                                 .padding(end = 10.dp)
-                                .fillMaxWidth()
-                                .height(40.dp)
+                                .weight(1F)
                                 .background(color = Color.Transparent),
                             value = frontContent,
                             onValueChange = {
-                                if (frontContent.length <= 300){
+                                if (((frontContent.length)+(it.length)) <= 300){
                                     onFrontContentChange(it)
                                 }
                             },
-                            singleLine = true,
                             textStyle = headerStyle.copy(
                                 fontWeight = FontWeight.Normal
                             )
@@ -163,12 +202,18 @@ fun CardEditComponent(
                             }
                             innerField()
                         }
-                        Spacer(modifier = Modifier.height(10.dp))
+                        Row(modifier = Modifier
+                            .padding(vertical = 5.dp)
+                            .fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                            Text(
+                                text = "${frontContent.length}/300",
+                                style = highlightTextStyle
+                            )
+                        }
                         BasicTextField(
                             modifier = Modifier
                                 .padding(end = 10.dp)
-                                .fillMaxWidth()
-                                .height(40.dp)
+                                .weight(1F)
                                 .background(color = Color.Transparent),
                             value = backContent,
                             onValueChange = {
@@ -176,7 +221,6 @@ fun CardEditComponent(
                                     onBackContentChange(it)
                                 }
                             },
-                            singleLine = true,
                             textStyle = headerStyle.copy(
                                 fontWeight = FontWeight.Normal
                             )
@@ -189,69 +233,25 @@ fun CardEditComponent(
                     }
                     if (!editState){
                         Text(
-                            modifier = Modifier.verticalScroll(frontTextScrollState),
-                            text = if(frontContent.isEmpty()) "Short Text ..." else frontContent,
+                            modifier = Modifier
+                                .verticalScroll(frontTextScrollState)
+                                .graphicsLayer {
+                                    alpha = if (rotated) animateBack else animateFront
+                                    rotationY = rotationState
+                                },
+                            text = if (!rotated){if(frontContent.isEmpty()) "Short Text ..." else frontContent} else { if(backContent.isEmpty()) "Full Content Text ..." else backContent},
                             style = cardTextStyle.copy(
                                 textAlign = TextAlign.Justify,
-                                fontWeight = FontWeight.SemiBold
+                                fontWeight = FontWeight.SemiBold,
+                                color = if (!rotated) Color.Black else Color.White,
+                                fontSize = if (!rotated) 22.sp else 18.sp
                             )
-                        )
-                    }
-                    if (!editState && cardExpandState.value){
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            modifier = Modifier.verticalScroll(backTextScrollState),
-                            text = if(backContent.isEmpty()) "Full Content Text ..." else backContent,
-                            style = cardTextStyle.copy(
-                                textAlign = TextAlign.Justify,
-                                fontWeight = FontWeight.Normal,
-                                fontSize = 16.sp
-                            ),
                         )
                     }
                     Spacer(modifier = Modifier.height(10.dp))
                 }
             }
         }
-        if (!editState){
-            IconButton(
-                modifier = Modifier
-                    .size(22.dp)
-                    .rotate(rotationState.value),
-                onClick = {
-                    if (!cardExpandState.value){
-                        cardExpandState.value = true
-                        itemHeight.value = 1F
-                    }else{
-                        cardExpandState.value = false
-                        itemHeight.value = 0.9F
-                    }
-                }
-            ) {
-                Icon(
-                    imageVector = Icons.Default.ArrowDropDown,
-                    contentDescription = "Arrow Up Down Icon",
-                    tint = Color.Gray
-                )
-            }
-        }
-
-
-//        else{
-//            IconButton(
-//                modifier = Modifier
-//                    .size(25.dp),
-//                onClick = {
-//                    onEditStateChange(false)
-//                }
-//            ) {
-//                Icon(
-//                    imageVector = Icons.Default.Done,
-//                    contentDescription = "Done Icon",
-//                    tint = Color.Green
-//                )
-//            }
-//        }
     }
 }
 

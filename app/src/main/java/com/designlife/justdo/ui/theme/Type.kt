@@ -126,3 +126,11 @@ val cardTextStyle = TextStyle(
     fontWeight = FontWeight.Normal,
     textAlign = TextAlign.Center
 )
+
+val highlightTextStyle = TextStyle(
+    color = Color.Gray,
+    fontFamily = fontFamily,
+    fontSize = 8.sp,
+    fontWeight = FontWeight.Normal,
+    textAlign = TextAlign.Center
+)
