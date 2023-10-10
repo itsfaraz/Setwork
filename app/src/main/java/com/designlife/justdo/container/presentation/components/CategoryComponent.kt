@@ -17,6 +17,7 @@ fun CategoryComponent(
     categoryList : List<Category>,
     selectedCategory : Int,
     colorPickerSelectedColor : Color,
+    colorPickerSelectedEmoji : String,
     categoryName : String,
     onCategoryNameChange : (categoryName : String) -> Unit,
     onColorPickerEvent : () -> Unit,
@@ -44,7 +45,7 @@ fun CategoryComponent(
                 onCategoryInsertEvent = {
                     // Add New Category
                     if (categoryName.isNotBlank() && colorPickerSelectedColor != TaskItemLabelColor)
-                        onNewCategoryEvent(Category(name = categoryName, totalTodo = 0, totalCompleted = 0, color = colorPickerSelectedColor))
+                        onNewCategoryEvent(Category(name = categoryName, totalTodo = 0, totalCompleted = 0, color = colorPickerSelectedColor, emoji = colorPickerSelectedEmoji))
                 }
             ){}
             Spacer(modifier = Modifier.height(20.dp))

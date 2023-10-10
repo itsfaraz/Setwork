@@ -47,7 +47,7 @@ import kotlin.math.roundToInt
 
 @Composable
 fun CreateCardListComponent(
-    scope: CoroutineScope,
+    modifier: Modifier = Modifier,
     listState: LazyListState,
     deckTheme: Color,
     cards: List<FlashCard>,
@@ -55,9 +55,7 @@ fun CreateCardListComponent(
     onExpandEvent: (index: Int) -> Unit,
 ) {
     LazyRow(
-        modifier = Modifier
-            .fillMaxHeight(.8F)
-            .fillMaxWidth(),
+        modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
         state = listState,
@@ -107,27 +105,29 @@ fun CreateCardListComponent(
                 targetValue = if (isSwiped) -2500F else 0F,
                 animationSpec = tween(durationMillis = 300)
             )
-            CardCreateComponent(
-                modifier = Modifier
-                    .offset { IntOffset(0, offsetY.value.roundToInt()) }
-                    .pointerInput(cards[index]) {
-                        detectVerticalDragGestures { _, dragAmount ->
-                            when{
-                                !isSwiped && dragAmount < threshold -> {
-                                    isSwiped = true
+            if (index < cards.size){
+                CardCreateComponent(
+                    modifier = Modifier
+                        .offset { IntOffset(0, offsetY.value.roundToInt()) }
+                        .pointerInput(index) {
+                            detectVerticalDragGestures { _, dragAmount ->
+                                when{
+                                    !isSwiped && dragAmount < threshold -> {
+                                        isSwiped = true
+                                    }
                                 }
                             }
-                        }
-                    },
-                deckTheme = deckTheme,
-                card = cards[index],
-                onDeleteEvent = { onDeleteEvent(index) },
-                onExpandEvent = { onExpandEvent(index) }
-            )
+                        },
+                    deckTheme = deckTheme,
+                    card = cards[index],
+                    onDeleteEvent = { isSwiped = true },
+                    onExpandEvent = { onExpandEvent(index) }
+                )
+            }
             if (isSwiped) {
-                LaunchedEffect(cards[index]) {
-                    delay(150) // Wait for the animation to complete
+                LaunchedEffect(isSwiped) {
                     onDeleteEvent(index)
+                    isSwiped = false
                 }
             }
         }

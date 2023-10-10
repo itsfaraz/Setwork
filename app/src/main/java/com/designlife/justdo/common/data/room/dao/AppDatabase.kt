@@ -21,6 +21,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun noteDao() : NoteDao
     abstract fun deckDao() : DeckDao
 
+    abstract fun widgetDao() : WidgetDao
     companion object{
         private val DB_NAME = "JUSTDO"
         @Volatile

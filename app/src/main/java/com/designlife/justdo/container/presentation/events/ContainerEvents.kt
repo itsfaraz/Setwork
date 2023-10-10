@@ -10,5 +10,6 @@ sealed class ContainerEvents{
     data class NewCategoryInsert(val category: Category) : ContainerEvents()
     data class ColorPickerToggle(val toggleValue : Boolean) : ContainerEvents()
     data class OnPaletteColorSelection(val color : Color) : ContainerEvents()
+    data class OnPaletteEmojiSelection(val emoji : String) : ContainerEvents()
     data class OnCategoryNameUpdate(val name : String) : ContainerEvents()
 }

@@ -8,6 +8,7 @@ import com.designlife.justdo.common.domain.repositories.CategoryRepository
 import com.designlife.justdo.common.domain.repositories.DeckRepository
 import com.designlife.justdo.common.domain.repositories.NoteRepository
 import com.designlife.justdo.common.domain.repositories.TodoRepository
+import com.designlife.justdo.common.domain.repositories.WidgetRepository
 import com.designlife.justdo.common.domain.repositories.appstore.IAppStoreRepository
 import java.util.Date
 
@@ -18,6 +19,7 @@ object AppServiceLocator {
     private var deckRepository : DeckRepository? = null
     private var repeatRepository : RepeatRepository? = null
     private var appStoreRepository : IAppStoreRepository? = null
+    private var widgetRepository : WidgetRepository? = null
 
 
     public fun provideCategoryRepository(context : Context) : CategoryRepository{
@@ -76,5 +78,15 @@ object AppServiceLocator {
         val deckDao = AppDatabase.getDatabase(context).deckDao()
         deckRepository = DeckRepository(deckDao)
         return deckRepository!!
+    }
+
+    public fun provideWidgetRepository(context : Context) : WidgetRepository{
+        return widgetRepository ?: createWidgetRepository(context);
+    }
+
+    private fun createWidgetRepository(context: Context): WidgetRepository {
+        val widgetDao = AppDatabase.getDatabase(context).widgetDao()
+        widgetRepository = WidgetRepository(widgetDao)
+        return widgetRepository!!
     }
 }

@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.designlife.justdo.common.utils.camelCase
 import com.designlife.justdo.ui.theme.ButtonHighLightPrimary
 import com.designlife.justdo.ui.theme.ButtonPrimary
@@ -30,6 +31,7 @@ import com.designlife.justdo.ui.theme.folderTextStyle
 @Composable
 fun FolderItem(
     folderName : String,
+    emoji : String,
     colorTheme : Color,
     isSelected : Boolean,
     onFolderEvent : () -> Unit
@@ -50,19 +52,21 @@ fun FolderItem(
     ) {
         Box(
             modifier = Modifier
-                .size(16.dp)
-                .clip(RoundedCornerShape(100))
-                .background(color = if (isSelected) Color.White else ButtonHighLightPrimary),
+                .size(18.dp)
+                .clip(RoundedCornerShape(100)),
             contentAlignment = Alignment.Center
         ) {
             Card(
                 modifier = Modifier
-                    .size(10.dp),
+                    .size(16.dp),
                 shape = RoundedCornerShape(100),
                 backgroundColor = colorTheme,
                 elevation = 10.dp
-            ) {
-            }
+            ) {}
+            Text(
+                text = emoji,
+                fontSize = 10.sp
+            )
         }
         Spacer(modifier = Modifier.width(4.dp))
         Text(

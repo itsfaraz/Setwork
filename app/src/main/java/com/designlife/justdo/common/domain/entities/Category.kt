@@ -8,5 +8,6 @@ data class Category(
     val name : String,
     val totalTodo : Int,
     val totalCompleted : Int,
+    val emoji : String = "",
     val color : Color
 )

@@ -98,7 +98,7 @@ fun CardCreateComponent(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = if (card.frontContent.isEmpty()) "Sample text flash card. Click to add content." else card.frontContent,
+                    text = if (card.frontContent.isEmpty()) "Sample Text" else card.frontContent,
                     style = cardTextStyle,
                     textAlign = TextAlign.Center
                 )

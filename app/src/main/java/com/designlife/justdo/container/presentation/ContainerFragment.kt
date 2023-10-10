@@ -65,6 +65,7 @@ class ContainerFragment : Fragment() {
                 val selectedCategoryIndex = viewmodel.selectedCategory.value
                 val colorPickerState = viewmodel.colorPickerToggle.value
                 val selectedPaletteColor = viewmodel.selectedPaletteColor.value
+                val selectedEmoji = viewmodel.selectedEmoji.value
                 val newCategoryName = viewmodel.categoryName.value
                 val isEditMode = viewmodel.editMode.value
                 val repeatList = viewmodel.repeatList.value
@@ -93,6 +94,7 @@ class ContainerFragment : Fragment() {
                                     categoryList = categoryList,
                                     selectedCategory = selectedCategoryIndex,
                                     colorPickerSelectedColor = selectedPaletteColor,
+                                    colorPickerSelectedEmoji = selectedEmoji,
                                     categoryName = newCategoryName,
                                     onCategoryNameChange = {
                                         viewmodel.onEvent(ContainerEvents.OnCategoryNameUpdate(it))
@@ -136,6 +138,9 @@ class ContainerFragment : Fragment() {
                                 selectedColor = selectedPaletteColor,
                                 onColorChange = {
                                     viewmodel.onEvent(ContainerEvents.OnPaletteColorSelection(it))
+                                },
+                                onEmojiChange = {
+                                    viewmodel.onEvent(ContainerEvents.OnPaletteEmojiSelection(it))
                                 }
                             )
                         }
@@ -144,5 +149,4 @@ class ContainerFragment : Fragment() {
             }
         }
     }
-
 }

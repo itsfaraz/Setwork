@@ -11,6 +11,7 @@ object CategoryConverter {
             totalTodo = category.totalTodo,
             totalCompleted = category.totalCompleted,
             color = ColorConverter.serializeColor(category.color),
+            emoji = category.emoji
         )
     }
 
@@ -22,6 +23,7 @@ object CategoryConverter {
             totalTodo = category.totalTodo,
             totalCompleted = category.totalCompleted,
             color = ColorConverter.deserializeColor(category.color),
+            emoji = category.emoji
         )
     }
 

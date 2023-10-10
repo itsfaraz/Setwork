@@ -9,7 +9,8 @@ object DeckConverters {
             deckName = deck.deckName,
             totalCards = deck.totalCards,
             modifiedDate = deck.modifiedDate.time,
-            cards = CardConverters.getFlashCardEntity(deck.cards)
+            cards = CardConverters.getFlashCardEntity(deck.cards),
+            categoryId = deck.categoryId
         )
     }
 
@@ -20,6 +21,7 @@ object DeckConverters {
             totalCards = deck.totalCards,
             cards = CardConverters.getFlashCard(deck.cards),
             modifiedDate = Date(deck.modifiedDate),
+            categoryId = deck.categoryId
         )
     }
 }

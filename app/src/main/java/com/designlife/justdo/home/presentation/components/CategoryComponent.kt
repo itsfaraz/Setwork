@@ -84,6 +84,7 @@ fun CategoryComponent(
                     FolderItem(
                         folderName = item.name,
                         colorTheme = item.color,
+                        emoji = item.emoji,
                         isSelected = index == selectedCategoryIndex) {
                         onEventClick(index)
                     }

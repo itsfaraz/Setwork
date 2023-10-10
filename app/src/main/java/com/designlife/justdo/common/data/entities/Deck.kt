@@ -12,5 +12,6 @@ data class Deck(
     val deckName : String = "",
     val totalCards : Int = 0,
     val modifiedDate : Long = 0,
+    val categoryId : Long,
     val cards : List<FlashCard>
 )

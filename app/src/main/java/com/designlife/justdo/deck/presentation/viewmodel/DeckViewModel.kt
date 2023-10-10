@@ -3,10 +3,15 @@ package com.designlife.justdo.deck.presentation.viewmodel
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.designlife.justdo.common.domain.entities.Deck
 import com.designlife.justdo.common.domain.entities.FlashCard
 import com.designlife.justdo.common.domain.entities.Note
 import com.designlife.justdo.common.domain.repositories.DeckRepository
 import com.designlife.justdo.deck.presentation.events.DeckEvents
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.util.Date
 
 class DeckViewModel(
     private val deckRepository: DeckRepository
@@ -46,7 +51,9 @@ class DeckViewModel(
             is DeckEvents.OnCardRemove -> {
 //                val cardList = _cardList.value.toMutableList()
 //                cardList.removeAt(event.index)
-                _cardList.value.removeAt(event.index)
+                if (event.index >= 0 && _cardList.value.size >= 1){
+                    _cardList.value.removeAt(event.index)
+                }
             }
             is DeckEvents.OnDeckToggle -> {
                 if (_cardList.value.isNotEmpty()){
@@ -101,20 +108,16 @@ class DeckViewModel(
 //        }
     }
 
-    fun updateNote() {
-//        viewModelScope.launch(Dispatchers.IO) {
-//            val note = Note(
-//                noteId = _noteId.value,
-//                title = _titleValue.value,
-//                content = _contentValue.value,
-//                emoji = _emojiValue.value,
-//                categoryId = _categoryId.value,
-//                coverImage = _coverImage.value,
-//                createdTime = Date(_createdTime.value),
-//                lastModified = Date(System.currentTimeMillis())
-//            )
-//            noteRepository.updateNote(_noteId.value,note)
-//        }
+    fun updateDeck() {
+        viewModelScope.launch(Dispatchers.IO) {
+            deckRepository.insertDeck(Deck(
+                deckName = _headerTitle.value,
+                totalCards = _cardList.value.size,
+                modifiedDate = Date(System.currentTimeMillis()),
+                cards = _cardList.value,
+                categoryId = 0L
+            ))
+        }
     }
 
 }

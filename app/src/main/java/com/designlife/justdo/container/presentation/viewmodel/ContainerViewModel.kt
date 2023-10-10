@@ -45,6 +45,9 @@ class ContainerViewModel(
     private val _selectedPaletteColor : MutableState<Color> = mutableStateOf(TaskItemLabelColor)
     val selectedPaletteColor = _selectedPaletteColor
 
+    private val _selectedEmoji : MutableState<String> = mutableStateOf("👀")
+    val selectedEmoji = _selectedEmoji
+
     private val _categoryName : MutableState<String> = mutableStateOf("")
     val categoryName = _categoryName
 
@@ -81,6 +84,9 @@ class ContainerViewModel(
             }
             is ContainerEvents.OnRepeatTypeSelected -> {
                 _selectedRepeatIndex.value = event.index
+            }
+            is ContainerEvents.OnPaletteEmojiSelection -> {
+                _selectedEmoji.value = event.emoji
             }
         }
     }
