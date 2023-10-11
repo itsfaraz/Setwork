@@ -26,6 +26,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -46,14 +47,15 @@ fun NoteItem(
 ) {
     val hasCover = note.coverImage.isNotEmpty() && note.coverImage.isNotBlank()
     val modifier = if (hasCover) Modifier
-        .width(240.dp)
+        .fillMaxWidth(1F)
         .wrapContentHeight() else Modifier
         .padding(horizontal = 10.dp, vertical = 10.dp)
-        .width(240.dp)
+        .fillMaxWidth(1F)
         .height(180.dp)
     Card(
         backgroundColor = Color.White,
         modifier = modifier
+            .padding(horizontal = if (!hasCover) 5.dp else 12.dp, vertical = if (!hasCover) 0.dp else 4.dp)
             .clickable {
                 onClick()
             },
@@ -62,7 +64,6 @@ fun NoteItem(
     ) {
         Column(
             modifier = Modifier
-                .padding(horizontal = if (!hasCover) 5.dp else 0.dp)
                 .wrapContentSize()
         ) {
             if (hasCover){
@@ -78,15 +79,15 @@ fun NoteItem(
                     )
                     Column(
                         modifier = Modifier
-                            .padding(top = 90.dp)
+                            .padding(top = 85.dp)
                             .fillMaxWidth()
-                            .height(25.dp),
+                            .height(30.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Card(modifier = Modifier
-                            .size(25.dp)
+                            .height(35.dp)
                             .clip(RoundedCornerShape(100)),
-                            backgroundColor = Color.White,
+                            backgroundColor = noteTheme,
                             elevation = 15.dp
                         ) {
                             Box(
@@ -132,22 +133,23 @@ fun NoteItem(
             Spacer(modifier = Modifier.height(12.dp))
             Column(
                 modifier = Modifier.padding(horizontal = if (hasCover) 10.dp else 0.dp),
-                horizontalAlignment = if (note.coverImage.isNotEmpty()) Alignment.Start else Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
                     modifier = Modifier.fillMaxWidth(),
                     text = if (note.title.length > 28) "${note.title.substring(0,25)} ..." else note.title,
                     style = noteItemTitleStyle.copy(
-                        textAlign = if (hasCover) TextAlign.Start else TextAlign.Center
+                        textAlign = TextAlign.Center
                     )
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 Text(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().height(35.dp),
                     text = if (note.content.length > 90) "${note.content.substring(0,80)} ..." else note.content,
                     style = noteItemContentStyle.copy(
-                        textAlign = if (hasCover) TextAlign.Start else TextAlign.Center
-                    )
+                        textAlign = TextAlign.Center
+                    ),
+                    overflow = TextOverflow.Ellipsis
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
@@ -155,9 +157,10 @@ fun NoteItem(
                     text = getGracefullyTimeFromEpoch(note.lastModified.time),
                     style = noteItemContentStyle.copy(
                         fontSize = 12.sp,
-                        textAlign = if (hasCover) TextAlign.Start else TextAlign.Center
+                        textAlign = TextAlign.Center
                     )
                 )
+                Spacer(modifier = Modifier.height(if (hasCover) 6.dp else 2.dp))
             }
         }
     }
