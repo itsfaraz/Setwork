@@ -109,7 +109,12 @@ class ContainerViewModel(
     }
 
     public fun setupRepeatList(currentDate : Date){
-        _repeatList.value = repeatRepository.getRepeatList(currentDate)
+        try {
+            _repeatList.value = repeatRepository.getRepeatList(currentDate)
+        }catch (e : Exception){
+            e.printStackTrace()
+            Log.i("VM", "setupRepeatList: Exception ${e.message}")
+        }
     }
 
     public fun getCatiegoryIndexById(categoryId : Long) : Int{

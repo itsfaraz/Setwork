@@ -186,6 +186,7 @@ class HomeFragment : Fragment() {
                     mutableStateOf(false)
                 }
                 val viewType = viewModel.viewType.value
+
                 Box(
                     modifier = Modifier.fillMaxSize(),
                 ) {
@@ -224,6 +225,8 @@ class HomeFragment : Fragment() {
                                     viewModel.onEvent(HomeEvents.OnViewChange(it))
                                     viewModel.onEvent(HomeEvents.OnClearSearch)
                                     viewModel.onEvent(HomeEvents.OnSearchToggle(false))
+                                    // impossible index
+                                    viewModel.onEvent(HomeEvents.OnCategorySortSelected(-1))
                                 }
                             )
                             Spacer(modifier = Modifier.height(if (searchToggle) 20.dp else 0.dp))

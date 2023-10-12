@@ -138,21 +138,24 @@ class HomeViewModel(
             }
             is HomeEvents.HighlightDateByTodo -> {
                 try{
-                    val date = _todoList.value[event.visibleIndex].date
-                    val dateEpoch = IDateGenerator.getEpochForDate(date)
-                    val index = _dateList.value.indexOf(IDateGenerator.getDateFromDate(date))
+                    val todoDate = _todoList.value[event.visibleIndex].date
+                    val index = _dateList.value.indexOf(IDateGenerator.getDateFromDate(todoDate)) // generateDateIndexByTodoDate(todoDate) // under working
                     if(index != -1){
                         _selectedIndex.value = index
                         _currentDateIndex.value = index
                     }
                 }catch (e : Exception){
-                    Log.e(TAG, "onEvent: $e")
+                    Log.e(TAG, "onEvent: ${e.message}")
                 }
             }
             is HomeEvents.OnCategorySortSelected -> {
-                _isSorted = !(_selectedCategoryIndex.value == event.categoryIndex)
-                _selectedCategoryIndex.value = if (event.categoryIndex == _selectedCategoryIndex.value) -1 else event.categoryIndex
-                applySortByCategory()
+                try {
+                    _isSorted = !(_selectedCategoryIndex.value == event.categoryIndex)
+                    _selectedCategoryIndex.value = if (event.categoryIndex == _selectedCategoryIndex.value) -1 else event.categoryIndex
+                    applySortByCategory()
+                }catch (e : Exception){
+                    Log.e(TAG, "onEvent: ${e.message}")
+                }
             }
             is HomeEvents.OnProgressBarToggle -> {
                 _progressBarVisibility.value = event.toggleValue
@@ -170,6 +173,21 @@ class HomeViewModel(
                 _searchText.value = ""
             }
         }
+    }
+
+    private fun generateDateIndexByTodoDate(todoDate: Date): Int {
+        val timeCondition = IDateGenerator.getEpochForDate(todoDate)
+        val loadCondition = IDateGenerator.getEpochForDate(_dateList.value[0]) > timeCondition
+        if (loadCondition){
+            while (IDateGenerator.getEpochForDate(_dateList.value[0]) >= timeCondition){
+                loadPreviousMonth()
+            }
+        }else{
+            while (IDateGenerator.getEpochForDate(_dateList.value[_dateList.value.lastIndex]) <= timeCondition){
+                loadNextMonth()
+            }
+        }
+        return _dateList.value.indexOf(IDateGenerator.getDateFromDate(todoDate))
     }
 
     private fun applySortByCategory() {
