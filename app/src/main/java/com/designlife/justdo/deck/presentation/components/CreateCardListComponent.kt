@@ -27,6 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -39,6 +40,8 @@ import androidx.compose.ui.unit.sp
 import com.designlife.justdo.R
 import com.designlife.justdo.common.domain.entities.FlashCard
 import com.designlife.justdo.ui.theme.ButtonPrimary
+import com.designlife.justdo.ui.theme.IconColor
+import com.designlife.justdo.ui.theme.TypographyColor
 import com.designlife.justdo.ui.theme.cardTextStyle
 import com.designlife.justdo.ui.theme.cardTextStyleSize
 import com.designlife.justdo.ui.theme.fontFamily
@@ -86,13 +89,14 @@ fun CreateCardListComponent(
                                 append("\n\n\nCreate new card")
                             }
                         },
-                        style = cardTextStyle.value.copy(fontSize = cardTextStyleSize.value)
+                        style = cardTextStyle.value.copy(fontSize = cardTextStyleSize.value, color = TypographyColor.value)
                     )
                     Spacer(modifier = Modifier.height(40.dp))
                     Image(
                         modifier = Modifier.size(200.dp, 250.dp),
                         painter = painterResource(id = R.drawable.ic_down_pointing_arrow),
-                        contentDescription = "Arrow"
+                        contentDescription = "Arrow",
+                        colorFilter = ColorFilter.tint(color = IconColor.value)
                     )
                 }
             }
