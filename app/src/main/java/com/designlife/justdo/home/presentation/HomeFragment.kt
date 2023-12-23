@@ -52,6 +52,7 @@ import com.designlife.justdo.common.domain.repositories.appstore.AppStoreReposit
 import com.designlife.justdo.common.presentation.components.BottomSheet
 import com.designlife.justdo.common.presentation.components.ProgressBar
 import com.designlife.justdo.common.utils.AppServiceLocator
+import com.designlife.justdo.common.utils.NavOptions
 import com.designlife.justdo.common.utils.constants.Constants.TASK_VIEW
 import com.designlife.justdo.common.utils.constants.Constants.TASK_VIEW_ID
 import com.designlife.justdo.common.utils.entity.BottomNavItem
@@ -315,6 +316,7 @@ class HomeFragment : Fragment() {
                                 }
                                 AnimatedVisibility(visible = searchToggle) {
                                     SearchBarComponent(
+                                        isDarkMode = isDarkMode,
                                         searchText = searchText,
                                         onSearchUpdates = {
                                             viewModel.onEvent(HomeEvents.OnSearchUpdate(it))
@@ -419,7 +421,8 @@ class HomeFragment : Fragment() {
                                             )
                                             findNavController().navigate(
                                                 R.id.noteFragment,
-                                                bundle
+                                                bundle,
+                                                NavOptions.navOptionStack
                                             )
                                         }
                                     )
@@ -438,7 +441,8 @@ class HomeFragment : Fragment() {
                                             bundle.putLong("deckId", deckList[index].deckId)
                                             findNavController().navigate(
                                                 R.id.deckFragment,
-                                                bundle
+                                                bundle,
+                                                NavOptions.navOptionStack
                                             )
                                         }
                                     )
@@ -513,7 +517,8 @@ class HomeFragment : Fragment() {
                                         .padding(bottom = 65.dp, end = 20.dp)
                                         .wrapContentSize(),
                                     onClick = {
-                                        viewModel.updateSheetVisibility(true)
+//                                        viewModel.updateSheetVisibility(true)
+                                          navigateByView(viewType)
                                     },
                                     backgroundColor = ButtonPrimary.value
                                 ) {
@@ -533,30 +538,13 @@ class HomeFragment : Fragment() {
                                         viewModel.updateSheetVisibility(false)
                                     },
                                     onTaskEvent = {
-                                        val bundle = bundleOf()
-                                        bundle.putBoolean(TASK_VIEW, false)
-                                        findNavController().navigate(
-                                            R.id.taskFragment,
-                                            bundle
-                                        )
+
                                     },
                                     onNoteEvent = {
-                                        val bundle = bundleOf()
-                                        bundle.putLong("noteId", -1L)
-                                        bundle.putInt("categoryIndex", 0)
-                                        findNavController().navigate(
-                                            R.id.noteFragment,
-                                            bundle
-                                        )
+
                                     },
                                     onDeckEvent = {
-                                        val bundle = bundleOf()
-                                        bundle.putLong("deckId", -1L)
-                                        bundle.putInt("categoryIndex", 0)
-                                        findNavController().navigate(
-                                            R.id.deckFragment,
-                                            bundle
-                                        )
+
                                     }
                                 )
                                 if (!isBottomSheetToggled.value) {
@@ -653,12 +641,47 @@ class HomeFragment : Fragment() {
         bundle.putInt(TASK_VIEW_ID, todoId)
         findNavController().navigate(
             R.id.taskFragment,
-            bundle
+            bundle,
+            NavOptions.navOptionStack
         )
     }
 
     private suspend fun scrollToRollItem(currentDateIndex: Int, listState: LazyListState) {
         listState.animateScrollToItem(currentDateIndex)
     }
+
+    private fun navigateByView(viewType : ViewType){
+        val bundle = bundleOf()
+        when(viewType){
+            ViewType.TASK -> {
+                bundle.putBoolean(TASK_VIEW, false)
+                findNavController().navigate(
+                    R.id.taskFragment,
+                    bundle,
+                    NavOptions.navOptionStackSlide
+                )
+            }
+            ViewType.DECK -> {
+                bundle.putLong("deckId", -1L)
+                bundle.putInt("categoryIndex", 0)
+                findNavController().navigate(
+                    R.id.deckFragment,
+                    bundle,
+                    NavOptions.navOptionStackSlide
+                )
+            }
+            ViewType.NOTE -> {
+                bundle.putLong("noteId", -1L)
+                bundle.putInt("categoryIndex", 0)
+                findNavController().navigate(
+                    R.id.noteFragment,
+                    bundle,
+                    NavOptions.navOptionStackSlide
+                )
+            }
+            else -> {}
+        }
+    }
+
 }
 

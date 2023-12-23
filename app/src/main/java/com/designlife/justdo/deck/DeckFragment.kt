@@ -112,33 +112,37 @@ class DeckFragment : Fragment() {
                             .background(color = UIComponentBackground.value),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        DeckHeader(
-                            headerTitle = headerTitle,
-                            onTitleChange = {
-                                viewModel.onEvent(DeckEvents.OnHeaderChange(it))
-                            },
-                            onCloseEvent = {
-                                findNavController().navigateUp()
-                            },
-                            isEdit = editState,
-                            onButtonClickEvent = {
-                                viewModel.onEvent(DeckEvents.OnEditStateChange(false))
-                                viewModel.onEvent(DeckEvents.OnPersistCardChanges)
-                            },
-                            categoryList = categoryList,
-                            selectedCategoryIndex = selectedCategoryIndex,
-                            onCategoryIndexChange = {
-                                viewModel.onEvent(DeckEvents.OnCategoryIndexChange(it))
-                            },
-                            addNewCategory = {
-                                val bundle = bundleOf()
-                                bundle.putInt(Constants.SCREEN_TYPE, ScreenType.CATEGORY.ordinal)
-                                findNavController().navigate(
-                                    R.id.containerFragment,
-                                    bundle
-                                )
-                            }
-                        )
+                        AnimatedVisibility(
+                            visible = !viewModeVisibility
+                        ){
+                            DeckHeader(
+                                headerTitle = headerTitle,
+                                onTitleChange = {
+                                    viewModel.onEvent(DeckEvents.OnHeaderChange(it))
+                                },
+                                onCloseEvent = {
+                                    findNavController().navigateUp()
+                                },
+                                isEdit = editState,
+                                onButtonClickEvent = {
+                                    viewModel.onEvent(DeckEvents.OnEditStateChange(false))
+                                    viewModel.onEvent(DeckEvents.OnPersistCardChanges)
+                                },
+                                categoryList = categoryList,
+                                selectedCategoryIndex = selectedCategoryIndex,
+                                onCategoryIndexChange = {
+                                    viewModel.onEvent(DeckEvents.OnCategoryIndexChange(it))
+                                },
+                                addNewCategory = {
+                                    val bundle = bundleOf()
+                                    bundle.putInt(Constants.SCREEN_TYPE, ScreenType.CATEGORY.ordinal)
+                                    findNavController().navigate(
+                                        R.id.containerFragment,
+                                        bundle
+                                    )
+                                }
+                            )
+                        }
                         // Create Card Section
                         AnimatedVisibility(
                             visible = !viewModeVisibility,

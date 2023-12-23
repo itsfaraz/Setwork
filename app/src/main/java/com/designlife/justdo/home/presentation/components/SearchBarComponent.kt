@@ -20,17 +20,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.designlife.justdo.R
+import com.designlife.justdo.ui.theme.IconColor
+import com.designlife.justdo.ui.theme.LightButtonPrimary
+import com.designlife.justdo.ui.theme.LightPrimaryColorHome1
 import com.designlife.justdo.ui.theme.Shapes
+import com.designlife.justdo.ui.theme.TypographyColor
+import com.designlife.justdo.ui.theme.UIComponentBackground
 import com.designlife.justdo.ui.theme.cutBottomRoundedCorners
 import com.designlife.justdo.ui.theme.noteContentStyle
 import com.designlife.justdo.ui.theme.noteContentStyleSize
 
 @Composable
 fun SearchBarComponent(
+    isDarkMode : Boolean,
     searchText : String,
     onSearchUpdates : (searchText : String) -> Unit,
     onClearSearch : () -> Unit
@@ -41,7 +48,7 @@ fun SearchBarComponent(
             .fillMaxWidth()
             .height(40.dp)
             .clip(RoundedCornerShape(15.dp))
-            .background(Color.White),
+            .background(UIComponentBackground.value),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
@@ -49,8 +56,10 @@ fun SearchBarComponent(
             value = searchText,
             singleLine = true,
             textStyle = noteContentStyle.value.copy(
-                fontSize = noteContentStyleSize.value
+                fontSize = noteContentStyleSize.value,
+                color = TypographyColor.value,
             ),
+            cursorBrush = SolidColor(LightButtonPrimary),
             onValueChange = {onSearchUpdates(it)}
         ){ innerTextField ->
             Row(
@@ -61,7 +70,7 @@ fun SearchBarComponent(
                 horizontalArrangement = Arrangement.Center
             ) {
                 if (searchText.isEmpty()){
-                    Icon(modifier = Modifier.size(15.dp),painter = painterResource(id = R.drawable.ic_search), contentDescription = "Search Icon")
+                    Icon(modifier = Modifier.size(15.dp),painter = painterResource(id = R.drawable.ic_search), contentDescription = "Search Icon", tint = LightButtonPrimary)
                 }
                 Spacer(modifier = Modifier.width(4.dp))
                 Row( modifier = Modifier.fillMaxWidth(.8F)) {
@@ -75,7 +84,7 @@ fun SearchBarComponent(
                         IconButton(onClick = {
                             onClearSearch()
                         }) {
-                            Icon(modifier = Modifier.size(20.dp),imageVector = Icons.Default.Close, contentDescription = "Cross Icon")
+                            Icon(modifier = Modifier.size(20.dp),imageVector = Icons.Default.Close, contentDescription = "Cross Icon", tint = IconColor.value)
                         }
                     }
                 }
