@@ -124,9 +124,14 @@ class DeckFragment : Fragment() {
                                     findNavController().navigateUp()
                                 },
                                 isEdit = editState,
+                                isNew = deckMode != DeckMode.UPDATE,
                                 onButtonClickEvent = {
                                     viewModel.onEvent(DeckEvents.OnEditStateChange(false))
                                     viewModel.onEvent(DeckEvents.OnPersistCardChanges)
+                                },
+                                onDeleteButtonClickEvent = {
+                                    viewModel.onEvent(DeckEvents.OnDeckDeleteEvent)
+                                    findNavController().navigateUp()
                                 },
                                 categoryList = categoryList,
                                 selectedCategoryIndex = selectedCategoryIndex,

@@ -11,5 +11,6 @@ sealed class DeckEvents{
     data class OnEditStateChange(val editState : Boolean) : DeckEvents()
     data class OnUpdateCardChange(val index : Int,val card : FlashCard) : DeckEvents()
     object OnPersistCardChanges : DeckEvents()
+    object OnDeckDeleteEvent : DeckEvents()
     data class OnCategoryIndexChange(val value : Int) : DeckEvents()
 }

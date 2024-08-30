@@ -111,8 +111,14 @@ class NoteFragment : Fragment() {
                                 }
                                 Toast.makeText(requireContext(), "Saved", Toast.LENGTH_SHORT).show()
                                 findNavController().navigateUp()
-                            }
-                        ) { /* do something */ }
+                            },
+                            hasDone = noteMode == NoteMode.UPDATE,
+                            forTask = noteMode == NoteMode.UPDATE,
+                            isOverview = noteMode == NoteMode.UPDATE
+                        ) {
+                            viewModel.onEvent(NoteEvents.OnDeleteNote(requireContext()))
+                            findNavController().navigateUp()
+                        }
                         CustomAttachementsTab(
                             hasCover = true,
                             onGalleryEvent = { bitMap ->
@@ -203,6 +209,10 @@ class NoteFragment : Fragment() {
 
     override fun onStop() {
         super.onStop()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
         // save updates
         if (noteMode == NoteMode.CREATE) {
             viewModel.insertNote()
@@ -212,10 +222,5 @@ class NoteFragment : Fragment() {
         if (viewModel.hasNoteModified.value) {
             Toast.makeText(requireContext(), "Saved", Toast.LENGTH_SHORT).show()
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-
     }
 }

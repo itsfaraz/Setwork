@@ -424,6 +424,8 @@ class HomeFragment : Fragment() {
                                                 bundle,
                                                 NavOptions.navOptionStack
                                             )
+                                        },
+                                        onNoteLongClickEvent = {
                                         }
                                     )
                                 }

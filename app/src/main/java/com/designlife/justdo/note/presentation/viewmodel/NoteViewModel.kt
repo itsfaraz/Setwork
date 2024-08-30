@@ -1,7 +1,9 @@
 package com.designlife.justdo.note.presentation.viewmodel
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -78,6 +80,22 @@ class NoteViewModel(
             is NoteEvents.OnCategoryIndexChange -> {
                 _selectedCategoryIndex.value = event.value
             }
+            is NoteEvents.OnDeleteNote -> {
+                deleteNoteById()
+            }
+        }
+    }
+
+    private fun deleteNoteById() {
+        if (_noteId.value != -1L){
+            try {
+                viewModelScope.launch(Dispatchers.IO){
+                    noteRepository.deleteNote(_noteId.value)
+                }
+            }catch (e : Exception){
+                Log.e(TAG, "deleteNoteById: ${e.message}")
+                e.printStackTrace()
+            }
         }
     }
 
@@ -133,7 +151,9 @@ class NoteViewModel(
             _hasNoteModified.value = true
             _progressBar.value = true
             CoroutineScope((Dispatchers.IO)).launch {
-                val coverImage = async { ImageConverter.getByteArrayFromBitMap(_coverImage.value) }.await()
+                val coverImage = async {
+                    ImageConverter.getByteArrayFromBitMap(if (_coverImage.value != null) _coverImage.value else _notePrevState.third)
+                }.await()
                 val note = Note(
                     noteId = _noteId.value,
                     title = _titleValue.value,
@@ -157,7 +177,7 @@ class NoteViewModel(
     }
 
     private fun isNoteUpdated(): Boolean {
-        if (_selectedCategoryIndex.value != _notePrevState.second)
+        if (_notePrevState.second != _selectedCategoryIndex.value)
             return true
         _notePrevState.first.also {
             if (_titleValue.value != it.title)
@@ -165,9 +185,8 @@ class NoteViewModel(
             if (_contentValue.value != it.content)
                 return true
         }
-        if (_coverImage.value != _notePrevState.third)
+        if (_notePrevState.third != _coverImage.value)
             return true
-
         return false
     }
 

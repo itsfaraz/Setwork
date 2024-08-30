@@ -25,6 +25,8 @@ class DeckViewModel(
     private val categoryRepository: CategoryRepository
 ) : ViewModel() {
 
+    private val TAG = "DeckViewModel"
+
     private val _deckId : MutableState<Long> = mutableStateOf(0L)
 
     private val _headerTitle : MutableState<String> = mutableStateOf("")
@@ -97,6 +99,22 @@ class DeckViewModel(
             is DeckEvents.OnCategoryIndexChange -> {
                 _selectedCategoryIndex.value = event.value
                 setupColor(event.value)
+            }
+            is DeckEvents.OnDeckDeleteEvent -> {
+                deleteDeckById()
+            }
+        }
+    }
+
+    private fun deleteDeckById() {
+        if (_deckId.value != -1L){
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    deckRepository.deleteDeck(_deckId.value)
+                }catch (e : Exception){
+                    Log.e(TAG,"deleteDeckById: ${e.message}" )
+                    e.printStackTrace()
+                }
             }
         }
     }

@@ -21,8 +21,10 @@ fun NoteItemList(
     listState: LazyStaggeredGridState,
     noteList: List<Note>,
     colorMap: Map<Long, Color>,
-    onNoteClickEvent: (index: Int) -> Unit
+    onNoteClickEvent: (index: Int) -> Unit,
+    onNoteLongClickEvent: (index: Int) -> Unit
 ) {
+
     LazyVerticalStaggeredGrid(
         modifier = Modifier
             .padding(horizontal = 6.dp)
@@ -35,9 +37,14 @@ fun NoteItemList(
             val item = noteList[index]
             if (colorMap.containsKey(item.categoryId)) {
                 val color: Color = colorMap.get(item.categoryId) ?: TaskItemLabelColor.value
-                NoteItem(note = noteList[index], noteTheme = color) {
-                    onNoteClickEvent(index)
-                }
+                NoteItem(
+                    note = noteList[index],
+                    noteTheme = color,
+                    onClick = {
+                        onNoteClickEvent(index)
+                              },
+                    onLongClick = {onNoteLongClickEvent(index)}
+                )
             }
             if (index == noteList.lastIndex){
                 Spacer(modifier = Modifier.height(120.dp))

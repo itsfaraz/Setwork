@@ -3,9 +3,11 @@ package com.designlife.justdo.home.presentation.components
 import android.graphics.BitmapFactory
 import android.graphics.Paint.Align
 import android.net.Uri
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,6 +26,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
@@ -54,11 +57,13 @@ import com.designlife.justdo.ui.theme.noteItemTitleStyleSize
 import com.designlife.justdo.ui.theme.noteListHeight
 import java.util.Date
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun NoteItem(
     noteTheme : Color,
     note : Note,
-    onClick : () -> Unit
+    onClick : () -> Unit,
+    onLongClick : () -> Unit
 ) {
     val hasCover = note.coverImage != null
     val modifier = if (hasCover) Modifier
@@ -77,9 +82,15 @@ fun NoteItem(
         backgroundColor = UIComponentBackground.value,
         modifier = modifier
             .padding(horizontal = if (!hasCover) 5.dp else 12.dp, vertical = if (!hasCover) 0.dp else 4.dp)
-            .clickable {
-                onClick()
-            },
+//            .alpha(if (deleteLock) 0.4F else 0F)
+            .combinedClickable(
+                onClick = {
+                    onClick()
+                },
+                onLongClick = {
+                    onLongClick()
+                }
+            ),
         shape = RoundedCornerShape(12.dp),
         elevation = 10.dp
     ) {

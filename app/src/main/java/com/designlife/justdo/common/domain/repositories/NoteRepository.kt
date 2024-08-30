@@ -49,7 +49,7 @@ class NoteRepository(
         }
     }
 
-    suspend fun deleteNote(noteId: Long): Unit {
+    suspend fun deleteNote(noteId: Long) {
         noteDao.deleteNoteById(noteId)
     }
 

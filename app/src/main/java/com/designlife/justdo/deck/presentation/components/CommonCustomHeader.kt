@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.Icon
@@ -42,7 +43,9 @@ fun DeckHeader(
     onTitleChange: (newTitle: String) -> Unit,
     onCloseEvent: () -> Unit,
     isEdit : Boolean,
+    isNew : Boolean,
     onButtonClickEvent : () -> Unit,
+    onDeleteButtonClickEvent : () -> Unit,
     categoryList : List<Category>,
     selectedCategoryIndex : Int,
     onCategoryIndexChange : (index : Int) -> Unit,
@@ -68,7 +71,7 @@ fun DeckHeader(
             Icon(imageVector = Icons.Default.Close, contentDescription = "Close Icon", tint = IconColor.value)
         }
         Row(
-            modifier = Modifier.fillMaxWidth(.75F),
+            modifier = Modifier.fillMaxWidth(.52F),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -76,7 +79,7 @@ fun DeckHeader(
             BasicTextField(
                 modifier = Modifier
                     .padding(end = 10.dp)
-                    .fillMaxWidth(if (isEdit) .78F else .78F)
+                    .fillMaxWidth()
                     .background(color = Color.Transparent),
                 value = headerTitle,
                 onValueChange = {
@@ -107,16 +110,27 @@ fun DeckHeader(
         }
 
         if (!isEdit){
-            CustomAttachementsTab(
-                hasCover = false,
-                onGalleryEvent = { /*TODO*/ },
-                categoryList = categoryList,
-                selectedCategoryIndex = selectedCategoryIndex,
-                onCategoryEvent = onCategoryIndexChange
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight(),
+                horizontalArrangement = Arrangement.Start
             ) {
-                addNewCategory()
+                CustomAttachementsTab(
+                    hasCover = false,
+                    onGalleryEvent = { /*TODO*/ },
+                    categoryList = categoryList,
+                    selectedCategoryIndex = selectedCategoryIndex,
+                    onCategoryEvent = onCategoryIndexChange
+                ) {
+                    addNewCategory()
+                }
+                if (!isNew){
+                    CustomButton(buttonText = "Delete", isDangerButton = true) {
+                        onDeleteButtonClickEvent()
+                    }
+                }
             }
         }
     }
-
 }
