@@ -6,11 +6,8 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.navigation.fragment.NavHostFragment
 import com.designlife.justdo.common.utils.AppServiceLocator
@@ -22,7 +19,6 @@ import com.designlife.justdo.ui.theme.updateSystemColor
 import com.designlife.justdo.ui.theme.updateSystemFont
 import com.designlife.justdo.ui.theme.updateSystemListSize
 import com.designlife.justdo.ui.theme.updateSystemUIMode
-import com.designlife.justdo_provider.ServiceLocator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest

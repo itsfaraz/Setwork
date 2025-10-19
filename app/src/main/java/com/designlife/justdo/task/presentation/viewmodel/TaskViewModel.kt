@@ -1,5 +1,6 @@
 package com.designlife.justdo.task.presentation.viewmodel
 
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -129,7 +130,9 @@ class TaskViewModel(
 
     private fun createTask(repeatType: RepeatType,category: Category) {
         _progressBar.value = true
+        Log.i("ERROR_CHECK","createTask: start")
         viewModelScope.launch(Dispatchers.IO) {
+            Log.i("ERROR_CHECK","createTask: viewModelScope.launch")
             val todo = Todo(
                 title = _titleValue.value,
                 note = _noteValue.value,
@@ -141,22 +144,29 @@ class TaskViewModel(
                 todoId = 0,
                 repeatIndex = shareViewModel.selectedRepeatIndex.value
             )
+            Log.i("ERROR_CHECK","createTask: createRepeatedEvents")
             val taskList = repeatRepository.createRepeatedEvents(todo,repeatType,_rawTaskDateTimeInstance.value.time)
             val totalTodo = category.totalTodo + taskList.size
+            Log.i("ERROR_CHECK","createTask:  categoryRepository.updateCategory")
             categoryRepository.updateCategory(category.copy(totalTodo = totalTodo))
+            Log.i("ERROR_CHECK","createTask:  todoRepository.insertAllTodo")
             todoRepository.insertAllTodo(taskList)
+            Log.i("ERROR_CHECK","createTask: setNotifications")
             setNotifications(taskList)
             _progressBar.value = false
         }
     }
 
     private fun setNotifications(taskList : List<Todo>){
+        Log.i("ERROR_CHECK","setNotifications: setNotifications")
         val triplets = taskList.map { todo: Todo -> Triple(
             first = todo.date,
             second = todo.title,
             third = todo.todoId
         ) }
+        Log.i("ERROR_CHECK","setNotifications: before taskNotificationRepository.scheduleNotification")
         taskNotificationRepository.scheduleNotification(triplets)
+        Log.i("ERROR_CHECK","setNotifications: after taskNotificationRepository.scheduleNotification")
     }
 
 

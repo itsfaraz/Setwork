@@ -22,16 +22,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.NavDeepLinkBuilder
-import androidx.navigation.Navigation.findNavController
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.findNavController
 import com.designlife.justdo.R
 import com.designlife.justdo.common.domain.calendar.IDateGenerator
 import com.designlife.justdo.common.presentation.components.CommonCustomHeader
@@ -50,9 +45,7 @@ import com.designlife.justdo.task.presentation.viewmodel.TaskViewModel
 import com.designlife.justdo.task.presentation.viewmodel.TaskViewModelFactory
 import com.designlife.justdo.ui.theme.ButtonPrimary
 import com.designlife.justdo.ui.theme.PrimaryBackgroundColor
-import com.designlife.justdo.ui.theme.TaskItemLabelColor
 import com.designlife.orchestrator.NotificationServiceLocator
-import com.designlife.orchestrator.notification.broadcastreceiver.TaskService
 import com.designlife.orchestrator.notification.clickmanager.NotificationClickManager
 import com.designlife.orchestrator.notification.clickmanager.TaskListener
 import com.designlife.orchestrator.notification.repository.TaskNotificationRepository
@@ -132,6 +125,7 @@ class TaskFragment : Fragment(), TaskListener {
 //                                viewmodel.onEvent(TaskEvents.MarkTaskDone(taskId))
                                 viewmodel.onEvent(TaskEvents.DeleteTaskEvent(taskId))
                             }else{
+                                Log.i("ERROR_CHECK", "onCreateView: Compose Click Create Task")
                                 viewmodel.onEvent(TaskEvents.CreateTask(getRepeatType(shareViewModel.selectedRepeatIndex.value),selectedCategory))
                             }
                             findNavController().navigateUp()
@@ -282,13 +276,10 @@ class TaskFragment : Fragment(), TaskListener {
         }
     }
 
-    override fun onBroadCastRecieveListener(id: Int, title: String) {
-//        val bundle = bundleOf()
-//        bundle.putBoolean(Constants.TASK_VIEW,true)
-//        bundle.putInt(Constants.TASK_VIEW_ID,id)
-//        findNavController().navigate(R.id.taskFragment, bundle)
+
+    override fun onUserNotificationEvent(id: Int, title: String) {
+        TODO("Not yet implemented")
         taskId = id
-        Log.i("LISTENER", "onBroadCastRecieveListener: ${id} : ${title}")
     }
 
 
