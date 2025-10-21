@@ -38,6 +38,7 @@ import com.designlife.justdo.common.utils.enums.RepeatType
 import com.designlife.justdo.common.utils.enums.ScreenType
 import com.designlife.justdo.container.presentation.viewmodel.ContainerViewModel
 import com.designlife.justdo.container.presentation.viewmodel.ContainerViewModelFactory
+import com.designlife.justdo.task.presentation.components.DeleteDialogComponent
 import com.designlife.justdo.task.presentation.components.TaskItemDate
 import com.designlife.justdo.task.presentation.components.TaskItemView
 import com.designlife.justdo.task.presentation.events.TaskEvents
@@ -49,6 +50,8 @@ import com.designlife.orchestrator.NotificationServiceLocator
 import com.designlife.orchestrator.notification.clickmanager.NotificationClickManager
 import com.designlife.orchestrator.notification.clickmanager.TaskListener
 import com.designlife.orchestrator.notification.repository.TaskNotificationRepository
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import java.util.Calendar
 
 class TaskFragment : Fragment(), TaskListener {
@@ -109,6 +112,7 @@ class TaskFragment : Fragment(), TaskListener {
                 val selectedRepeatMode = shareViewModel.repeatList.value[shareViewModel.selectedRepeatIndex.value]
                 val calendarInstance = shareViewModel.setupRepeatList(viewmodel.rawTaskDateTimeInstance.value.time)
                 val progressBar = viewmodel.progressBar.value
+                val deletePopupState = viewmodel.deleteTaskPopup.value
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -123,12 +127,13 @@ class TaskFragment : Fragment(), TaskListener {
                         CommonCustomHeader(headerTitle = if (isOverview) "Task Overview" else "New Task", forTask = true, hasDone = viewmodel.isCompleted.value, onCloseEvent = { findNavController().navigateUp()}, isOverview = isOverview) {
                             if (isOverview){
 //                                viewmodel.onEvent(TaskEvents.MarkTaskDone(taskId))
-                                viewmodel.onEvent(TaskEvents.DeleteTaskEvent(taskId))
+//                                viewmodel.onEvent(TaskEvents.DeleteTaskEvent(taskId))
+                                viewmodel.onEvent(TaskEvents.DeleteTaskPopup(true))
                             }else{
                                 Log.i("ERROR_CHECK", "onCreateView: Compose Click Create Task")
                                 viewmodel.onEvent(TaskEvents.CreateTask(getRepeatType(shareViewModel.selectedRepeatIndex.value),selectedCategory))
+                                findNavController().navigateUp()
                             }
-                            findNavController().navigateUp()
                         }
                         Spacer(modifier = Modifier.height(20.dp))
                         LazyColumn(
@@ -257,6 +262,17 @@ class TaskFragment : Fragment(), TaskListener {
                     }
                     if (progressBar){
                         ProgressBar()
+                    }
+                    if (deletePopupState){
+                        DeleteDialogComponent(eventSuccuss = {
+                            viewmodel.onEvent(TaskEvents.DeleteTasksEvent(taskId,true))
+                            viewmodel.onEvent(TaskEvents.DeleteTaskPopup(false))
+                            findNavController().navigateUp()
+                        }, eventFail = {
+                            viewmodel.onEvent(TaskEvents.DeleteTasksEvent(taskId,false))
+                            viewmodel.onEvent(TaskEvents.DeleteTaskPopup(false))
+                            findNavController().navigateUp()
+                        })
                     }
                 }
 

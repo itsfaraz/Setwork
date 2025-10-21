@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.designlife.justdo.common.domain.calendar.IDateGenerator
 import com.designlife.justdo.common.domain.entities.Category
+import com.designlife.justdo.common.domain.entities.RawTodo
 import com.designlife.justdo.common.domain.entities.Todo
 import com.designlife.justdo.common.domain.repeat.RepeatRepository
 import com.designlife.justdo.common.domain.repositories.CategoryRepository
@@ -19,7 +20,13 @@ import com.designlife.orchestrator.notification.repository.TaskNotificationRepos
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import java.util.Calendar
 import java.util.Date
 
@@ -52,9 +59,22 @@ class TaskViewModel(
     private val _progressBar : MutableState<Boolean> = mutableStateOf(false)
     val progressBar = _progressBar
 
+    private val _deleteTaskPopup : MutableState<Boolean> = mutableStateOf(false)
+    val deleteTaskPopup = _deleteTaskPopup
+
+    private val _rawTodos = MutableStateFlow<List<RawTodo>>(emptyList())
+
     // Task Overview
     private val _isCompleted : MutableState<Boolean> = mutableStateOf(false)
     val isCompleted = _isCompleted
+
+    init {
+        viewModelScope.launch{
+            todoRepository.getAllRawTodo().collect { todos ->
+                _rawTodos.value = todos
+            }
+        }
+    }
 
     fun onEvent(event : TaskEvents){
         when(event){
@@ -90,11 +110,38 @@ class TaskViewModel(
             is TaskEvents.MarkTaskDone -> {
                 updateTodoDone(event.todoId)
             }
-            is TaskEvents.DeleteTaskEvent -> {
-                deleteTodoById(event.todoId)
+            is TaskEvents.DeleteTaskPopup -> {
+//                deleteTodoById(event.todoId)
+                _deleteTaskPopup.value = event.state
+            }
+            is TaskEvents.DeleteTasksEvent -> {
+                if (event.allOccurrence){
+                    deleteAllTodoOccurrenceById(event.taskId)
+                }else{
+                    deleteTodoById(event.taskId)
+                }
             }
         }
 
+    }
+
+    private fun deleteAllTodoOccurrenceById(taskId: Int): Unit {
+        _progressBar.value = true
+        Log.i("DATA_CHECK", "deleteAllTodoOccurrenceById: Raw Todo Data List ${_rawTodos.value.size}")
+        if (taskId != -1){
+            viewModelScope.launch(Dispatchers.IO) {
+                val rawTodo = async {  todoRepository.getRawTodoById(taskId) }.await()
+                Log.i("DATA_CHECK", "deleteAllTodoOccurrenceById: Raw Todo Date : ${rawTodo.date} & CreatedOn : ${rawTodo.createdOn}")
+                _rawTodos.value
+                    .filter { todo ->
+                        Log.i("DATA_CHECK", "deleteAllTodoOccurrenceById: Each Raw Todo Date : ${todo.date} & CreatedOn : ${todo.createdOn}")
+
+                        rawTodo.date.equals(todo.date) || rawTodo.createdOn.equals(todo.createdOn)
+                    }
+                    .forEach { todo -> todoRepository.deleteTodo(todo.todoId.toInt()) }
+            }
+        }
+        _progressBar.value = false
     }
 
     private fun deleteTodoById(todoId: Int) {
