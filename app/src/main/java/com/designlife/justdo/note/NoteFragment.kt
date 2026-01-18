@@ -215,7 +215,7 @@ class NoteFragment : Fragment() {
         super.onDestroy()
         // save updates
         if (noteMode == NoteMode.CREATE) {
-            viewModel.insertNote()
+//            viewModel.insertNote()
         } else {
             viewModel.updateNote()
         }

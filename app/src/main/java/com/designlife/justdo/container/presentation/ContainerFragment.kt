@@ -1,6 +1,7 @@
 package com.designlife.justdo.container.presentation
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -16,6 +17,8 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import com.designlife.justdo.common.domain.calendar.IDateGenerator
+import com.designlife.justdo.common.domain.enums.CategoryState
+import com.designlife.justdo.common.presentation.components.CategoryHeader
 import com.designlife.justdo.common.presentation.components.CommonCustomHeader
 import com.designlife.justdo.common.utils.AppServiceLocator
 import com.designlife.justdo.common.utils.constants.Constants
@@ -36,7 +39,7 @@ class ContainerFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        Log.i("FRAGMENT_CHECK", "onCreate: ContainerFragment")
         val categoryRepository = AppServiceLocator.provideCategoryRepository(requireActivity().applicationContext)
         val repeatRepository = AppServiceLocator.provideRepeatRepository()
         val factory = ContainerViewModelFactory(categoryRepository,repeatRepository)
@@ -61,13 +64,15 @@ class ContainerFragment : Fragment() {
         return ComposeView(requireContext()).apply {
             setContent {
                 val screenType = viewmodel.screenType.value
-                val categoryList = viewmodel.categoryList.value
+                val categoryList = viewmodel.categoryList
                 val selectedCategoryIndex = viewmodel.selectedCategory.value
                 val colorPickerState = viewmodel.colorPickerToggle.value
                 val selectedPaletteColor = viewmodel.selectedPaletteColor.value
                 val selectedEmoji = viewmodel.selectedEmoji.value
                 val newCategoryName = viewmodel.categoryName.value
+                val editCategoryName = viewmodel.categoryTitle.value
                 val isEditMode = viewmodel.editMode.value
+                val categoryMode = viewmodel.categoryMode.value
                 val repeatList = viewmodel.repeatList.value
                 val selectedRepeatIndex = viewmodel.selectedRepeatIndex.value
 
@@ -81,12 +86,16 @@ class ContainerFragment : Fragment() {
                             .background(PrimaryBackgroundColor.value)
                             .alpha(if (colorPickerState) .8F else 1F)
                     ) {
-                        CommonCustomHeader(
+                        CategoryHeader(
                             headerTitle = if (screenType == ScreenType.CATEGORY) "New Category" else "Repeat",
+                            screenType = screenType,
                             onCloseEvent = {
+                                viewmodel.onEvent(ContainerEvents.OnCategoryStateChange(CategoryState.INSERT))
                                 findNavController().navigateUp()
                             },
-                            onButtonClickEvent = { /* auto save mode */ }
+                            onEditEvent = {
+                                viewmodel.onEvent(ContainerEvents.OnCategoryStateChange(CategoryState.UPDATE))
+                            }
                         )
                         when(screenType){
                             ScreenType.CATEGORY -> {
@@ -96,6 +105,14 @@ class ContainerFragment : Fragment() {
                                     colorPickerSelectedColor = selectedPaletteColor,
                                     colorPickerSelectedEmoji = selectedEmoji,
                                     categoryName = newCategoryName,
+                                    categoryMode = categoryMode,
+                                    onCategoryListUpdate = {
+                                        viewmodel.onEvent(ContainerEvents.OnCategoryListUpdate(CategoryState.INSERT))
+                                    },
+                                    onCategoryDelete = {index -> viewmodel.onEvent(ContainerEvents.OnCategoryDelete(index)) },
+                                    onCategoryTitleUpdate = { index,oldTitle, title ->
+                                        viewmodel.onEvent(ContainerEvents.OnCategoryTitleUpdate(index = index, oldName = oldTitle, name = title))
+                                    },
                                     onCategoryNameChange = {
                                         viewmodel.onEvent(ContainerEvents.OnCategoryNameUpdate(it))
                                     },

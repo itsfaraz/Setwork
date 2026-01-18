@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
@@ -113,18 +115,29 @@ fun DeckHeader(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .fillMaxHeight()
                     .wrapContentHeight(),
-                horizontalArrangement = Arrangement.Start
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                CustomAttachementsTab(
-                    hasCover = false,
-                    onGalleryEvent = { /*TODO*/ },
-                    categoryList = categoryList,
-                    selectedCategoryIndex = selectedCategoryIndex,
-                    onCategoryEvent = onCategoryIndexChange
+                Row(
+                    modifier = Modifier
+                        .wrapContentWidth()
+                        .padding(horizontal = 8.dp)
+                        .background(color = Color.LightGray, shape = RoundedCornerShape(100))
+                        .padding(start = 4.dp)
                 ) {
-                    addNewCategory()
+                    CustomAttachementsTab(
+                        hasCover = false,
+                        onGalleryEvent = { /*TODO*/ },
+                        categoryList = categoryList,
+                        selectedCategoryIndex = selectedCategoryIndex,
+                        onCategoryEvent = onCategoryIndexChange
+                    ) {
+                        addNewCategory()
+                    }
                 }
+
                 if (!isNew){
                     CustomButton(buttonText = "Delete", isDangerButton = true) {
                         onDeleteButtonClickEvent()

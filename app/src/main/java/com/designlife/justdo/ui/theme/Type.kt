@@ -64,7 +64,7 @@ val deckItemTitleStyleSize = mutableStateOf<TextUnit>(16.sp)
 val deckItemContentStyleSize = mutableStateOf<TextUnit>(12.sp)
 val attachmentTabItemTextStyleSize = mutableStateOf<TextUnit>(13.sp)
 val settingPageHeaderStyleSize = mutableStateOf<TextUnit>(26.sp)
-val settingHeaderStyleSize = mutableStateOf<TextUnit>(8.sp)
+val settingHeaderStyleSize = mutableStateOf<TextUnit>(12.sp)
 val settingItemStyleSize = mutableStateOf<TextUnit>(16.sp)
 val pickerItemStyleSize = mutableStateOf<TextUnit>(14.sp)
 
@@ -230,7 +230,7 @@ fun updateSystemFont(value: AppFontSize) {
             deckItemContentStyleSize.value = 12.sp
             attachmentTabItemTextStyleSize.value = 13.sp
             settingPageHeaderStyleSize.value = 13.sp
-            settingHeaderStyleSize.value = 8.sp
+            settingHeaderStyleSize.value = 11.sp
             settingItemStyleSize.value = 16.sp
             pickerItemStyleSize.value = 14.sp
         }
@@ -252,7 +252,7 @@ fun updateSystemFont(value: AppFontSize) {
             deckItemContentStyleSize.value = 10.sp
             attachmentTabItemTextStyleSize.value = 11.sp
             settingPageHeaderStyleSize.value = 11.sp
-            settingHeaderStyleSize.value = 6.sp
+            settingHeaderStyleSize.value = 10.sp
             settingItemStyleSize.value = 14.sp
             pickerItemStyleSize.value = 12.sp
         }
@@ -274,7 +274,7 @@ fun updateSystemFont(value: AppFontSize) {
             deckItemContentStyleSize.value = 14.sp
             attachmentTabItemTextStyleSize.value = 15.sp
             settingPageHeaderStyleSize.value = 15.sp
-            settingHeaderStyleSize.value = 10.sp
+            settingHeaderStyleSize.value = 12.sp
             settingItemStyleSize.value = 17.sp
             pickerItemStyleSize.value = 16.sp
         }

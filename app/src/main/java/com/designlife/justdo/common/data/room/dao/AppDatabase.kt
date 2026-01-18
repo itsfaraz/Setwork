@@ -21,13 +21,15 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun noteDao() : NoteDao
     abstract fun deckDao() : DeckDao
 
+    abstract fun todoCategoryJunctionDao() : TodoCategoryJunctionDao
+
     abstract fun widgetDao() : WidgetDao
     companion object{
         public val DB_NAME = "Setwork"
-        public val BACKUP_EN_TODO = "Todo.db.crypt"
-        public val BACKUP_EN_CATEGORY = "Category.db.crypt"
-        public val BACKUP_EN_NOTE = "Note.db.crypt"
-        public val BACKUP_EN_DECK = "Deck.db.crypt"
+        public val BACKUP_EN_TODO = "Todo.db"
+        public val BACKUP_EN_CATEGORY = "Category.db"
+        public val BACKUP_EN_NOTE = "Note.db"
+        public val BACKUP_EN_DECK = "Deck.db"
         @Volatile
         private var INSTANCE : AppDatabase? = null
 

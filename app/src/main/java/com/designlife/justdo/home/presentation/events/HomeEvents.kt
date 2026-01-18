@@ -13,5 +13,6 @@ sealed class HomeEvents{
     data class OnViewChange(val view : ViewType) : HomeEvents()
     data class OnSearchToggle(val toggleValue : Boolean) : HomeEvents()
     data class OnSearchUpdate(val searchText : String) : HomeEvents()
+    object OnRefreshInitialDates : HomeEvents()
     object OnClearSearch : HomeEvents()
 }

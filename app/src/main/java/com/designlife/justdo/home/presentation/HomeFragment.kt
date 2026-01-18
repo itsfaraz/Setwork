@@ -151,7 +151,6 @@ class HomeFragment : Fragment() {
             }
 
             initialSlide()
-            Log.i("SCREEN", "onCreate: Default Screen ${settingViewModel.defaultScreen.value}")
             viewModel.onEvent(HomeEvents.OnViewChange(settingViewModel.defaultScreen.value))
         }
 
@@ -191,17 +190,24 @@ class HomeFragment : Fragment() {
 
     private suspend fun initialSlide() {
         if (::scope.isInitialized) {
-            delay(800)
+            delay(200)
+            viewModel.onEvent(HomeEvents.OnRefreshInitialDates)
+            delay(200)
+            val index = viewModel.dateList.value.indexOf(viewModel.currentDate.value)
+            Log.i("SLIDE_DATA", "initialSlide: List ${viewModel.dateList.value}")
+            Log.i("SLIDE_DATA", "initialSlide: Current Date ${viewModel.currentDate.value}")
+            Log.i("SLIDE_DATA", "initialSlide: List Size ${viewModel.dateList.value.size} :: Index ${index}")
+            viewModel.onEvent(HomeEvents.OnIndexSelected(index))
             val job: Job = scope.launch(Dispatchers.Default) {
-                val index = viewModel.dateList.value.indexOf(viewModel.currentDate.value)
-                viewModel.onEvent(HomeEvents.OnIndexSelected(index))
                 scope.launch {
-                    scrollToRollItem(viewModel.todoIndex.value + 1, todoListState)
+                    scrollToRollItem(viewModel.todoIndex.value, todoListState)
                 }
             }
             job.join()
+            delay(100)
+            scope.launch { scrollToRollItem(index, dateListState) }
+            viewModel.onEvent(HomeEvents.OnProgressBarToggle(false))
         }
-        viewModel.onEvent(HomeEvents.OnProgressBarToggle(false))
     }
 
     @OptIn(
@@ -231,7 +237,7 @@ class HomeFragment : Fragment() {
                 val searchToggle = viewModel.searchToggle.value
                 val searchText = viewModel.searchText.value
                 val noteList =
-                    if (searchText.isNotEmpty()) viewModel.searchList.value as List<Note> else viewModel.noteList.value
+                    if (searchText.isNotEmpty()) viewModel.searchList.value as List<Note> else viewModel.noteList
                 val deckList =
                     if (searchText.isNotEmpty()) viewModel.searchList.value as List<Deck> else viewModel.deckList.value
                 val colorMap = viewModel.colorMap.value
@@ -239,6 +245,7 @@ class HomeFragment : Fragment() {
                 val currentYear = viewModel.currentYear.value
                 val currentDate = viewModel.currentDate.value
                 val todayDateIndex = dateList.indexOf(currentDate)
+                Log.i("DateCheck", "onCreateView: ${todayDateIndex}")
                 val selectedDateTodoIndex = viewModel.todoIndex.value
                 val selectedCategoryIndex = viewModel.selectedCategoryIndex.value
                 val progressBar = viewModel.progressBarVisibility.value
@@ -649,7 +656,9 @@ class HomeFragment : Fragment() {
     }
 
     private suspend fun scrollToRollItem(currentDateIndex: Int, listState: LazyListState) {
-        listState.animateScrollToItem(currentDateIndex)
+        if (currentDateIndex != -1){
+            listState.animateScrollToItem(currentDateIndex)
+        }
     }
 
     private fun navigateByView(viewType : ViewType){

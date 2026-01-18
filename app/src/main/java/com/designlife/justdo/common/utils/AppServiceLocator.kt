@@ -7,6 +7,7 @@ import com.designlife.justdo.common.domain.repeat.RepeatRepository
 import com.designlife.justdo.common.domain.repositories.CategoryRepository
 import com.designlife.justdo.common.domain.repositories.DeckRepository
 import com.designlife.justdo.common.domain.repositories.NoteRepository
+import com.designlife.justdo.common.domain.repositories.TodoCategoryRepository
 import com.designlife.justdo.common.domain.repositories.TodoRepository
 import com.designlife.justdo.common.domain.repositories.WidgetRepository
 import com.designlife.justdo.common.domain.repositories.appstore.IAppStoreRepository
@@ -19,6 +20,7 @@ object AppServiceLocator {
     private var todoRepository : TodoRepository? = null
     private var noteRepository : NoteRepository? = null
     private var deckRepository : DeckRepository? = null
+    private var todoCategoryRepository : TodoCategoryRepository? = null
     private var repeatRepository : RepeatRepository? = null
     private var appStoreRepository : IAppStoreRepository? = null
     private var widgetRepository : WidgetRepository? = null
@@ -80,6 +82,18 @@ object AppServiceLocator {
         val deckDao = AppDatabase.getDatabase(context).deckDao()
         deckRepository = DeckRepository(deckDao)
         return deckRepository!!
+    }
+
+    public fun provideTodoCategoryRepository(context : Context) : TodoCategoryRepository{
+        return todoCategoryRepository ?: createTodoCategoryRepository(context);
+    }
+
+    private fun createTodoCategoryRepository(context: Context): TodoCategoryRepository {
+        val todoCategoryDao = AppDatabase.getDatabase(context).todoCategoryJunctionDao()
+        val todoDao = AppDatabase.getDatabase(context).todoDao()
+        val categoryDao = AppDatabase.getDatabase(context).categoryDao()
+        todoCategoryRepository = TodoCategoryRepository(todoCategoryDao,todoDao,categoryDao)
+        return todoCategoryRepository!!
     }
 
     public fun provideWidgetRepository(context : Context) : WidgetRepository{

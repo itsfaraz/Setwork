@@ -13,6 +13,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
@@ -23,32 +24,50 @@ import java.io.FileWriter
 import java.io.IOException
 
 
-suspend fun backupImport(context : Context,scope: CoroutineScope) : Boolean{
-    val internalStorageDir = context.obbDir
-    val fileDir = context.filesDir
-    val externalFileDir = context.getExternalFilesDir(null)
-    val envExternalFileDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
-    Log.i("BACKUP", "backupImport: internalStorageDir : ${internalStorageDir.absoluteFile}")
-    val appFolder = File(envExternalFileDir, "Setwork")
-    val backupFolder = File(appFolder, "Backup")
+object HardStorage {
+    val scope = CoroutineScope(Dispatchers.IO + Job())
 
-    if (!appFolder.exists() || !backupFolder.exists()) {
-        Log.i("BACKUP", "backupExport: backupFolder not exists")
-        return false
-    }
+    suspend fun backupImport(context : Context) : Boolean {
+        val backupFolder = File(context.getExternalFilesDir(null),"Setwork/Backup/")
+//        val envExternalFileDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
 
-    try {
-        val backupTodoFile = File(backupFolder, AppDatabase.BACKUP_EN_TODO)
-        val backupDeckFile = File(backupFolder, AppDatabase.BACKUP_EN_DECK)
-        val backupCategoryFile = File(backupFolder, AppDatabase.BACKUP_EN_CATEGORY)
-        val backupNoteFile = File(backupFolder, AppDatabase.BACKUP_EN_NOTE)
+        if (!backupFolder.exists()){
+            Log.i("BACKUP", "backupImport: Document folder Not exists")
+            return false
+        }
+//        val appFolder = File(envExternalFileDir, "Setwork")
+//        if (!appFolder.exists()) {
+//            Log.i("BACKUP", "backupImport: Setwork folder Not exists")
+//            return false
+//        }
+//        val backupFolder = File(appFolder, "Backup")
+//        if (!backupFolder.exists()) {
+//            Log.i("BACKUP", "backupImport: Backup folder Not exists")
+//            return false
+//        }
 
-        val todoRepository = AppServiceLocator.provideTodoRepository(context)
-        val deckRepository = AppServiceLocator.provideDeckRepository(context)
-        val noteRepository = AppServiceLocator.provideNoteRepository(context)
-        val categoryRepository = AppServiceLocator.provideCategoryRepository(context)
+        try {
+            val backupTodoFile = File(backupFolder,AppDatabase.BACKUP_EN_TODO)
+            val backupDeckFile = File(backupFolder,AppDatabase.BACKUP_EN_DECK)
+            val backupCategoryFile = File(backupFolder,AppDatabase.BACKUP_EN_CATEGORY)
+            val backupNoteFile = File(backupFolder, AppDatabase.BACKUP_EN_NOTE)
 
-        scope.async(Dispatchers.IO) {
+            Log.i("BACKUP", "backupImport: Backup Todo Path :${backupTodoFile.absolutePath}")
+            Log.i("BACKUP", "backupImport: Backup Todo File Exists :${backupTodoFile.exists()}")
+            Log.i("BACKUP", "backupImport: Backup Todo File Reading :${backupTodoFile.canRead()}")
+
+
+            setFilePermission(backupTodoFile)
+            setFilePermission(backupDeckFile)
+            setFilePermission(backupCategoryFile)
+            setFilePermission(backupNoteFile)
+
+            val todoRepository = AppServiceLocator.provideTodoRepository(context)
+            val deckRepository = AppServiceLocator.provideDeckRepository(context)
+            val noteRepository = AppServiceLocator.provideNoteRepository(context)
+            val categoryRepository = AppServiceLocator.provideCategoryRepository(context)
+
+            Log.i("BACKUP", "backupImport: Backup Todo File Path :${backupTodoFile.path.toString()}")
             val todoJson = backupTodoFile.readText()
             val deckJson = backupDeckFile.readText()
             val noteJson = backupNoteFile.readText()
@@ -56,112 +75,143 @@ suspend fun backupImport(context : Context,scope: CoroutineScope) : Boolean{
 
             Log.i("BACKUP", "backupImport: Todo Json : ${todoJson}")
             val todoListType = object : TypeToken<List<Todo>>() {}.type
-            val todoList : List<Todo> = Gson().fromJson(async {decrypt(todoJson)}.await(),todoListType)
+            val todoList : List<Todo> = Gson().fromJson(scope.async {decrypt(todoJson)}.await(),todoListType)
 
             val deckListType = object : TypeToken<List<Deck>>() {}.type
-            val deckList : List<Deck> = Gson().fromJson(async {decrypt(deckJson)}.await(),deckListType)
+            val deckList : List<Deck> = Gson().fromJson(scope.async {decrypt(deckJson)}.await(),deckListType)
 
             val noteListType = object : TypeToken<List<Note>>() {}.type
-            val noteList : List<Note> = Gson().fromJson(async {decrypt(noteJson)}.await(),noteListType)
+            val noteList : List<Note> = Gson().fromJson(scope.async {decrypt(noteJson)}.await(),noteListType)
 
             val categoryListType = object : TypeToken<List<Category>>() {}.type
-            val categoryList : List<Category> = Gson().fromJson(async {decrypt(categoryJson)}.await(),categoryListType)
+            val categoryList : List<Category> = Gson().fromJson(scope.async {decrypt(categoryJson)}.await(),categoryListType)
 
 
             todoRepository.insertAllImportedTodo(todoList)
             deckRepository.insertAllImportedDeck(deckList)
             noteRepository.insertAllImportedNote(noteList)
             categoryRepository.insertAllImportedCategories(categoryList)
-        }.await()
 
-        return true
-    } catch (e: IOException) {
-        e.printStackTrace()
-        Log.i("BACKUP", "backupImport: Exception : ${e.message}")
-        return false
+            return true
+        } catch (e: IOException) {
+            e.printStackTrace()
+            Log.i("BACKUP", "backupImport: Exception : ${e.message}")
+            return false
+        }
     }
-}
 
-suspend fun backupExport(context : Context,scope : CoroutineScope){
-    val internalStorageDir = context.obbDir
-    val fileDir = context.filesDir
-    val externalFileDir = context.getExternalFilesDir(null).toString()
-    val envExternalFileDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
-    Log.i("BACKUP", "backupExport: internalStorageDir : ${internalStorageDir.absoluteFile}")
-    val appFolder = File(envExternalFileDir, "Setwork")
-    if (!appFolder.exists()) {
-        appFolder.mkdirs();
-    }
-    val backupFolder = File(appFolder, "Backup")
-    if (!backupFolder.exists()) {
-        backupFolder.mkdirs();
-    }
-    Log.i("BACKUP", "backupExport: backupFolder : ${backupFolder.absoluteFile}")
-    val backupFileTodo = File(backupFolder, AppDatabase.BACKUP_EN_TODO)
-    val backupFileNote = File(backupFolder, AppDatabase.BACKUP_EN_NOTE)
-    val backupFileDeck = File(backupFolder, AppDatabase.BACKUP_EN_DECK)
-    val backupFileCategory = File(backupFolder, AppDatabase.BACKUP_EN_CATEGORY)
+    suspend fun backupExport(context : Context){
+        val backupFolder = File(context.getExternalFilesDir(null),"Setwork/Backup/")
+//        val envExternalFileDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
 
+        if (!backupFolder.exists()){
+            backupFolder.mkdirs()
+        }
+//        val appFolder = File(envExternalFileDir, "Setwork")
+//        if (!appFolder.exists()) {
+//            appFolder.mkdirs();
+//        }
+//        val backupFolder = File(appFolder, "Backup")
+//        if (!backupFolder.exists()) {
+//            backupFolder.mkdirs();
+//        }
+        Log.i("BACKUP", "backupExport: backupFolder : ${backupFolder.absoluteFile}")
+//        val backupFileTodo = File(backupFolder, AppDatabase.BACKUP_EN_TODO)
+        val backupFileTodo = File(backupFolder,AppDatabase.BACKUP_EN_TODO)
+        val backupFileNote = File(backupFolder,AppDatabase.BACKUP_EN_NOTE)
+        val backupFileDeck = File(backupFolder, AppDatabase.BACKUP_EN_DECK)
+        val backupFileCategory = File(backupFolder,  AppDatabase.BACKUP_EN_CATEGORY)
 
-    try {
-        val todoRepository = AppServiceLocator.provideTodoRepository(context)
-        val deckRepository = AppServiceLocator.provideDeckRepository(context)
-        val noteRepository = AppServiceLocator.provideNoteRepository(context)
-        val categoryRepository = AppServiceLocator.provideCategoryRepository(context)
+        checkFileExists(backupFileTodo)
+        checkFileExists(backupFileNote)
+        checkFileExists(backupFileDeck)
+        checkFileExists(backupFileCategory)
 
-        val todoList =  todoRepository.getAllRawTodo().firstOrNull()
-        val deckList = deckRepository.getAllRawDecks().firstOrNull()
-        val noteList = noteRepository.getAllRawNotes().firstOrNull()
-        val categoryList = categoryRepository.getAllRawCategory().firstOrNull()
+        setFilePermission(backupFileTodo)
+        setFilePermission(backupFileNote)
+        setFilePermission(backupFileDeck)
+        setFilePermission(backupFileCategory)
 
-        val todoJson = Gson().toJson(todoList)
-        val deckJson = Gson().toJson(deckList)
-        val noteJson = Gson().toJson(noteList)
-        val categoryJson = Gson().toJson(categoryList)
+        Log.i("BACKUP", "backupExport: backupFolder : App Database Check")
+        try {
+            val todoRepository = AppServiceLocator.provideTodoRepository(context)
+            val deckRepository = AppServiceLocator.provideDeckRepository(context)
+            val noteRepository = AppServiceLocator.provideNoteRepository(context)
+            val categoryRepository = AppServiceLocator.provideCategoryRepository(context)
+            Log.i("BACKUP", "backupExport: backupFolder : App Database Repositories Fetch")
+            val todoList =  todoRepository.getAllRawTodo().firstOrNull()
+            val deckList = deckRepository.getAllRawDecks().firstOrNull()
+            val noteList = noteRepository.getAllRawNotes().firstOrNull()
+            val categoryList = categoryRepository.getAllRawCategory().firstOrNull()
 
-        scope.async(Dispatchers.IO) {
-            val todoFileWriter = FileWriter(backupFileTodo)
+            val todoJson = Gson().toJson(todoList)
+            val deckJson = Gson().toJson(deckList)
+            val noteJson = Gson().toJson(noteList)
+            val categoryJson = Gson().toJson(categoryList)
+
+            Log.i("BACKUP", "backupExport: backupFolder : App Database Repositories Data --> Json File --> ${backupFileTodo.exists()}")
+            val todoFileWriter = FileWriter(backupFileTodo, false)
+            Log.i("BACKUP", "backupExport: backupFolder : App Database Repositories Data --> Json --> Write")
             todoFileWriter.use {
                 Log.i("BACKUP", "backupExport: todo json content : ${todoJson}")
-                it.write(async { encrypt(todoJson) }.await())
+                it.write(scope.async { encrypt(todoJson) }.await())
+                Log.i("BACKUP", "backupExport: backupFolder : App Database Repositories Data --> Json --> Write --> Encrypt")
             }
-            Log.i("BACKUP", "backupExport: todo file content : ${todoFileWriter.toString()}")
 
-            val noteFileWriter = FileWriter(backupFileNote)
+
+            val noteFileWriter = FileWriter(backupFileNote, false)
             noteFileWriter.use {
-                it.write(async {encrypt(noteJson)}.await())
+                it.write(scope.async {encrypt(noteJson)}.await())
             }
 
-            val deckFileWriter = FileWriter(backupFileDeck)
+            val deckFileWriter = FileWriter(backupFileDeck, false)
             deckFileWriter.use {
-                it.write(async {encrypt(deckJson)}.await())
+                it.write(scope.async {encrypt(deckJson)}.await())
             }
 
-            val categoryFileWriter = FileWriter(backupFileCategory)
+            val categoryFileWriter = FileWriter(backupFileCategory, false)
             categoryFileWriter.use {
-                it.write(async {encrypt(categoryJson)}.await())
+                it.write(scope.async {encrypt(categoryJson)}.await())
             }
 
-            setReadOnly(backupFileTodo)
-            setReadOnly(backupFileNote)
-            setReadOnly(backupFileDeck)
-            setReadOnly(backupFileCategory)
-        }.await()
-    } catch (e: IOException) {
-        e.printStackTrace()
+            todoFileWriter.close()
+            noteFileWriter.close()
+            deckFileWriter.close()
+            categoryFileWriter.close()
+//
+//            setReadOnly(backupFileTodo)
+//            setReadOnly(backupFileNote)
+//            setReadOnly(backupFileDeck)
+//            setReadOnly(backupFileCategory)
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
     }
-}
 
-private suspend fun encrypt(json : String) : String{
+    private fun checkFileExists(backupFile: File) {
+        if (!backupFile.exists()){
+            backupFile.createNewFile()
+        }
+    }
+
+    private fun setFilePermission(backupFile: File) {
+        backupFile.setExecutable(true)
+        backupFile.setWritable(true)
+        backupFile.setReadable(true)
+    }
+
+    private suspend fun encrypt(json : String) : String{
 //    val secretKey = EncryptionUtils.generateKey()
 //    return EncryptionUtils.encrypt(json,secretKey)
     return json
 }
 
-private suspend fun decrypt(json : String) : String{
-//    val secretKey = EncryptionUtils.generateKey()
-//    return EncryptionUtils.decrypt(json,secretKey)
-    return json
-}
+    private suspend fun decrypt(json : String) : String{
+    //    val secretKey = EncryptionUtils.generateKey()
+    //    return EncryptionUtils.decrypt(json,secretKey)
+        return json
+    }
 
-private fun setReadOnly(file : File) = file.setReadOnly()
+    private fun setReadOnly(file : File) = file.setReadOnly()
+
+}

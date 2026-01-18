@@ -62,7 +62,7 @@ class RepeatRepository(
         calendar.time = eventDate
         val year = calendar.get(Calendar.YEAR)
         val month = calendar.get(Calendar.MONTH)
-        calendar.set(year,month,1)
+        calendar.set(year,month,1,eventDate.hours,eventDate.minutes,eventDate.seconds)
         for (yearIdx in 0..4){
             calendar.set(Calendar.YEAR,year+yearIdx)
             todoList.add(task.copy(
@@ -81,7 +81,7 @@ class RepeatRepository(
         calendar.time = eventDate
         val year = calendar.get(Calendar.YEAR)
         val month = calendar.get(Calendar.MONTH)
-        calendar.set(year,month,1)
+        calendar.set(year,month,1,eventDate.hours,eventDate.minutes,eventDate.seconds)
         for (day in dayStart..lastDay){
             calendar.set(Calendar.DAY_OF_MONTH,day)
             val isDaysSame = IDateGenerator.checkDays(calendar.time,eventDate)
@@ -103,7 +103,7 @@ class RepeatRepository(
         calendar.time = eventDate
         val year = calendar.get(Calendar.YEAR)
         val month = calendar.get(Calendar.MONTH)
-        calendar.set(year,month,1)
+        calendar.set(year,month,1,eventDate.hours,eventDate.minutes,eventDate.seconds)
         for (day in dayStart..lastDay){
             calendar.set(Calendar.DAY_OF_MONTH,day)
             val isWorkingDay = IDateGenerator.checkIsWorkingDay(calendar.time)
@@ -125,7 +125,7 @@ class RepeatRepository(
         calendar.time = eventDate
         val year = calendar.get(Calendar.YEAR)
         val month = calendar.get(Calendar.MONTH)
-        calendar.set(year,month,1)
+        calendar.set(year,month,1,eventDate.hours,eventDate.minutes,eventDate.seconds)
         for (day in dayStart..lastDay){
             calendar.set(Calendar.DAY_OF_MONTH,day)
             todoList.add(task.copy(

@@ -13,5 +13,6 @@ sealed class TaskEvents{
     data class OnProgressBarToggle(val toggleValue : Boolean) : TaskEvents()
     data class LoadTodoById(val todoId : Int) : TaskEvents()
     data class MarkTaskDone(val todoId : Int)  : TaskEvents()
-    data class DeleteTaskEvent(val todoId : Int)  : TaskEvents()
+    data class DeleteTaskPopup(val state : Boolean)  : TaskEvents()
+    data class DeleteTasksEvent(val taskId : Int, val allOccurrence : Boolean)  : TaskEvents()
 }

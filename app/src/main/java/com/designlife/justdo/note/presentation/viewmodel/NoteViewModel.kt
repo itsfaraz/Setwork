@@ -121,13 +121,13 @@ class NoteViewModel(
 
     fun insertNote(){
         if (_contentValue.value.isNotEmpty()){
-            Log.i(TAG, "insertNote: Condition Check True")
+            Log.i("INSERT_FLOW", "insertNote: Condition Check True")
             _hasNoteModified.value = true
             _progressBar.value = true
             CoroutineScope((Dispatchers.IO)).launch {
-                Log.i(TAG, "insertNote: Context Change")
+                Log.i("INSERT_FLOW", "insertNote: Context Change")
                 val coverImage = async { ImageConverter.getByteArrayFromBitMap(_coverImage.value) }.await()
-                Log.i(TAG, "insertNote: Cover Image Converted ${coverImage}")
+                Log.i("INSERT_FLOW", "insertNote: Cover Image Converted ${coverImage}")
                 noteRepository.insertNote(Note(
                     title = _titleValue.value,
                     content = _contentValue.value,
@@ -137,7 +137,7 @@ class NoteViewModel(
                     createdTime = Date(System.currentTimeMillis()),
                     lastModified = Date(System.currentTimeMillis())
                 ))
-                Log.i(TAG, "insertNote: Note Inserted")
+                Log.i("INSERT_FLOW", "insertNote: Note Inserted")
                 _progressBar.value = false
                 _hasNoteModified.value = false
             }
@@ -154,6 +154,7 @@ class NoteViewModel(
                 val coverImage = async {
                     ImageConverter.getByteArrayFromBitMap(if (_coverImage.value != null) _coverImage.value else _notePrevState.third)
                 }.await()
+                Log.i("UPDATE_FLOW", "updateNote: Category ${_categoryList.value[_selectedCategoryIndex.value].name}")
                 val note = Note(
                     noteId = _noteId.value,
                     title = _titleValue.value,

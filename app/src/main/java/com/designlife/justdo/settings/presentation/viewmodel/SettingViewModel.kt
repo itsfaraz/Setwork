@@ -11,8 +11,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.designlife.justdo.common.domain.entities.SettingPreference
 import com.designlife.justdo.common.domain.repositories.appstore.AppStoreRepository
-import com.designlife.justdo.common.utils.backupExport
-import com.designlife.justdo.common.utils.backupImport
+import com.designlife.justdo.common.utils.HardStorage.backupExport
+import com.designlife.justdo.common.utils.HardStorage.backupImport
 import com.designlife.justdo.settings.presentation.enums.AppFontSize
 import com.designlife.justdo.settings.presentation.enums.AppListHeight
 import com.designlife.justdo.settings.presentation.enums.AppTheme
@@ -286,20 +286,20 @@ class SettingViewModel(
     }
 
     private fun exportData(context : Context) {
-        viewModelScope.launch(Dispatchers.Default) {
-            withContext(Dispatchers.Main){
+        viewModelScope.launch(Dispatchers.Main) {
+            withContext(Dispatchers.Main.immediate){
                 _loaderStatus.value = _loaderStatus.value.copy(
                     title = "Exporting Data", loaderState = LoaderState.PENDING,
                     message = "Pending"
                 )
             }
-            async(Dispatchers.IO) { backupExport(context,this@launch) }.await()
+            async { backupExport(context) }.await()
             _loaderStatus.value = _loaderStatus.value.copy(
                 title = "Exported Data", loaderState = LoaderState.SUCCESS,
                 message = "Data Exported Successfully :)"
             )
-            delay(1000)
-            withContext(Dispatchers.Main){
+            delay(1200)
+            withContext(Dispatchers.Main.immediate){
                 _loaderVisibility.value = false
             }
         }
@@ -307,20 +307,20 @@ class SettingViewModel(
     }
 
     private fun importData(context : Context) {
-        viewModelScope.launch(Dispatchers.Default) {
-            withContext(Dispatchers.Main){
+        viewModelScope.launch(Dispatchers.Main) {
+            withContext(Dispatchers.Main.immediate){
                 _loaderStatus.value = _loaderStatus.value.copy(
                     title = "Importing Data", loaderState = LoaderState.PENDING,
                     message = "Pending"
                 )
             }
-            async(Dispatchers.IO) { backupImport(context,this@launch) }.await()
+            async(Dispatchers.IO) { backupImport(context) }.await()
             _loaderStatus.value = _loaderStatus.value.copy(
                 title = "Imported Data", loaderState = LoaderState.SUCCESS,
                 message = "Data Imported Successfully :)"
             )
             delay(1000)
-            withContext(Dispatchers.Main){
+            withContext(Dispatchers.Main.immediate){
                 _loaderVisibility.value = false
             }
         }

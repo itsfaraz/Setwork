@@ -29,7 +29,6 @@ import com.designlife.justdo.ui.theme.SettingPageHeaderStyle
 import com.designlife.justdo.ui.theme.TypographyColor
 import com.designlife.justdo.ui.theme.UIComponentBackground
 import com.designlife.justdo.ui.theme.settingHeaderStyleSize
-import com.designlife.justdo.ui.theme.settingPageHeaderStyleSize
 
 @Composable
 fun Settings(
@@ -47,7 +46,6 @@ fun Settings(
     onGeneralSettingItemClick : () -> Unit,
     onBackupSettingItemClick : () -> Unit
 ) {
-
     Box(modifier = Modifier
         .fillMaxSize()
         .background(UIComponentBackground.value)
