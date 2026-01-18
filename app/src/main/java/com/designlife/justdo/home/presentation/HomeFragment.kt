@@ -191,7 +191,12 @@ class HomeFragment : Fragment() {
     private suspend fun initialSlide() {
         if (::scope.isInitialized) {
             delay(200)
+            viewModel.onEvent(HomeEvents.OnRefreshInitialDates)
+            delay(200)
             val index = viewModel.dateList.value.indexOf(viewModel.currentDate.value)
+            Log.i("SLIDE_DATA", "initialSlide: List ${viewModel.dateList.value}")
+            Log.i("SLIDE_DATA", "initialSlide: Current Date ${viewModel.currentDate.value}")
+            Log.i("SLIDE_DATA", "initialSlide: List Size ${viewModel.dateList.value.size} :: Index ${index}")
             viewModel.onEvent(HomeEvents.OnIndexSelected(index))
             val job: Job = scope.launch(Dispatchers.Default) {
                 scope.launch {
@@ -201,8 +206,8 @@ class HomeFragment : Fragment() {
             job.join()
             delay(100)
             scope.launch { scrollToRollItem(index, dateListState) }
+            viewModel.onEvent(HomeEvents.OnProgressBarToggle(false))
         }
-        viewModel.onEvent(HomeEvents.OnProgressBarToggle(false))
     }
 
     @OptIn(
@@ -651,7 +656,9 @@ class HomeFragment : Fragment() {
     }
 
     private suspend fun scrollToRollItem(currentDateIndex: Int, listState: LazyListState) {
-        listState.animateScrollToItem(currentDateIndex)
+        if (currentDateIndex != -1){
+            listState.animateScrollToItem(currentDateIndex)
+        }
     }
 
     private fun navigateByView(viewType : ViewType){

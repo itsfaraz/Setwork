@@ -181,6 +181,13 @@ class HomeViewModel(
                 _searchText.value = ""
                 _searchList.value = emptyList()
             }
+            is HomeEvents.OnRefreshInitialDates -> {
+                viewModelScope.launch {
+                    dateGenerator.getDateList().collect{
+                        _dateList.value = it
+                    }
+                }
+            }
         }
     }
 
@@ -252,7 +259,7 @@ class HomeViewModel(
 
 
     fun loadInitialDates(){
-        viewModelScope.launch(Dispatchers.Default) {
+        viewModelScope.launch(Dispatchers.Main.immediate) {
             loadInitialDateUseCase()
         }
     }
