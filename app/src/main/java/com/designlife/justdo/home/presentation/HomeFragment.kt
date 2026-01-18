@@ -12,7 +12,6 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -77,7 +76,6 @@ import com.designlife.justdo.home.presentation.viewmodel.HomeViewModelFactory
 import com.designlife.justdo.settings.presentation.components.CustomLoaderComponent
 import com.designlife.justdo.settings.presentation.components.CustomPickerComponent
 import com.designlife.justdo.settings.presentation.enums.AppBackup
-import com.designlife.justdo.settings.presentation.enums.LoaderState
 import com.designlife.justdo.settings.presentation.events.SettingEvents
 import com.designlife.justdo.settings.presentation.viewmodel.SettingViewModel
 import com.designlife.justdo.settings.presentation.viewmodel.SettingViewModelFactory
@@ -526,7 +524,6 @@ class HomeFragment : Fragment() {
                                         .padding(bottom = 65.dp, end = 20.dp)
                                         .wrapContentSize(),
                                     onClick = {
-//                                        viewModel.updateSheetVisibility(true)
                                           navigateByView(viewType)
                                     },
                                     backgroundColor = ButtonPrimary.value

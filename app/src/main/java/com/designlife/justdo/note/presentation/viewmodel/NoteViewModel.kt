@@ -17,6 +17,7 @@ import com.designlife.justdo.note.presentation.events.NoteEvents
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import java.util.Date
@@ -103,13 +104,16 @@ class NoteViewModel(
         _progressBar.value = true
         viewModelScope.launch(Dispatchers.IO) {
             val note = noteRepository.getNoteById(noteId)
+            Log.i("FETCH", "fetchNoteById: Note Id ${noteId}")
             note.also {
                 _titleValue.value = it.title
                 _contentValue.value = it.content
                 _noteId.value = it.noteId
                 _categoryId.value = it.categoryId
             }
-            _coverImage.value = async { ImageConverter.getBitMapFromByteArray(note.coverImage) }.await()
+            Log.i("FETCH", "fetchNoteById: Before bitmap ${note.coverImage}")
+            _coverImage.value = ImageConverter.getBitMapFromByteArray(note.coverImage)  // async(Dispatchers.Default) { }.await()
+            Log.i("FETCH", "fetchNoteById: ${_coverImage.value}")
             setNoteState(note)
             _progressBar.value = false
         }
@@ -150,9 +154,13 @@ class NoteViewModel(
             Log.i("UPDATE_FLOW", "updateNote: After isNoteUpdated")
             _hasNoteModified.value = true
             _progressBar.value = true
+            Log.i("UPDATE_FLOW", "updateNote: Cover Image ${_coverImage.value}")
+
             CoroutineScope((Dispatchers.IO)).launch {
-                val coverImage = async {
-                    ImageConverter.getByteArrayFromBitMap(if (_coverImage.value != null) _coverImage.value else _notePrevState.third)
+                val coverImage = async(Dispatchers.Default) {
+                    _coverImage.value?.let {
+                        ImageConverter.getByteArrayFromBitMap(it)
+                    }
                 }.await()
                 Log.i("UPDATE_FLOW", "updateNote: Category ${_categoryList.value[_selectedCategoryIndex.value].name}")
                 val note = Note(

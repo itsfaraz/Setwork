@@ -47,8 +47,8 @@ object ImageConverter {
 
     private fun getConvertedBitMap(imageData: ByteArray) : Bitmap?{
         try {
-            val decodedBytes = Base64.decode(imageData, Base64.DEFAULT)
-            return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
+//            val decodedBytes = Base64.decode(imageData, Base64.DEFAULT)
+            return BitmapFactory.decodeByteArray(imageData, 0, imageData.size)
         } catch (e: Exception) {
             e.printStackTrace()
             return null
