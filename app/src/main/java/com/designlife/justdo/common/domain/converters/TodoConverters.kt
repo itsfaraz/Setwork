@@ -4,10 +4,12 @@ import com.designlife.justdo.common.data.room.dao.TodoDao
 import com.designlife.justdo.common.domain.calendar.IDateGenerator
 import com.designlife.justdo.common.domain.entities.RawTodo
 import com.designlife.justdo.common.domain.entities.Todo
+import kotlin.math.absoluteValue
 
 object TodoConverters {
     fun getTodoEntity(todo: Todo) : com.designlife.justdo.common.data.entities.Todo{
         return com.designlife.justdo.common.data.entities.Todo(
+            todoId = todo.todoId.toLong(),
             title = todo.title,
             date = IDateGenerator.getEpochFromDate(todo.date),
             note = todo.note,
@@ -30,7 +32,6 @@ object TodoConverters {
             categoryId = todo.categoryId,
             createdOn = todo.createdOn,
             repeatIndex = todo.repeatIndex,
-            notificationId = 0L
         )
     }
 

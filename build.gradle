@@ -12,7 +12,7 @@ buildscript {
     }
     // modules
     ext{
-        orchestrator_version = 'v1.0.6'
+        orchestrator_version = 'v1.0.8'
         provider_version = 'v1.0.0'
     }
 

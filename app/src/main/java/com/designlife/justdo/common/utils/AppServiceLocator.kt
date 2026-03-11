@@ -2,15 +2,23 @@ package com.designlife.justdo.common.utils
 
 import android.content.Context
 import com.designlife.justdo.common.data.datastore.appStore
+import com.designlife.justdo.common.data.network.SoftwareUpdateService
+import com.designlife.justdo.common.data.network.retrofit.RetrofitBuilder
 import com.designlife.justdo.common.data.room.dao.SetworkDatabase
 import com.designlife.justdo.common.domain.repeat.RepeatRepository
 import com.designlife.justdo.common.domain.repositories.CategoryRepository
 import com.designlife.justdo.common.domain.repositories.DeckRepository
 import com.designlife.justdo.common.domain.repositories.NoteRepository
+import com.designlife.justdo.common.domain.repositories.SoftwareUpdateRepository
 import com.designlife.justdo.common.domain.repositories.TodoCategoryRepository
 import com.designlife.justdo.common.domain.repositories.TodoRepository
 import com.designlife.justdo.common.domain.repositories.WidgetRepository
 import com.designlife.justdo.common.domain.repositories.appstore.IAppStoreRepository
+import com.designlife.justdo.common.utils.update.SoftwareUpdateManager
+import com.designlife.orchestrator.SchedulingEngine
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.serialization.InternalSerializationApi
 
 object AppServiceLocator {
     private var categoryRepository : CategoryRepository? = null
@@ -21,6 +29,7 @@ object AppServiceLocator {
     private var repeatRepository : RepeatRepository? = null
     private var appStoreRepository : IAppStoreRepository? = null
     private var widgetRepository : WidgetRepository? = null
+    private var softwareUpdateManager : SoftwareUpdateManager? = null
 
 
     public fun provideCategoryRepository(context : Context) : CategoryRepository{
@@ -56,6 +65,7 @@ object AppServiceLocator {
         return appStoreRepository ?: createAppStoreRepository(context)
     }
 
+    @OptIn(InternalSerializationApi::class)
     private fun createAppStoreRepository(context: Context): IAppStoreRepository {
         appStoreRepository = IAppStoreRepository(context.appStore)
         return appStoreRepository!!
@@ -101,5 +111,25 @@ object AppServiceLocator {
         val widgetDao = SetworkDatabase.getDatabase(context).widgetDao()
         widgetRepository = WidgetRepository(widgetDao)
         return widgetRepository!!
+    }
+
+    public fun provideSoftwareUpdateManager(context : Context) : SoftwareUpdateManager{
+        return softwareUpdateManager ?: createSoftwareUpdateManager(context)
+    }
+
+    fun createSoftwareUpdateManager(context: Context): SoftwareUpdateManager {
+        val scope = CoroutineScope(Dispatchers.IO)
+        val softwareService = RetrofitBuilder.networkBuilder("",context.applicationContext).create(SoftwareUpdateService::class.java)
+        val updateRepository = SoftwareUpdateRepository(
+            softwareUpdateService = softwareService
+        )
+        val notificationScheduler = SchedulingEngine(context.applicationContext).notificationScheduler()
+        softwareUpdateManager = SoftwareUpdateManager(
+            context = context,
+            scope = scope,
+            updateRepository = updateRepository,
+            notificationScheduler = notificationScheduler
+        )
+        return softwareUpdateManager!!
     }
 }

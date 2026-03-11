@@ -220,9 +220,8 @@ class TaskViewModel(
                 date = _rawTaskDateTimeInstance.value.time,
                 isCompleted = false,
                 createdOn = System.currentTimeMillis(),
-                todoId = 0,
+                todoId = System.currentTimeMillis().hashCode().absoluteValue.toInt(),
                 repeatIndex = shareViewModel.selectedRepeatIndex.value,
-                notificationId = System.currentTimeMillis().hashCode().absoluteValue.toLong()
             )
             Log.i("ERROR_CHECK","createTask: createRepeatedEvents")
             val taskList = repeatRepository.createRepeatedEvents(todo,repeatType,_rawTaskDateTimeInstance.value.time)
@@ -239,9 +238,7 @@ class TaskViewModel(
 
     private fun setNotifications(taskList : List<Todo>) {
         Log.i("ERROR_CHECK","setNotifications: setNotifications")
-        var indexUUID = System.currentTimeMillis().hashCode().absoluteValue
         val notificationInfoData = taskList.map { todo: Todo ->
-            indexUUID += 1
             NotificationInfo(
                 taskTitle = todo.title,
                 taskSubTitle = (if (todo.note.isEmpty()) "" else if (todo.note.length > 25) "${
@@ -255,7 +252,7 @@ class TaskViewModel(
                 deliveredTime = 0L,
                 notificationType = NotificationType.TASK_NOTIFY,
                 notificationStatus = NotificationStatus.ACTIVE,
-                taskId = indexUUID
+                taskId = todo.todoId
             )
         }
         Log.i("ERROR_CHECK","setNotifications: before taskNotificationRepository.scheduleNotification")

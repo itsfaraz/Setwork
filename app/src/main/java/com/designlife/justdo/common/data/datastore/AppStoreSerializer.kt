@@ -2,10 +2,12 @@ package com.designlife.justdo.common.data.datastore
 
 import android.util.Log
 import androidx.datastore.core.Serializer
+import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.json.Json
 import java.io.InputStream
 import java.io.OutputStream
 
+@OptIn(InternalSerializationApi::class)
 object AppStoreSerializer : Serializer<AppStore> {
     private val TAG = "APP_SERIALIZER"
     override val defaultValue: AppStore

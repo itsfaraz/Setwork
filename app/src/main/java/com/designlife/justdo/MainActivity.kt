@@ -16,6 +16,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.ContextCompat
 import androidx.navigation.fragment.NavHostFragment
 import com.designlife.justdo.common.utils.AppServiceLocator
+import com.designlife.justdo.common.utils.update.SoftwareUpdateManager
 import com.designlife.justdo.permission.PermissionHandler
 import com.designlife.justdo.settings.presentation.viewmodel.SettingViewModel
 import com.designlife.justdo.settings.presentation.viewmodel.SettingViewModel.Companion.getAppThemeFromOrdinal
@@ -29,6 +30,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.serialization.InternalSerializationApi
 import java.lang.reflect.Field
 
 
@@ -65,10 +67,16 @@ class MainActivity : AppCompatActivity() {
         val navController = navHostFragment.navController
         observeDarkModeChanges()
         observeSettingChanges()
+        checkSoftwareUpdates()
+    }
+
+    private fun checkSoftwareUpdates() {
+        AppServiceLocator.provideSoftwareUpdateManager(this).checkForUpdate()
     }
 
 
     // Preference Changes Observe
+    @OptIn(InternalSerializationApi::class)
     private fun observeSettingChanges() {
         val appStore = AppServiceLocator.provideAppStoreRepository(this)
         CoroutineScope(Dispatchers.IO).launch {

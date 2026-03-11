@@ -1,11 +1,11 @@
-package com.designlife.justdo.home.presentation
+package com.designlife.justdo.home
 
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.scaleIn
@@ -40,6 +40,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
@@ -52,12 +53,11 @@ import com.designlife.justdo.common.presentation.components.BottomSheet
 import com.designlife.justdo.common.presentation.components.ProgressBar
 import com.designlife.justdo.common.utils.AppServiceLocator
 import com.designlife.justdo.common.utils.NavOptions
-import com.designlife.justdo.common.utils.constants.Constants.TASK_VIEW
-import com.designlife.justdo.common.utils.constants.Constants.TASK_VIEW_ID
+import com.designlife.justdo.common.utils.constants.Constants
 import com.designlife.justdo.common.utils.entity.BottomNavItem
 import com.designlife.justdo.common.utils.entity.SettingItem
-import com.designlife.justdo.settings.presentation.enums.GeneralSettingView
 import com.designlife.justdo.common.utils.enums.ViewType
+import com.designlife.justdo.common.utils.update.SoftwareUpdateManager
 import com.designlife.justdo.home.domain.usecase.LoadIntialDatesUseCase
 import com.designlife.justdo.home.domain.usecase.LoadNextDatesSetUseCase
 import com.designlife.justdo.home.domain.usecase.LoadPreviousDatesSetUseCase
@@ -76,18 +76,24 @@ import com.designlife.justdo.home.presentation.viewmodel.HomeViewModelFactory
 import com.designlife.justdo.settings.presentation.components.CustomLoaderComponent
 import com.designlife.justdo.settings.presentation.components.CustomPickerComponent
 import com.designlife.justdo.settings.presentation.enums.AppBackup
+import com.designlife.justdo.settings.presentation.enums.GeneralSettingView
 import com.designlife.justdo.settings.presentation.events.SettingEvents
 import com.designlife.justdo.settings.presentation.viewmodel.SettingViewModel
 import com.designlife.justdo.settings.presentation.viewmodel.SettingViewModelFactory
-import com.designlife.justdo.ui.theme.*
+import com.designlife.justdo.ui.theme.ButtonPrimary
+import com.designlife.justdo.ui.theme.PrimaryBackgroundColor
+import com.designlife.justdo.ui.theme.PrimaryColorHome1
+import com.designlife.justdo.ui.theme.PrimaryColorHome2
+import com.designlife.orchestrator.notification.clickmanager.TaskListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Date
 
-class HomeFragment : Fragment() {
+class HomeFragment : Fragment(), TaskListener {
 
     private lateinit var navigationItems: List<BottomNavItem>
     private lateinit var viewModel: HomeViewModel
@@ -96,6 +102,7 @@ class HomeFragment : Fragment() {
     private lateinit var todoListState: LazyListState
     private lateinit var scope: CoroutineScope
     private lateinit var appStoreRepository: AppStoreRepository
+    private lateinit var softwareUpdateManager: SoftwareUpdateManager
     private val settingIcons: List<SettingItem> = initSettingIcons()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -124,9 +131,10 @@ class HomeFragment : Fragment() {
         )
         viewModel = ViewModelProvider(this, factory)[HomeViewModel::class.java]
         appStoreRepository = AppServiceLocator.provideAppStoreRepository(requireContext())
+        onNotificationAvailable()
         val settingFactory = SettingViewModelFactory(appStoreRepository)
         settingViewModel = ViewModelProvider(this, settingFactory)[SettingViewModel::class.java]
-        checkNotificationView()
+        softwareUpdateManager = AppServiceLocator.provideSoftwareUpdateManager(requireContext())
         CoroutineScope(Dispatchers.Main).launch {
             viewModel.onEvent(HomeEvents.OnProgressBarToggle(true))
             launch {
@@ -151,7 +159,7 @@ class HomeFragment : Fragment() {
             initialSlide()
             viewModel.onEvent(HomeEvents.OnViewChange(settingViewModel.defaultScreen.value))
         }
-
+        checkNotificationView()
     }
 
     private fun initBottomNavItems() {
@@ -172,17 +180,41 @@ class HomeFragment : Fragment() {
             SettingItem("Import", R.drawable.ic_import),
             SettingItem("Export", R.drawable.ic_export),
             SettingItem("Help", R.drawable.ic_help),
-            SettingItem("Feedback", R.drawable.ic_feedback)
+            SettingItem("Feedback", R.drawable.ic_feedback),
+            SettingItem("Software update", R.drawable.ic_autorenew),
         )
     }
 
+
+    private fun onNotificationAvailable() {
+        if (requireActivity().intent?.getBooleanExtra("fromNotification", false) == true) {
+            val id = requireActivity().intent.getIntExtra("notificationId", 0)
+            val title = requireActivity().intent.getStringExtra("title") ?: ""
+            onUserNotificationEvent(id, title)
+        }
+    }
+
+
+
+
     private fun checkNotificationView() {
         CoroutineScope(Dispatchers.IO).launch {
-            val todoId = appStoreRepository.getTodoId()
+            val todoId = async {  appStoreRepository.getTodoId() }.await()
+            Log.i("NOTIFICATION_FLOW", "HomeFragment :: checkNotificationView: fetched todoId : ${todoId}")
             if (todoId != -1) {
+                Log.i("NOTIFICATION_FLOW", "HomeFragment :: checkNotificationView: navigated to todoId : ${todoId}")
                 navigateToTaskViewById(todoId)
+                Log.i("NOTIFICATION_FLOW", "HomeFragment :: checkNotificationView: update todoId : -1")
                 appStoreRepository.updateTodoId(-1)
             }
+        }
+    }
+
+    private fun byPassNotificationView(todoId : Int) {
+        if (todoId != -1) {
+            Log.i("NOTIFICATION_FLOW", "HomeFragment :: checkNotificationView: navigated to todoId : ${todoId}")
+            navigateToTaskViewById(todoId)
+            Log.i("NOTIFICATION_FLOW", "HomeFragment :: checkNotificationView: update todoId : -1")
         }
     }
 
@@ -205,6 +237,15 @@ class HomeFragment : Fragment() {
             delay(100)
             scope.launch { scrollToRollItem(index, dateListState) }
             viewModel.onEvent(HomeEvents.OnProgressBarToggle(false))
+        }
+    }
+
+    override fun onUserNotificationEvent(id: Int, title: String) {
+        Log.i("NOTIFICATION_FLOW", "HomeFragment :: onUserNotificationEvent: task : ${id}")
+        if (title.equals("Software Update") && id == 10001){
+            softwareUpdateManager.installUpdate()
+        }else{
+            byPassNotificationView(id)
         }
     }
 
@@ -257,26 +298,26 @@ class HomeFragment : Fragment() {
                 val pickerListState = settingViewModel.pickerItemList.value
                 val loaderState = settingViewModel.loaderVisibility.value
                 val loaderStatus = settingViewModel.loaderStatus.value
-                val isDarkMode = SettingViewModel.darkModeStatus.value
+                val isDarkMode = SettingViewModel.Companion.darkModeStatus.value
                 Box(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.Companion.fillMaxSize(),
                 ) {
                     Box(
-                        modifier = Modifier
+                        modifier = Modifier.Companion
                             .fillMaxSize()
                             .alpha(if (viewModel.progressBarVisibility.value) 0.7F else 1F)
                             .blur(radius = if (viewModel.progressBarVisibility.value) 7.dp else 0.dp)
                     ) {
                         Box(
-                            modifier = Modifier
+                            modifier = Modifier.Companion
                                 .fillMaxSize(),
-                            contentAlignment = Alignment.BottomEnd
+                            contentAlignment = Alignment.Companion.BottomEnd
                         ) {
                             Column(
-                                modifier = Modifier
+                                modifier = Modifier.Companion
                                     .fillMaxSize()
                                     .background(
-                                        brush = Brush.verticalGradient(
+                                        brush = Brush.Companion.verticalGradient(
                                             colors = if (viewType == ViewType.SETTING) listOf(
                                                 PrimaryBackgroundColor.value,
                                                 PrimaryBackgroundColor.value
@@ -317,7 +358,7 @@ class HomeFragment : Fragment() {
                                     )
                                 }
                                 AnimatedVisibility(visible = viewType != ViewType.SETTING) {
-                                    Spacer(modifier = Modifier.height(if (searchToggle) 20.dp else 0.dp))
+                                    Spacer(modifier = Modifier.Companion.height(if (searchToggle) 20.dp else 0.dp))
                                 }
                                 AnimatedVisibility(visible = searchToggle) {
                                     SearchBarComponent(
@@ -332,7 +373,7 @@ class HomeFragment : Fragment() {
                                         }
                                     )
                                 }
-                                Spacer(modifier = Modifier.height(if (viewType == ViewType.TASK) 20.dp else 0.dp))
+                                Spacer(modifier = Modifier.Companion.height(if (viewType == ViewType.TASK) 20.dp else 0.dp))
                                 AnimatedVisibility(visible = viewType == ViewType.TASK) {
                                     DateComponent(
                                         listState = dateListState,
@@ -376,7 +417,7 @@ class HomeFragment : Fragment() {
                                     )
                                 }
                                 AnimatedVisibility(visible = viewType != ViewType.SETTING) {
-                                    Spacer(modifier = Modifier.height(20.dp))
+                                    Spacer(modifier = Modifier.Companion.height(20.dp))
                                 }
                                 AnimatedVisibility(visible = viewType != ViewType.SETTING) {
                                     CategoryComponent(
@@ -392,7 +433,7 @@ class HomeFragment : Fragment() {
                                     }
                                 }
                                 AnimatedVisibility(visible = viewType != ViewType.SETTING) {
-                                    Spacer(modifier = Modifier.height(20.dp))
+                                    Spacer(modifier = Modifier.Companion.height(20.dp))
                                 }
                                 AnimatedVisibility(visible = viewType == ViewType.TASK) {
                                     TodoItemList(
@@ -505,11 +546,23 @@ class HomeFragment : Fragment() {
                                         },
                                         onHelpEvent = {},
                                         onFeedbackEvent = {},
+                                        onSoftwareUpdateEvent = {
+                                            softwareUpdateManager.checkForUpdate()
+                                            Toast.makeText(requireContext(), "Checking Software Updates", Toast.LENGTH_SHORT).show()
+                                        },
                                         onGeneralSettingItemClick = {
-                                            settingViewModel.onEvent(SettingEvents.OnPickerToggle(true))
+                                            settingViewModel.onEvent(
+                                                SettingEvents.OnPickerToggle(
+                                                    true
+                                                )
+                                            )
                                         },
                                         onBackupSettingItemClick = {
-                                            settingViewModel.onEvent(SettingEvents.OnLoaderToggle(true))
+                                            settingViewModel.onEvent(
+                                                SettingEvents.OnLoaderToggle(
+                                                    true
+                                                )
+                                            )
                                         }
                                     )
                                 }
@@ -520,11 +573,11 @@ class HomeFragment : Fragment() {
                                 exit = scaleOut()
                             ) {
                                 FloatingActionButton(
-                                    modifier = Modifier
+                                    modifier = Modifier.Companion
                                         .padding(bottom = 65.dp, end = 20.dp)
                                         .wrapContentSize(),
                                     onClick = {
-                                          navigateByView(viewType)
+                                        navigateByView(viewType)
                                     },
                                     backgroundColor = ButtonPrimary.value
                                 ) {
@@ -560,8 +613,8 @@ class HomeFragment : Fragment() {
                             }
                         }
                         Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.BottomEnd
+                            modifier = Modifier.Companion.fillMaxSize(),
+                            contentAlignment = Alignment.Companion.BottomEnd
                         ) {
                             BottomNavigationBar(
                                 items = navigationItems,
@@ -579,9 +632,9 @@ class HomeFragment : Fragment() {
                         }
                         if (viewType == ViewType.SETTING) {
                             Box(
-                                modifier = Modifier
+                                modifier = Modifier.Companion
                                     .fillMaxSize(),
-                                contentAlignment = Alignment.Center,
+                                contentAlignment = Alignment.Companion.Center,
                             ) {
                                 AnimatedVisibility(
                                     visible = pickerState,
@@ -643,8 +696,9 @@ class HomeFragment : Fragment() {
 
     private fun navigateToTaskViewById(todoId: Int) {
         val bundle = bundleOf()
-        bundle.putBoolean(TASK_VIEW, true)
-        bundle.putInt(TASK_VIEW_ID, todoId)
+        bundle.putBoolean(Constants.TASK_VIEW, true)
+        bundle.putInt(Constants.TASK_VIEW_ID, todoId)
+        Log.i("NOTIFICATION_FLOW", "HomeFragment :: navigateToTaskViewById: navigated to todoId : ${todoId}")
         findNavController().navigate(
             R.id.taskFragment,
             bundle,
@@ -662,7 +716,7 @@ class HomeFragment : Fragment() {
         val bundle = bundleOf()
         when(viewType){
             ViewType.TASK -> {
-                bundle.putBoolean(TASK_VIEW, false)
+                bundle.putBoolean(Constants.TASK_VIEW, false)
                 findNavController().navigate(
                     R.id.taskFragment,
                     bundle,
@@ -692,4 +746,3 @@ class HomeFragment : Fragment() {
     }
 
 }
-

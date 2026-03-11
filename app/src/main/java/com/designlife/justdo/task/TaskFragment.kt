@@ -53,7 +53,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import java.util.Calendar
 
-class TaskFragment : Fragment(), TaskListener {
+class TaskFragment : Fragment() {
 
     private lateinit var viewmodel : TaskViewModel
     private lateinit var shareViewModel : ContainerViewModel
@@ -85,7 +85,8 @@ class TaskFragment : Fragment(), TaskListener {
     private fun navigationArgsDateSet() {
         arguments?.let { bundle ->
             val todoId = bundle.getInt(Constants.TASK_VIEW_ID)
-            val taskViewCheck = bundle.getBoolean(Constants.TASK_VIEW)
+            val taskViewCheck = bundle.getBoolean(Constants.TASK_VIEW,false)
+            Log.i("NOTIFICATION_FLOW", "TaskFragment :: navigationArgsDateSet :: todo Id ${todoId} : taskViewCheck ${taskViewCheck}")
             taskViewCheck?.let {
                 if (it){
                     isOverview = it
@@ -298,12 +299,4 @@ class TaskFragment : Fragment(), TaskListener {
             else -> RepeatType.NO_REPEAT
         }
     }
-
-
-    override fun onUserNotificationEvent(id: Int, title: String) {
-        TODO("Not yet implemented")
-        taskId = id
-    }
-
-
 }

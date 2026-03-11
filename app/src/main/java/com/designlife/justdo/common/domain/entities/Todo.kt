@@ -12,5 +12,4 @@ data class Todo(
     val repeatIndex : Int,
     val isCompleted : Boolean,
     val createdOn : Long,
-    val notificationId : Long
 )

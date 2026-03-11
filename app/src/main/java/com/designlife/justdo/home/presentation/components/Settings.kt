@@ -43,6 +43,7 @@ fun Settings(
     onExportEvent : () -> Unit,
     onHelpEvent : () -> Unit,
     onFeedbackEvent : () -> Unit,
+    onSoftwareUpdateEvent : () -> Unit,
     onGeneralSettingItemClick : () -> Unit,
     onBackupSettingItemClick : () -> Unit
 ) {
@@ -120,6 +121,10 @@ fun Settings(
                     Spacer(modifier = Modifier.height(15.dp))
                     SettingItemComponent(drawableIcon = iconList[7].icon, title = iconList[7].title) {
                         onFeedbackEvent.invoke()
+                    }
+                    Spacer(modifier = Modifier.height(15.dp))
+                    SettingItemComponent(drawableIcon = iconList[8].icon, title = iconList[8].title) {
+                        onSoftwareUpdateEvent.invoke()
                     }
                 }
                 item {
