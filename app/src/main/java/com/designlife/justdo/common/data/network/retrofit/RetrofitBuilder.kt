@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit
 
 object RetrofitBuilder {
 
-    private val URL = "https://api.github.com/repos/itsfaraz"
+    private val URL = "https://api.github.com/"
 
     fun networkBuilder(
         token : String,
