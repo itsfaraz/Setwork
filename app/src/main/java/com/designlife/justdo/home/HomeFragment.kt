@@ -12,6 +12,7 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -22,10 +23,12 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
+import androidx.compose.material.Button
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.rememberModalBottomSheetState
@@ -37,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
@@ -131,10 +135,10 @@ class HomeFragment : Fragment(), TaskListener {
         )
         viewModel = ViewModelProvider(this, factory)[HomeViewModel::class.java]
         appStoreRepository = AppServiceLocator.provideAppStoreRepository(requireContext())
+        softwareUpdateManager = AppServiceLocator.provideSoftwareUpdateManager(requireContext())
         onNotificationAvailable()
         val settingFactory = SettingViewModelFactory(appStoreRepository)
         settingViewModel = ViewModelProvider(this, settingFactory)[SettingViewModel::class.java]
-        softwareUpdateManager = AppServiceLocator.provideSoftwareUpdateManager(requireContext())
         CoroutineScope(Dispatchers.Main).launch {
             viewModel.onEvent(HomeEvents.OnProgressBarToggle(true))
             launch {

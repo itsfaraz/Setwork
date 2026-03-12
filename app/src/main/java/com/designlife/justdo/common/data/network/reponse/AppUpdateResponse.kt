@@ -3,7 +3,7 @@ package com.designlife.justdo.common.data.network.reponse
 data class AppMetaResponse(
     val tag_name : String, // tag or version
     val name : String, // release title
-    val assets : LatestMeta // Meta info
+    val assets : List<LatestMeta> // Meta info
 ){
     data class LatestMeta(
         val name : String, // file name

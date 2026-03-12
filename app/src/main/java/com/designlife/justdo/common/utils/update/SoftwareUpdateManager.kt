@@ -1,13 +1,16 @@
 package com.designlife.justdo.common.utils.update
 
 import android.app.DownloadManager
+import android.content.ActivityNotFoundException
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
 import android.os.Environment
+import android.util.Log
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import com.designlife.justdo.BuildConfig
 import com.designlife.justdo.common.domain.repositories.SoftwareUpdateRepository
 import com.designlife.orchestrator.NotificationScheduler
@@ -24,18 +27,19 @@ import kotlin.math.absoluteValue
 
 class SoftwareUpdateManager(
     private val context: Context,
-    private val scope : CoroutineScope,
+    private val scope: CoroutineScope,
     private val updateRepository: SoftwareUpdateRepository,
     private val notificationScheduler: NotificationScheduler
 ) {
 
-    private var downloadId : Long = 0L
-    private var sha256CheckSum : String = ""
+    private var downloadId: Long = 0L
+    private var sha256CheckSum: String = ""
+    private var isReceiverRegistered = false
 
     private val downloadReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-
             val id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
+            Log.i("SoftwareUpdateManager", "onReceive: downloadReceiver :: id : $id")
 
             if (id == downloadId) {
                 handleDownloadCompleted(context, id)
@@ -43,41 +47,69 @@ class SoftwareUpdateManager(
         }
 
         private fun handleDownloadCompleted(context: Context, id: Long) {
+            Log.i("SoftwareUpdateManager", "onReceive: handleDownloadCompleted :: id : $id")
 
-            val apkFile = getDownloadedFile(context, id) ?: return
+            val apkFile = getDownloadedFile(context, id)
+            if (apkFile == null) {
+                Log.e("SoftwareUpdateManager", "Failed to get downloaded file")
+                return
+            }
 
             val calculated = sha256(apkFile)
+            Log.i("SoftwareUpdateManager", "onReceive: handleDownloadCompleted :: calculated-sha : $calculated :: existing-sha256CheckSum $sha256CheckSum")
 
             if (calculated == sha256CheckSum) {
-                val uri = getDownloadedApkUri(context,downloadId)
-                uri?.let {uri ->
-                    installApk(context, uri)
+                val uri = getDownloadedApkUri(context, downloadId)
+                if (uri != null) {
+                    try {
+                        installApk(context, uri)
+                        Log.i("SoftwareUpdateManager", "APK installation intent started successfully")
+                    } catch (e: Exception) {
+                        Log.e("SoftwareUpdateManager", "Failed to install APK", e)
+                        apkFile.delete()
+                    }
+                } else {
+                    Log.e("SoftwareUpdateManager", "Failed to get download URI")
+                    apkFile.delete()
                 }
             } else {
+                Log.e(
+                    "SoftwareUpdateManager",
+                    "SHA256 checksum mismatch. Calculated: $calculated, Expected: $sha256CheckSum"
+                )
                 apkFile.delete()
             }
+
+            // Unregister receiver after download completion
+            unregisterDownloadReceiver()
         }
     }
 
     fun checkForUpdate() {
         scope.launch(Dispatchers.IO) {
-            updateRepository.fetchReleaseUpdates()?.let { appMetaResponse ->
-                if (isUpdateAvailable(appMetaResponse.tag_name)){
-                    val updateNotification = NotificationInfo(
-                        scheduledTime = System.currentTimeMillis() + 10,
-                        taskTitle = "Software Update",
-                        taskSubTitle = "Tap to install update",
-                        taskId = 10001,
-                        notificationType = NotificationType.APP_UPDATE,
-                        notificationStatus = NotificationStatus.ACTIVE,
-                        createdTime = System.currentTimeMillis(),
-                        deliveredTime = 0L
-                    )
-                    notificationScheduler.scheduleNotification(updateNotification)
+            try {
+                updateRepository.fetchReleaseUpdates()?.let { appMetaResponse ->
+                    if (isUpdateAvailable(appMetaResponse.tag_name)) {
+                        val updateNotification = NotificationInfo(
+                            scheduledTime = System.currentTimeMillis() + 10,
+                            taskTitle = "Software Update",
+                            taskSubTitle = "Tap to install update",
+                            taskId = 10001,
+                            notificationType = NotificationType.APP_UPDATE,
+                            notificationStatus = NotificationStatus.ACTIVE,
+                            createdTime = System.currentTimeMillis(),
+                            deliveredTime = 0L
+                        )
+                        notificationScheduler.scheduleNotification(updateNotification)
+                        Log.i("SoftwareUpdateManager", "Update available: ${appMetaResponse.tag_name}")
+                    } else {
+                        Log.i("SoftwareUpdateManager", "No update available")
+                    }
                 }
+            } catch (e: Exception) {
+                Log.e("SoftwareUpdateManager", "Error checking for updates", e)
             }
         }
-
     }
 
     private fun isUpdateAvailable(latestVersion: String): Boolean {
@@ -103,16 +135,65 @@ class SoftwareUpdateManager(
 
     fun installUpdate() {
         scope.launch(Dispatchers.IO) {
-            updateRepository.fetchReleaseUpdates()?.let { appMetaResponse ->
-                appMetaResponse.assets?.let { appMeta ->
-                    downloadId = downloadApk(context,appMeta.browser_download_url,appMeta.name)
-                    ContextCompat.registerReceiver(
-                        context,
-                        downloadReceiver,
-                        IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE),
-                        ContextCompat.RECEIVER_NOT_EXPORTED
-                    )
+            try {
+                Log.i("SoftwareUpdateManager", "Starting installUpdate process")
+                updateRepository.fetchReleaseUpdates()?.let { appMetaResponse ->
+                    appMetaResponse.assets.firstOrNull()?.let { appMeta ->
+                        downloadId = downloadApk(context, appMeta.browser_download_url, appMeta.name)
+                        sha256CheckSum = appMeta.digest.removePrefix("sha256:")
+
+                        Log.i("SoftwareUpdateManager", "Download started with ID: $downloadId, Expected SHA256: $sha256CheckSum")
+                        scope.launch(Dispatchers.Main) {
+                            registerDownloadReceiver()
+                        }
+                    }
                 }
+            } catch (e: Exception) {
+                Log.e("SoftwareUpdateManager", "Error initiating update", e)
+            }
+        }
+    }
+
+    private fun registerDownloadReceiver() {
+        if (!isReceiverRegistered) {
+            try {
+                Log.i("SoftwareUpdateManager", "=== Starting Receiver Registration ===")
+                Log.i("SoftwareUpdateManager", "Context type: ${context::class.simpleName}")
+                Log.i("SoftwareUpdateManager", "Context is Activity: ${context is android.app.Activity}")
+
+                val intentFilter = IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE)
+
+                ContextCompat.registerReceiver(
+                    context,
+                    downloadReceiver,
+                    intentFilter,
+                    ContextCompat.RECEIVER_EXPORTED
+                )
+
+                isReceiverRegistered = true
+                Log.i("SoftwareUpdateManager", "Download receiver registered successfully")
+                Log.i("SoftwareUpdateManager", "Receiver will listen for: ${DownloadManager.ACTION_DOWNLOAD_COMPLETE}")
+                Log.i("SoftwareUpdateManager", "Download ID to match: $downloadId")
+                Log.i("SoftwareUpdateManager", "=== Receiver Registration Complete ===")
+
+            } catch (e: Exception) {
+                Log.e("SoftwareUpdateManager", "Error registering download receiver", e)
+                e.printStackTrace()
+                isReceiverRegistered = false
+            }
+        } else {
+            Log.w("SoftwareUpdateManager", "Receiver already registered, skipping")
+        }
+    }
+
+    private fun unregisterDownloadReceiver() {
+        if (isReceiverRegistered) {
+            try {
+                context.unregisterReceiver(downloadReceiver)
+                isReceiverRegistered = false
+                Log.i("SoftwareUpdateManager", "Download receiver unregistered")
+            } catch (e: Exception) {
+                Log.e("SoftwareUpdateManager", "Error unregistering download receiver", e)
             }
         }
     }
@@ -120,7 +201,7 @@ class SoftwareUpdateManager(
     private fun downloadApk(
         context: Context,
         apkUrl: String,
-        packageName : String,
+        packageName: String,
     ): Long {
         val request = DownloadManager.Request(Uri.parse(apkUrl))
             .setTitle("Software Update")
@@ -133,73 +214,109 @@ class SoftwareUpdateManager(
                 Environment.DIRECTORY_DOWNLOADS,
                 packageName
             )
+            .setAllowedOverMetered(true)
+            .setAllowedOverRoaming(true)
 
         val dm = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
         return dm.enqueue(request)
     }
 
     private fun getDownloadedApkUri(context: Context, downloadId: Long): Uri? {
-        val dm = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-        return dm.getUriForDownloadedFile(downloadId)
+        return try {
+            val dm = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+            dm.getUriForDownloadedFile(downloadId)
+        } catch (e: Exception) {
+            Log.e("SoftwareUpdateManager", "Error getting downloaded file URI", e)
+            null
+        }
     }
 
     private fun sha256(file: File): String {
-        val digest = MessageDigest.getInstance("SHA-256")
-        val input = FileInputStream(file)
+        return try {
+            val digest = MessageDigest.getInstance("SHA-256")
 
-        val buffer = ByteArray(8192)
-        var read: Int
+            FileInputStream(file).use { input ->
+                val buffer = ByteArray(8192)
+                var read: Int
 
-        while (input.read(buffer).also { read = it } != -1) {
-            digest.update(buffer, 0, read)
-        }
+                while (input.read(buffer).also { read = it } != -1) {
+                    digest.update(buffer, 0, read)
+                }
+            }
 
-        val hash = digest.digest()
-
-        return hash.joinToString("") {
-            "%02x".format(it)
+            val hash = digest.digest()
+            hash.joinToString("") { "%02x".format(it) }
+        } catch (e: Exception) {
+            Log.e("SoftwareUpdateManager", "Error calculating SHA256", e)
+            ""
         }
     }
+
     private fun installApk(context: Context, uri: Uri) {
-        val intent = Intent(Intent.ACTION_VIEW).apply {
-            setDataAndType(uri, "application/vnd.android.package-archive")
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or
-                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+        try {
+            // Convert file:// URI to content:// URI using FileProvider
+            val contentUri = if (uri.scheme == "file") {
+                val file = File(uri.path!!)
+                FileProvider.getUriForFile(
+                    context,
+                    "${context.packageName}.fileprovider",
+                    file
+                )
+            } else {
+                uri
+            }
+
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(contentUri, "application/vnd.android.package-archive")
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
+                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            }
+
+            Log.i("SoftwareUpdateManager", "Starting APK installation with URI: $contentUri")
+            context.startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            Log.e("SoftwareUpdateManager", "No activity found to handle APK installation", e)
+            throw e
+        } catch (e: Exception) {
+            Log.e("SoftwareUpdateManager", "Error installing APK", e)
+            throw e
         }
-        context.startActivity(intent)
     }
 
     private fun getDownloadedFile(context: Context, downloadId: Long): File? {
+        return try {
+            val dm = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+            val query = DownloadManager.Query().apply { setFilterById(downloadId) }
 
-        val dm = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+            dm.query(query)?.use { cursor ->
+                if (cursor.moveToFirst()) {
+                    val status = cursor.getInt(
+                        cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS)
+                    )
 
-        val query = DownloadManager.Query()
-        query.setFilterById(downloadId)
+                    if (status == DownloadManager.STATUS_SUCCESSFUL) {
+                        val uriString = cursor.getString(
+                            cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_LOCAL_URI)
+                        )
 
-        val cursor = dm.query(query)
+                        val uri = Uri.parse(uriString)
+                        val file = File(uri.path!!)
 
-        if (cursor.moveToFirst()) {
-
-            val status = cursor.getInt(
-                cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS)
-            )
-
-            if (status == DownloadManager.STATUS_SUCCESSFUL) {
-
-                val uriString = cursor.getString(
-                    cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_LOCAL_URI)
-                )
-
-                cursor.close()
-
-                val uri = Uri.parse(uriString)
-                return File(uri.path!!)
+                        Log.i("SoftwareUpdateManager", "Downloaded file found at: ${file.absolutePath}")
+                        return@use file
+                    } else {
+                        Log.e("SoftwareUpdateManager", "Download status is not successful: $status")
+                    }
+                }
+                null
             }
+        } catch (e: Exception) {
+            Log.e("SoftwareUpdateManager", "Error getting downloaded file", e)
+            null
         }
-
-        cursor.close()
-        return null
     }
 
+    fun cleanup() {
+        unregisterDownloadReceiver()
+    }
 }
-

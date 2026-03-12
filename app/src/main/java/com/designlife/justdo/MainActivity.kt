@@ -32,6 +32,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.serialization.InternalSerializationApi
 import java.lang.reflect.Field
+import java.util.Calendar
 
 
 class MainActivity : AppCompatActivity() {
@@ -39,6 +40,8 @@ class MainActivity : AppCompatActivity() {
     private var isNotificationPermissionGranted = false
     private var isStorageWritePermissionGranted = false
     private var isStorageReadPermissionGranted = false
+    private var updateChecked = false
+
 //    private var isStorageReadImagePermissionGranted = false
 //    private var isStorageReadVideoPermissionGranted = false
 //    private var isStorageReadAudioPermissionGranted = false
@@ -67,13 +70,21 @@ class MainActivity : AppCompatActivity() {
         val navController = navHostFragment.navController
         observeDarkModeChanges()
         observeSettingChanges()
-        checkSoftwareUpdates()
+//        checkSoftwareUpdates()
     }
 
     private fun checkSoftwareUpdates() {
-        AppServiceLocator.provideSoftwareUpdateManager(this).checkForUpdate()
-    }
+        if (updateChecked) return
 
+        val calendar = Calendar.getInstance()
+        val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
+
+        // run only on Sunday (last day of week)
+        if (dayOfWeek == Calendar.SUNDAY) {
+            updateChecked = true
+            AppServiceLocator.provideSoftwareUpdateManager(this).checkForUpdate()
+        }
+    }
 
     // Preference Changes Observe
     @OptIn(InternalSerializationApi::class)
