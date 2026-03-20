@@ -32,9 +32,7 @@
 
 Setwork is a minimal, offline-first task management application for Android. It is written entirely in Kotlin and built on top of Jetpack Compose, with no cloud dependency, no subscription model, and no telemetry of any kind. All data is stored locally on the device.
 
-The project is structured as a **multi-module ecosystem** — three independent repositories, each with a clearly bounded responsibility, consumed together to form the complete application. This architecture was a deliberate design decision, not an accidental one, and it reflects the way production-grade Android systems are increasingly being built.
-
-This document exists to give engineers — whether they are users, contributors, or students — a thorough understanding of the project: what it does, how it is structured, why certain decisions were made, and how to meaningfully engage with it.
+The project is structured as a **multi-module ecosystem** — three independent repositories, each with a clearly bounded responsibility, consumed together to form the complete application.
 
 ---
 
@@ -48,7 +46,7 @@ The Setwork ecosystem is composed of three repositories:
 | [`Setwork-Orchestrator`](https://github.com/itsfaraz/Setwork-Orchestrator) | Library module — notification scheduling and date rendering |
 | [`Setwork-Provider`](https://github.com/itsfaraz/Setwork-Provider) | Library module — data provision and content sourcing |
 
-Each module is independently versioned and independently releasable. The Orchestrator is currently at `v1.0.7`, which means it has already iterated beyond the main app's `v1.0.0` — a practical demonstration of why module isolation matters in multi-module systems.
+Each module is independently versioned and independently releasable. The Orchestrator is currently at `v1.0.7`, which means it has already iterated beyond the main app's `v1.0.0` — a incapsulated multi-module systems.
 
 ---
 
@@ -61,7 +59,7 @@ Each module is independently versioned and independently releasable. The Orchest
 
 ### Architectural Philosophy
 
-The application follows **Clean Architecture** principles, organized by feature rather than by layer. This is a meaningful distinction. Layer-organized projects (`data/`, `domain/`, `ui/` at the root) tend to couple features together implicitly. Feature-organized projects isolate each vertical slice of functionality, allowing individual features to be developed, tested, and replaced without touching unrelated code.
+The application follows **Clean Architecture** principles, organized by feature rather than by layer. 
 
 Each feature module within the main app contains its own `data`, `domain`, and `presentation` sub-packages. Shared infrastructure — repositories, utilities, base classes — lives in `common/`.
 
