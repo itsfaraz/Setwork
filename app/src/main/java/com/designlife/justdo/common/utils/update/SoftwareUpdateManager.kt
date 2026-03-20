@@ -94,8 +94,8 @@ class SoftwareUpdateManager(
                     if (isUpdateAvailable(appMetaResponse.tag_name)) {
                         val updateNotification = NotificationInfo(
                             scheduledTime = System.currentTimeMillis() + 10,
-                            taskTitle = "Software Update",
-                            taskSubTitle = "Tap to install update",
+                            taskTitle = "Software Update Available",
+                            taskSubTitle = "Tap to install latest update",
                             taskId = 10001,
                             notificationType = NotificationType.APP_UPDATE,
                             notificationStatus = NotificationStatus.ACTIVE,

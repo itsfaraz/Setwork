@@ -1,6 +1,7 @@
 package com.designlife.justdo.common.utils
 
 import android.content.Context
+import com.designlife.justdo.common.data.datastore.AppStore.Companion.getDataStore
 import com.designlife.justdo.common.data.datastore.appStore
 import com.designlife.justdo.common.data.network.SoftwareUpdateService
 import com.designlife.justdo.common.data.network.retrofit.RetrofitBuilder
@@ -67,7 +68,7 @@ object AppServiceLocator {
 
     @OptIn(InternalSerializationApi::class)
     private fun createAppStoreRepository(context: Context): IAppStoreRepository {
-        appStoreRepository = IAppStoreRepository(context.appStore)
+        appStoreRepository = IAppStoreRepository(getDataStore(context))
         return appStoreRepository!!
     }
 

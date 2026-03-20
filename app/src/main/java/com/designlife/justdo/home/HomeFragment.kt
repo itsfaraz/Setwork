@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.designlife.justdo.R
@@ -92,6 +93,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Date
@@ -138,29 +140,31 @@ class HomeFragment : Fragment(), TaskListener {
         onNotificationAvailable()
         val settingFactory = SettingViewModelFactory(appStoreRepository)
         settingViewModel = ViewModelProvider(this, settingFactory)[SettingViewModel::class.java]
-        CoroutineScope(Dispatchers.Main).launch {
+        lifecycleScope.launch {
             viewModel.onEvent(HomeEvents.OnProgressBarToggle(true))
-            launch {
-                viewModel.loadInitialDates()
-            }
-            launch {
+            launch(Dispatchers.IO) {
                 settingViewModel.initSettingPreferences()
+                viewModel.onEvent(HomeEvents.OnViewChange(settingViewModel.defaultScreen.value))
             }
-            launch {
+            launch(Dispatchers.Main.immediate) {
+                viewModel.loadInitialDates()
+
+            }
+
+            launch(Dispatchers.IO) {
                 viewModel.fetchAllTodo()
             }
-            launch {
+            launch(Dispatchers.IO) {
                 viewModel.fetchAllCategory()
             }
-            launch {
+            launch(Dispatchers.IO) {
                 viewModel.fetchAllNotes()
             }
-            launch {
+            launch(Dispatchers.IO) {
                 viewModel.fetchAllDecks()
             }
 
-            initialSlide()
-            viewModel.onEvent(HomeEvents.OnViewChange(settingViewModel.defaultScreen.value))
+
             viewModel.onEvent(HomeEvents.OnProgressBarToggle(false))
         }
         checkNotificationView()
@@ -223,27 +227,28 @@ class HomeFragment : Fragment(), TaskListener {
     }
 
     private suspend fun initialSlide() {
-        if (::scope.isInitialized) {
-            delay(200)
-            viewModel.onEvent(HomeEvents.OnRefreshInitialDates)
-            delay(200)
-            val index = viewModel.dateList.value.indexOf(viewModel.currentDate.value)
-            Log.i("SLIDE_DATA", "initialSlide: List ${viewModel.dateList.value}")
-            Log.i("SLIDE_DATA", "initialSlide: Current Date ${viewModel.currentDate.value}")
-            Log.i("SLIDE_DATA", "initialSlide: List Size ${viewModel.dateList.value.size} :: Index ${index}")
-            viewModel.onEvent(HomeEvents.OnIndexSelected(index))
-            val job: Job = scope.launch(Dispatchers.Default) {
-                scope.launch {
-                    scrollToRollItem(viewModel.todoIndex.value, todoListState)
-                }
-            }
-            val job1 = scope.launch { scrollToRollItem(index, dateListState) }
-            job.join()
-            job1.join()
-            scope.launch(Dispatchers.Main.immediate) {
-                viewModel.onEvent(HomeEvents.OnProgressBarToggle(false))
-            }
+        if (::scope.isInitialized == false){
+            return
         }
+        viewModel.onEvent(HomeEvents.OnProgressBarToggle(true))
+
+        viewModel.onEvent(HomeEvents.OnRefreshInitialDates)
+
+        val dateList = viewModel.dateList.value
+        val currentDate = viewModel.currentDate.value
+        val index = dateList.indexOf(currentDate)
+
+        viewModel.onEvent(HomeEvents.OnIndexSelected(index))
+
+        scope.launch {
+            scrollToRollItem(viewModel.todoIndex.value, todoListState)
+        }
+
+        scope.launch {
+            scrollToRollItem(index, dateListState)
+        }
+
+        viewModel.onEvent(HomeEvents.OnProgressBarToggle(false))
     }
 
     override fun onUserNotificationEvent(id: Int, title: String) {
@@ -305,6 +310,12 @@ class HomeFragment : Fragment(), TaskListener {
                 val loaderState = settingViewModel.loaderVisibility.value
                 val loaderStatus = settingViewModel.loaderStatus.value
                 val isDarkMode = SettingViewModel.Companion.darkModeStatus.value
+                remember {
+                    scope.launch {
+                        delay(120)
+                        initialSlide()
+                    }
+                }
                 Box(
                     modifier = Modifier.Companion.fillMaxSize(),
                 ) {
