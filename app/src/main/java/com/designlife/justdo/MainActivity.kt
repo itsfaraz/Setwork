@@ -39,6 +39,7 @@ import java.util.Calendar
 
 
 class MainActivity : AppCompatActivity() {
+    private val TAG = MainActivity::class.java.simpleName
     private lateinit var permissionLauncher: ActivityResultLauncher<Array<String>>
     private var isNotificationPermissionGranted = false
     private var isStorageWritePermissionGranted = false
@@ -52,6 +53,11 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
+            Log.i(TAG, "onCreate: SETWORK CRASH :: Crash happened on thread ${thread.name} ::  ${throwable.printStackTrace()}")
+        }
+
+
         if (!PermissionHandler.checkAllPermissions(this)){
             permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
 //                isManageExternalStoragePermissionGranted = permissions[Manifest.permission.MANAGE_EXTERNAL_STORAGE] ?: isManageExternalStoragePermissionGranted
