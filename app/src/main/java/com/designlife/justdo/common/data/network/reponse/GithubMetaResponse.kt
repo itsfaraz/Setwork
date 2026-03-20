@@ -1,6 +1,6 @@
 package com.designlife.justdo.common.data.network.reponse
 
-data class AppMetaResponse(
+data class GithubMetaResponse(
     val tag_name : String, // tag or version
     val name : String, // release title
     val assets : List<LatestMeta> // Meta info

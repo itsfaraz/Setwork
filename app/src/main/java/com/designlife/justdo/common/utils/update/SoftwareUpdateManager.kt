@@ -21,6 +21,7 @@ import com.designlife.orchestrator.data.NotificationType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileInputStream
 import java.security.MessageDigest
@@ -105,8 +106,9 @@ class SoftwareUpdateManager(
                         Log.i("SoftwareUpdateManager", "Update available: ${appMetaResponse.tag_name}")
                     } else {
                         Log.i("SoftwareUpdateManager", "No update available")
-                        Toast.makeText(context, "Installed software version is updated", Toast.LENGTH_SHORT).show()
-                    }
+                        withContext(Dispatchers.Main.immediate) {
+                            Toast.makeText(context, "Installed software version is updated", Toast.LENGTH_SHORT).show()
+                        }                    }
                 }
             } catch (e: Exception) {
                 Log.e("SoftwareUpdateManager", "Error checking for updates", e)

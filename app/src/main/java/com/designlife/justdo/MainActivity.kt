@@ -77,7 +77,7 @@ class MainActivity : AppCompatActivity() {
         val navController = navHostFragment.navController
         observeDarkModeChanges()
         observeSettingChanges()
-//        checkSoftwareUpdates()
+        checkSoftwareUpdates()
     }
 
     private fun checkSoftwareUpdates() {
