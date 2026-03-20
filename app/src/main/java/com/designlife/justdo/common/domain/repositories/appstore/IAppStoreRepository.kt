@@ -67,4 +67,24 @@ class IAppStoreRepository @OptIn(InternalSerializationApi::class) constructor(
             Log.e(TAG, "updateSettingPreferences: App Store Repository : ${e.message}")
         }
     }
+
+    @OptIn(InternalSerializationApi::class)
+    override suspend fun getUpdateCheck(): Boolean {
+        return appStore.data.firstOrNull()?.isUpdateBotChecked ?: false
+    }
+
+    @OptIn(InternalSerializationApi::class)
+    override suspend fun setUpdateCheck(checkState: Boolean) {
+        try {
+            Log.i("NOTIFICATION_FLOW", "IAppStoreRepository: setUpdateCheck : isUpdateBotChecked : ${checkState}")
+
+            appStore.updateData {
+                it.copy(
+                    isUpdateBotChecked = checkState
+                )
+            }
+        }catch (e : Exception){
+            Log.e(TAG, "updateTodoId: App Store Repository : ${e.message}")
+        }
+    }
 }

@@ -13,5 +13,6 @@ interface AppStoreRepository {
     suspend fun getSettingPreferences() : SettingPreference?
     suspend fun updateSettingPreferences(settingPreference: SettingPreference)
     suspend fun observerSettingPreferences() : Flow<AppStore>
-
+    suspend fun getUpdateCheck() : Boolean
+    suspend fun setUpdateCheck(checkState : Boolean) : Unit
 }

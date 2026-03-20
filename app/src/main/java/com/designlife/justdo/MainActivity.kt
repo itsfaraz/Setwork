@@ -14,7 +14,9 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
+import com.designlife.justdo.common.data.datastore.appStore
 import com.designlife.justdo.common.utils.AppServiceLocator
 import com.designlife.justdo.common.utils.update.SoftwareUpdateManager
 import com.designlife.justdo.permission.PermissionHandler
@@ -26,6 +28,7 @@ import com.designlife.justdo.ui.theme.updateSystemColor
 import com.designlife.justdo.ui.theme.updateSystemFont
 import com.designlife.justdo.ui.theme.updateSystemListSize
 import com.designlife.justdo.ui.theme.updateSystemUIMode
+import com.designlife.justdo_provider.ServiceLocator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
@@ -40,8 +43,6 @@ class MainActivity : AppCompatActivity() {
     private var isNotificationPermissionGranted = false
     private var isStorageWritePermissionGranted = false
     private var isStorageReadPermissionGranted = false
-    private var updateChecked = false
-
 //    private var isStorageReadImagePermissionGranted = false
 //    private var isStorageReadVideoPermissionGranted = false
 //    private var isStorageReadAudioPermissionGranted = false
@@ -74,15 +75,22 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkSoftwareUpdates() {
-        if (updateChecked) return
+        AppServiceLocator.provideAppStoreRepository(this).let { appStore ->
+            lifecycleScope.launch {
+                val calendar = Calendar.getInstance()
+                val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
 
-        val calendar = Calendar.getInstance()
-        val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
-
-        // run only on Sunday (last day of week)
-        if (dayOfWeek == Calendar.SUNDAY) {
-            updateChecked = true
-            AppServiceLocator.provideSoftwareUpdateManager(this).checkForUpdate()
+                // run only on Sunday (last day of week)
+                if (dayOfWeek == Calendar.SUNDAY) {
+                    val updateChecked = appStore.getUpdateCheck()
+                    if (!updateChecked){
+                        AppServiceLocator.provideSoftwareUpdateManager(this@MainActivity).checkForUpdate()
+                        appStore.setUpdateCheck(true)
+                    }
+                }else{
+                    appStore.setUpdateCheck(false)
+                }
+            }
         }
     }
 

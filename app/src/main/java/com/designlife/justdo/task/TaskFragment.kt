@@ -280,6 +280,8 @@ class TaskFragment : Fragment() {
                             viewmodel.onEvent(TaskEvents.DeleteTasksEvent(taskId,false))
                             viewmodel.onEvent(TaskEvents.DeleteTaskPopup(false))
                             findNavController().navigateUp()
+                        }, noDelete = {
+                            viewmodel.onEvent(TaskEvents.DeletePopToggleOff)
                         })
                     }
                 }

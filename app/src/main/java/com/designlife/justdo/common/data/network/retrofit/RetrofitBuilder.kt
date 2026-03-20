@@ -1,7 +1,7 @@
 package com.designlife.justdo.common.data.network.retrofit
 
 import android.content.Context
-import com.chuckerteam.chucker.api.ChuckerInterceptor
+//import com.chuckerteam.chucker.api.ChuckerInterceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -22,7 +22,7 @@ object RetrofitBuilder {
             .readTimeout(120, TimeUnit.SECONDS)
             .connectTimeout(120, TimeUnit.SECONDS)
             .addInterceptor(interceptor)
-            .addInterceptor(ChuckerInterceptor(context))
+//            .addInterceptor(ChuckerInterceptor(context))
             .build()
 
 

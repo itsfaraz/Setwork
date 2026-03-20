@@ -15,4 +15,5 @@ sealed class TaskEvents{
     data class MarkTaskDone(val todoId : Int)  : TaskEvents()
     data class DeleteTaskPopup(val state : Boolean)  : TaskEvents()
     data class DeleteTasksEvent(val taskId : Int, val allOccurrence : Boolean)  : TaskEvents()
+    object DeletePopToggleOff  : TaskEvents()
 }

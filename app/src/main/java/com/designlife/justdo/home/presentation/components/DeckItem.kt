@@ -66,7 +66,7 @@ fun DeckItem(
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = deck.deckName,
+                    text = if (deck.deckName.isNotEmpty() && deck.deckName.length > 35)  deck.deckName.substring(0,34) else deck.deckName,
                     style = deckItemTitleStyle.value,
                     fontSize = deckItemTitleStyleSize.value
                 )

@@ -1,6 +1,7 @@
 package com.designlife.justdo.task.presentation.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,18 +33,22 @@ import com.designlife.justdo.ui.theme.pickerItemStyleSize
 @Composable
 fun DeleteDialogComponent(
     eventSuccuss : () -> Unit,
-    eventFail : () -> Unit
+    eventFail : () -> Unit,
+    noDelete : () -> Unit
 ) {
     Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize().clickable{
+            noDelete()
+        },
         contentAlignment = Alignment.Center
     ) {
         Card(
             modifier = Modifier
                 .fillMaxWidth(0.7F)
-                .height(220.dp)
+                .height(236.dp)
                 .background(UIComponentBackground.value, shape = RoundedCornerShape(12.dp)),
-            elevation = 12.dp
+            elevation = 12.dp,
+            shape = RoundedCornerShape(12.dp)
         ) {
             Column(
                 modifier = Modifier

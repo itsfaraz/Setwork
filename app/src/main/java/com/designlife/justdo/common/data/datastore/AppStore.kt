@@ -17,7 +17,8 @@ data class AppStore(
     @SerialName("selectedScreen") val selectedScreen : Int = 0,
     @SerialName("appTheme") val selectedAppTheme: Int = 0,
     @SerialName("fontSize") val selectedFontSize: Int = 1,
-    @SerialName("listItemHeight") val selectedListItemHeight: Int = 0
+    @SerialName("listItemHeight") val selectedListItemHeight: Int = 0,
+    @SerialName("isUpdateBotChecked") val isUpdateBotChecked: Boolean = false
 ){
     @Keep
     companion object{

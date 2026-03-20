@@ -85,7 +85,7 @@ fun DeckHeader(
                     .padding(end = 10.dp)
                     .fillMaxWidth()
                     .background(color = Color.Transparent),
-                value = headerTitle,
+                value = if (headerTitle.length > 20) headerTitle.substring(0,19) else headerTitle,
                 onValueChange = {
                     onTitleChange(it)
                 },
@@ -124,7 +124,7 @@ fun DeckHeader(
             ) {
                 Row(
                     modifier = Modifier
-                        .wrapContentWidth()
+                        .fillMaxWidth(.7F)
                         .padding(horizontal = 8.dp)
                         .background(color = Color.LightGray, shape = RoundedCornerShape(100))
                         .padding(start = 4.dp)

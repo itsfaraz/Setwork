@@ -1,6 +1,7 @@
 package com.designlife.justdo.deck
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -218,7 +219,6 @@ class DeckFragment : Fragment() {
                         verticalArrangement = Arrangement.Bottom,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Spacer(modifier = Modifier.height(6.dp))
                         AnimatedVisibility(visible = !viewModeVisibility) {
                             CustomCardButton {
                                 viewModel.onEvent(DeckEvents.OnCreateCard)
@@ -228,7 +228,7 @@ class DeckFragment : Fragment() {
                                 }
                             }
                         }
-                        Spacer(modifier = Modifier.height(if (!viewModeVisibility) 15.dp else 0.dp))
+                        Spacer(modifier = Modifier.height(if (!viewModeVisibility) 5.dp else 0.dp))
                         DeckBottomBarComponent(
                             listState = editListState,
                             viewModeVisible = viewModeVisibility,
@@ -239,17 +239,20 @@ class DeckFragment : Fragment() {
                                     viewModel.onEvent(DeckEvents.OnPersistCardChanges)
                                 }
                             },
-                            onNextCardEvent = {
-                                val nextIndex = getNextIndex(cardList, it)
-                                scope.launch(Dispatchers.Main) {
-                                    editListState.animateScrollToItem(nextIndex)
-                                    previewListState.scrollToItem(nextIndex)
-                                    listState.scrollToItem(nextIndex)
+                            onNextCardEvent = { index ->
+                                scope.launch(Dispatchers.Main.immediate) {
+                                    val nextIndex = getNextIndex(cardList, index)
+                                    Log.i("INDEX", "onCreateView: NEXT Index : $nextIndex ")
+                                    editListState.animateScrollToItem(nextIndex+1)
+                                    previewListState.scrollToItem(nextIndex+1)
+                                    listState.scrollToItem(nextIndex+1)
+
                                 }
                             },
                             onPreviousCardEvent = {
-                                val previousIndex = getPreviousIndex(cardList, it)
-                                scope.launch(Dispatchers.Main) {
+                                scope.launch(Dispatchers.Main.immediate) {
+                                    val previousIndex = getPreviousIndex(cardList, it)
+                                    Log.i("INDEX", "onCreateView: PREVIOUS Index : $previousIndex ")
                                     editListState.animateScrollToItem(previousIndex)
                                     previewListState.scrollToItem(previousIndex)
                                     listState.scrollToItem(previousIndex)
@@ -268,8 +271,9 @@ class DeckFragment : Fragment() {
     }
 
     private fun getNextIndex(cardList: MutableList<FlashCard>, index: Int): Int {
-        return if (index + 1 == cardList.size+1) cardList.lastIndex
-        else index + 1
+        return if (index == 0 ) { 1 }
+        else if (index < cardList.lastIndex) { index + 1 }
+        else { cardList.lastIndex }
     }
 
     override fun onStop() {

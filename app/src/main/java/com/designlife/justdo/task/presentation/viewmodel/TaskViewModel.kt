@@ -138,6 +138,9 @@ class TaskViewModel(
                     }
                 }
             }
+            is TaskEvents.DeletePopToggleOff -> {
+                _deleteTaskPopup.value = false
+            }
         }
 
     }

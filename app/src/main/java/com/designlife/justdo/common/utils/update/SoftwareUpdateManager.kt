@@ -9,6 +9,7 @@ import android.content.IntentFilter
 import android.net.Uri
 import android.os.Environment
 import android.util.Log
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.designlife.justdo.BuildConfig
@@ -104,6 +105,7 @@ class SoftwareUpdateManager(
                         Log.i("SoftwareUpdateManager", "Update available: ${appMetaResponse.tag_name}")
                     } else {
                         Log.i("SoftwareUpdateManager", "No update available")
+                        Toast.makeText(context, "Installed software version is updated", Toast.LENGTH_SHORT).show()
                     }
                 }
             } catch (e: Exception) {
