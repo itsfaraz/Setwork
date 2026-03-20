@@ -329,9 +329,10 @@ The following items are planned or under consideration. None of these are guaran
 
 | Item | Notes |
 |---|---|
-| Home screen widget | Read-only task overview |
-| Recurring tasks | Daily, weekly, monthly recurrence rules |
+| Task View Screen | navigate to deck or notes |
+| Scheduling Reminder | Task, Notes (Every if any) |
 | Subtasks | Parent-child task hierarchy |
+| Task, Note | Task & Note widget |
 | Task priority levels | High / medium / low with visual differentiation |
 | Search and filter | Full-text search across tasks and notes |
 | Productivity metrics | Completion rates, streaks, historical view |
@@ -339,8 +340,6 @@ The following items are planned or under consideration. None of these are guaran
 | Test coverage | Unit and UI test suite |
 | Optional cloud sync | User-controlled, no default data collection |
 | Tablet and foldable layouts | Adaptive UI for large screens |
-| F-Droid listing | Pending |
-| Amazon Appstore listing | Pending |
 
 ---
 
