@@ -104,13 +104,19 @@ class NoteFragment : Fragment() {
                             headerTitle = if (noteTitle.isEmpty()) "New Note" else noteTitle,
                             onCloseEvent = {
                                 // save updates
-                                if (noteMode == NoteMode.CREATE) {
-                                    viewModel.insertNote()
-                                } else {
-                                    viewModel.updateNote()
+                                try {
+                                    if (noteMode == NoteMode.CREATE) {
+                                        viewModel.insertNote()
+                                    } else {
+                                        viewModel.updateNote()
+                                    }
+                                }catch (e : Exception){
+                                    e.printStackTrace()
+                                }finally {
+                                    Toast.makeText(requireContext(), "Saved", Toast.LENGTH_SHORT).show()
+                                    findNavController().navigateUp()
                                 }
-                                Toast.makeText(requireContext(), "Saved", Toast.LENGTH_SHORT).show()
-                                findNavController().navigateUp()
+
                             },
                             hasDone = noteMode == NoteMode.UPDATE,
                             forTask = noteMode == NoteMode.UPDATE,
@@ -214,13 +220,17 @@ class NoteFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
         // save updates
-        if (noteMode == NoteMode.CREATE) {
+        try {
+            if (noteMode == NoteMode.CREATE) {
 //            viewModel.insertNote()
-        } else {
-            viewModel.updateNote()
-        }
-        if (viewModel.hasNoteModified.value) {
-            Toast.makeText(requireContext(), "Saved", Toast.LENGTH_SHORT).show()
+            } else {
+                viewModel.updateNote()
+            }
+            if (viewModel.hasNoteModified.value) {
+                Toast.makeText(requireContext(), "Saved", Toast.LENGTH_SHORT).show()
+            }
+        }catch (e : Exception){
+            e.printStackTrace()
         }
     }
 }
