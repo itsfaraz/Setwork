@@ -8,6 +8,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.animateValueAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,6 +31,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -57,7 +59,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.designlife.justdo.common.domain.entities.FlashCard
+import com.designlife.justdo.ui.theme.PrimaryColorHome2
 import com.designlife.justdo.ui.theme.TaskItemLabelColor
+import com.designlife.justdo.ui.theme.UIComponentBackground
 import com.designlife.justdo.ui.theme.cardTextStyle
 import com.designlife.justdo.ui.theme.headerStyle
 import com.designlife.justdo.ui.theme.highlightTextStyle
@@ -112,12 +116,12 @@ fun CardEditComponent(
 
     Box(
         modifier = Modifier
-            .padding(horizontal = 5.dp)
-            .width((screenWidth * itemWidthFraction).dp)
             .graphicsLayer {
                 rotationY = rotationState
                 cameraDistance = 8 * density
             }
+            .width((screenWidth * itemWidthFraction).dp)
+            .fillMaxHeight(itemHeight.value)
             .clickable {
                 if (editState) {
                     rotated = false
@@ -125,8 +129,7 @@ fun CardEditComponent(
                     rotated = !rotated
                 }
             }
-            .fillMaxHeight(itemHeight.value)
-            .background(color = Color.Transparent, shape = RoundedCornerShape(8.dp)),
+            .padding(horizontal = 3.dp),
         contentAlignment = Alignment.BottomCenter
     ) {
         Card(
@@ -141,13 +144,13 @@ fun CardEditComponent(
                 .width((screenWidth * itemWidthFraction).dp)
                 .fillMaxHeight(itemHeight.value),
             backgroundColor = animateColor,
-            elevation = 15.dp,
-            shape = RoundedCornerShape(8.dp)
+            shape = RoundedCornerShape(12.dp)
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxHeight()
+                    .clip(RoundedCornerShape(8.dp))
             ) {
                 if (!rotated){
                     Row(
@@ -178,7 +181,9 @@ fun CardEditComponent(
                         .padding(bottom = 20.dp)
                         .fillMaxWidth()
                         .fillMaxHeight()
-                        .padding(horizontal = 6.dp),
+                        .padding(horizontal = 6.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                    ,
                     verticalArrangement = if (editState) Arrangement.SpaceEvenly else Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ){
@@ -262,7 +267,7 @@ fun CardEditComponent(
 @Composable
 fun CardEditPrev() {
     val edit = remember {
-        mutableStateOf(false)
+        mutableStateOf(true)
     }
     Column(
         modifier = Modifier
