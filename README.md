@@ -18,7 +18,7 @@
 [Website](https://setwork.web.app) &nbsp;&nbsp;|&nbsp;&nbsp;
 [Download](#download) &nbsp;&nbsp;|&nbsp;&nbsp;
 [Architecture](#architecture) &nbsp;&nbsp;|&nbsp;&nbsp;
-[For Engineers](#for-engineers-and-learners) &nbsp;&nbsp;|&nbsp;&nbsp;
+[For Developers](#for-engineers-and-learners) &nbsp;&nbsp;|&nbsp;&nbsp;
 [Contributing](#contributing) &nbsp;&nbsp;|&nbsp;&nbsp;
 [Donate](#support-the-project)
 
