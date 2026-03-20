@@ -787,7 +787,7 @@ class HomeFragment : Fragment(), TaskListener {
 
 
     private fun helpMailToOrangeBytes(){
-        val email = arrayOf("help.orangebytes@protonmail.com")
+        val email = arrayOf("help.orangebytes@proton.me")
         val subject = "Setwork - Help"
 
         val gmailIntent = Intent(Intent.ACTION_SEND).apply {
