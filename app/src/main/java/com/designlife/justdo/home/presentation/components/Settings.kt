@@ -1,6 +1,5 @@
 package com.designlife.justdo.home.presentation.components
 
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Box
@@ -33,8 +32,8 @@ fun Settings(
     iconList: List<SettingItem>,
     pickerState: Boolean,
     loaderState: Boolean,
-    onSwipeLeftEvent : () -> Unit,
-    onSwipeRightEvent : () -> Unit,
+    onSwipeLeftEvent: () -> Unit,
+    onSwipeRightEvent: () -> Unit,
     onDefaultScreenEvent: () -> Unit,
     onAppThemeEvent: () -> Unit,
     onFontSizeEvent: () -> Unit,
@@ -63,8 +62,7 @@ fun Settings(
             .alpha(if (pickerState || loaderState) 0.7F else 1F)
             .blur(radius = if (pickerState || loaderState) 7.dp else 0.dp)
             .appBackground(enable = true)
-    )
-    {
+    ) {
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
@@ -77,7 +75,7 @@ fun Settings(
             )
             LazyColumn(
                 modifier = Modifier
-                    .padding(start = 6.dp)
+                    .padding(start = 6.dp, end = 6.dp)
                     .fillMaxSize()
             ) {
                 item {
@@ -86,96 +84,113 @@ fun Settings(
                     Spacer(modifier = Modifier.height(15.dp))
                     SettingHeader(headerTitle = "General")
                     Spacer(modifier = Modifier.height(15.dp))
-                    SettingItemComponent(
-                        drawableIcon = iconList[0].icon,
-                        title = iconList[0].title
-                    ) {
-                        onDefaultScreenEvent.invoke()
-                        onGeneralSettingItemClick()
-                    }
-                    Spacer(modifier = Modifier.height(15.dp))
-                    SettingItemComponent(
-                        drawableIcon = iconList[1].icon,
-                        title = iconList[1].title
-                    ) {
-                        onAppThemeEvent.invoke()
-                        onGeneralSettingItemClick()
-                    }
-                    Spacer(modifier = Modifier.height(15.dp))
-                    SettingItemComponent(
-                        drawableIcon = iconList[2].icon,
-                        title = iconList[2].title
-                    ) {
-                        onFontSizeEvent.invoke()
-                        onGeneralSettingItemClick()
-                    }
-                    Spacer(modifier = Modifier.height(15.dp))
-                    SettingItemComponent(
-                        drawableIcon = iconList[3].icon,
-                        title = iconList[3].title
-                    ) {
-                        onListHeightEvent.invoke()
-                        onGeneralSettingItemClick()
+                }
+
+                iconList.getOrNull(0)?.let { item ->
+                    item {
+                        SettingItemComponent(drawableIcon = item.icon, title = item.title) {
+                            onDefaultScreenEvent()
+                            onGeneralSettingItemClick()
+                        }
+                        Spacer(modifier = Modifier.height(15.dp))
                     }
                 }
+                iconList.getOrNull(1)?.let { item ->
+                    item {
+                        SettingItemComponent(drawableIcon = item.icon, title = item.title) {
+                            onAppThemeEvent()
+                            onGeneralSettingItemClick()
+                        }
+                        Spacer(modifier = Modifier.height(15.dp))
+                    }
+                }
+                iconList.getOrNull(2)?.let { item ->
+                    item {
+                        SettingItemComponent(drawableIcon = item.icon, title = item.title) {
+                            onFontSizeEvent()
+                            onGeneralSettingItemClick()
+                        }
+                        Spacer(modifier = Modifier.height(15.dp))
+                    }
+                }
+                iconList.getOrNull(3)?.let { item ->
+                    item {
+                        SettingItemComponent(drawableIcon = item.icon, title = item.title) {
+                            onListHeightEvent()
+                            onGeneralSettingItemClick()
+                        }
+                        Spacer(modifier = Modifier.height(15.dp))
+                    }
+                }
+
                 item {
                     Spacer(modifier = Modifier.height(12.dp))
                     DividerLiner()
                     Spacer(modifier = Modifier.height(15.dp))
                     SettingHeader(headerTitle = "Backup")
                     Spacer(modifier = Modifier.height(15.dp))
-                    SettingItemComponent(
-                        drawableIcon = iconList[4].icon,
-                        title = iconList[4].title
-                    ) {
-                        onImportEvent.invoke()
-                        onBackupSettingItemClick()
-                    }
-                    Spacer(modifier = Modifier.height(15.dp))
-                    SettingItemComponent(
-                        drawableIcon = iconList[5].icon,
-                        title = iconList[5].title
-                    ) {
-                        onExportEvent.invoke()
-                        onBackupSettingItemClick()
+                }
+
+                iconList.getOrNull(4)?.let { item ->
+                    item {
+                        SettingItemComponent(drawableIcon = item.icon, title = item.title) {
+                            onImportEvent()
+                            onBackupSettingItemClick()
+                        }
+                        Spacer(modifier = Modifier.height(15.dp))
                     }
                 }
+                iconList.getOrNull(5)?.let { item ->
+                    item {
+                        SettingItemComponent(drawableIcon = item.icon, title = item.title) {
+                            onExportEvent()
+                            onBackupSettingItemClick()
+                        }
+                        Spacer(modifier = Modifier.height(15.dp))
+                    }
+                }
+
                 item {
                     Spacer(modifier = Modifier.height(12.dp))
                     DividerLiner()
                     Spacer(modifier = Modifier.height(15.dp))
                     SettingHeader(headerTitle = "More")
                     Spacer(modifier = Modifier.height(15.dp))
-                    SettingItemComponent(
-                        drawableIcon = iconList[6].icon,
-                        title = iconList[6].title
-                    ) {
-                        onHelpEvent.invoke()
-                    }
-                    Spacer(modifier = Modifier.height(15.dp))
-                    SettingItemComponent(
-                        drawableIcon = iconList[7].icon,
-                        title = iconList[7].title
-                    ) {
-                        onFeedbackEvent.invoke()
-                    }
-                    Spacer(modifier = Modifier.height(15.dp))
-                    SettingItemComponent(
-                        drawableIcon = iconList[8].icon,
-                        title = iconList[8].title
-                    ) {
-                        onSoftwareUpdateEvent.invoke()
+                }
+
+                iconList.getOrNull(6)?.let { item ->
+                    item {
+                        SettingItemComponent(drawableIcon = item.icon, title = item.title) {
+                            onHelpEvent()
+                        }
+                        Spacer(modifier = Modifier.height(15.dp))
                     }
                 }
+                iconList.getOrNull(7)?.let { item ->
+                    item {
+                        SettingItemComponent(drawableIcon = item.icon, title = item.title) {
+                            onFeedbackEvent()
+                        }
+                        Spacer(modifier = Modifier.height(15.dp))
+                    }
+                }
+                iconList.getOrNull(8)?.let { item ->
+                    item {
+                        SettingItemComponent(drawableIcon = item.icon, title = item.title) {
+                            onSoftwareUpdateEvent()
+                        }
+                        Spacer(modifier = Modifier.height(15.dp))
+                    }
+                }
+
                 item {
                     Spacer(modifier = Modifier.height(20.dp))
-                    SettingHeader(headerTitle = "VERSION 1.0.0")
+                    SettingHeader(headerTitle = "VERSION 1.0.1")
+                    Spacer(modifier = Modifier.height(32.dp))
                 }
             }
         }
     }
-
-
 }
 
 @Composable
@@ -198,4 +213,3 @@ fun DividerLiner() {
             .background(color = ButtonHighLightPrimary.value)
     )
 }
-

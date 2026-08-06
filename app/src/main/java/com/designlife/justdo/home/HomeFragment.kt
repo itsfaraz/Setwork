@@ -111,6 +111,7 @@ import java.util.Date
 import androidx.core.net.toUri
 import com.designlife.justdo.common.presentation.components.TopPaddingComponent
 import com.designlife.justdo.common.presentation.components.appBackground
+import kotlin.time.Duration.Companion.milliseconds
 
 class HomeFragment : Fragment(), TaskListener {
 
@@ -261,17 +262,12 @@ class HomeFragment : Fragment(), TaskListener {
 
     private fun initialSlide() {
         val dateList = viewModel.dateList.value
-        Log.i("DATE_SLIDE", "initialSlide: date list ${dateList.size}")
         val currentDate = viewModel.currentDate.value
-        Log.i("DATE_SLIDE", "initialSlide: current date : ${currentDate} :: date list ${dateList}")
         val computeIndex = dateList.indexOf(currentDate)
-        Log.i("DATE_SLIDE", "initialSlide: ${computeIndex}")
         scope.launch(Dispatchers.Main.immediate) {
             if (dateList.isNotEmpty()){
                 computeIndex.let { index ->
-                    Log.i("DATE_SLIDE", "initialSlide: computeIndex ${index}")
                     if (index != -1){
-                        Log.i("DATE_SLIDE", "initialSlide: ${computeIndex}")
                         viewModel.onEvent(HomeEvents.OnIndexSelected(index))
                         dateListState.scrollToItem(index)
                         viewModel.onEvent(HomeEvents.HighlightTodoByDate(index))
@@ -307,7 +303,7 @@ class HomeFragment : Fragment(), TaskListener {
         }
 
         if (actionId == -4){
-            Log.i("PROVIDER_FLOW", "onUserProviderEvent: actionId : ${actionId} taskId : ${taskId}")
+            Log.i("PROVIDER_FLOW", "onUserProviderEvent: actionId : $actionId taskId : $taskId")
         }
     }
 
@@ -395,7 +391,7 @@ class HomeFragment : Fragment(), TaskListener {
                 val pickerListState = settingViewModel.pickerItemList.value
                 val loaderState = settingViewModel.loaderVisibility.value
                 val loaderStatus = settingViewModel.loaderStatus.value
-                val isDarkMode = SettingViewModel.Companion.darkModeStatus.value
+                val isDarkMode = SettingViewModel.darkModeStatus.value
                 todoListIE = viewModel.todoList.value
                 noteListIE = viewModel.noteList
                 deckListIE = viewModel.deckList
@@ -405,7 +401,7 @@ class HomeFragment : Fragment(), TaskListener {
                         initialSlide()
                     }catch (e : Exception){
                         e.printStackTrace()
-                        delay(200)
+                        delay(200.milliseconds)
                         initialSlide()
                     }
                 }
@@ -413,7 +409,7 @@ class HomeFragment : Fragment(), TaskListener {
                 LaunchedEffect(legacyScroll.value) {
                     try {
                         scope.launch {
-                            delay(300)
+                            delay(300.milliseconds)
                             legacyScroll.value = false
                             highlightToday()
                         }
@@ -422,25 +418,25 @@ class HomeFragment : Fragment(), TaskListener {
                     }
                 }
                 Box(
-                    modifier = Modifier.Companion.fillMaxSize(),
+                    modifier = Modifier.fillMaxSize(),
                 ) {
                     Box(
-                        modifier = Modifier.Companion
+                        modifier = Modifier
                             .fillMaxSize()
                             .alpha(if (viewModel.progressBarVisibility.value) 0.7F else 1F)
                             .blur(radius = if (viewModel.progressBarVisibility.value) 7.dp else 0.dp),
                         contentAlignment = Alignment.BottomEnd
                     ) {
                         Box(
-                            modifier = Modifier.Companion
+                            modifier = Modifier
                                 .fillMaxSize(),
-                            contentAlignment = Alignment.Companion.BottomEnd
+                            contentAlignment = Alignment.BottomEnd
                         ) {
                             Column(
-                                modifier = Modifier.Companion
+                                modifier = Modifier
                                     .fillMaxSize()
                                     .background(
-                                        brush = Brush.Companion.verticalGradient(
+                                        brush = Brush.verticalGradient(
                                             colors = if (viewType == ViewType.SETTING) listOf(
                                                 PrimaryBackgroundColor.value,
                                                 PrimaryBackgroundColor.value
@@ -478,7 +474,7 @@ class HomeFragment : Fragment(), TaskListener {
                                     )
                                 }
                                 AnimatedVisibility(visible = viewType != ViewType.SETTING) {
-                                    Spacer(modifier = Modifier.Companion.height(if (searchToggle) 20.dp else 0.dp))
+                                    Spacer(modifier = Modifier.height(if (searchToggle) 20.dp else 0.dp))
                                 }
                                 AnimatedVisibility(visible = searchToggle) {
                                     SearchBarComponent(
@@ -492,7 +488,7 @@ class HomeFragment : Fragment(), TaskListener {
                                         }
                                     )
                                 }
-                                Spacer(modifier = Modifier.Companion.height(if (viewType == ViewType.TASK) 20.dp else 0.dp))
+                                Spacer(modifier = Modifier.height(if (viewType == ViewType.TASK) 20.dp else 0.dp))
                                 AnimatedVisibility(visible = viewType == ViewType.TASK) {
                                     DateComponent(
                                         listState = dateListState,
@@ -536,7 +532,7 @@ class HomeFragment : Fragment(), TaskListener {
                                     )
                                 }
                                 AnimatedVisibility(visible = viewType != ViewType.SETTING) {
-                                    Spacer(modifier = Modifier.Companion.height(20.dp))
+                                    Spacer(modifier = Modifier.height(20.dp))
                                 }
                                 AnimatedVisibility(visible = viewType != ViewType.SETTING) {
                                     CategoryComponent(
@@ -552,7 +548,7 @@ class HomeFragment : Fragment(), TaskListener {
                                     }
                                 }
                                 AnimatedVisibility(visible = viewType != ViewType.SETTING) {
-                                    Spacer(modifier = Modifier.Companion.height(20.dp))
+                                    Spacer(modifier = Modifier.height(20.dp))
                                 }
                                 AnimatedVisibility(
                                     visible = viewType == ViewType.TASK,
@@ -683,7 +679,7 @@ class HomeFragment : Fragment(), TaskListener {
                                             lifecycleScope.launch {
                                                 val fileName = "Setwork_${getFormattedTimestamp(System.currentTimeMillis())}.json"
                                                 settingViewModel.onEvent(SettingEvents.OnExportEvent)
-                                                delay(600)
+                                                delay(600.milliseconds)
                                                 if (settingViewModel.isExportReady.value){
                                                     settingViewModel.onEvent(SettingEvents.OnImportExportCompute(false))
                                                     createFileLauncher.launch(fileName)
@@ -742,10 +738,10 @@ class HomeFragment : Fragment(), TaskListener {
                             }
                         }
                         Box(
-                            modifier = Modifier.Companion
+                            modifier = Modifier
                                 .fillMaxSize()
                                 .padding(WindowInsets.navigationBars.asPaddingValues()),
-                            contentAlignment = Alignment.Companion.BottomEnd
+                            contentAlignment = Alignment.BottomEnd
                         ) {
                             BottomNavigationBar(
                                 items = navigationItems,
@@ -759,9 +755,9 @@ class HomeFragment : Fragment(), TaskListener {
                         }
                         if (viewType == ViewType.SETTING) {
                             Box(
-                                modifier = Modifier.Companion
+                                modifier = Modifier
                                     .fillMaxSize(),
-                                contentAlignment = Alignment.Companion.Center,
+                                contentAlignment = Alignment.Center,
                             ) {
                                 AnimatedVisibility(
                                     visible = pickerState,
@@ -802,7 +798,7 @@ class HomeFragment : Fragment(), TaskListener {
                             exit = scaleOut()
                         ) {
                             androidx.compose.material.FloatingActionButton(
-                                modifier = Modifier.Companion
+                                modifier = Modifier
                                     .padding(bottom = 115.dp, end = 20.dp)
                                     .wrapContentSize(),
                                 onClick = {
@@ -1005,10 +1001,10 @@ class HomeFragment : Fragment(), TaskListener {
     }
 
     companion object{
-        internal var todoListIE : List<Todo> = mutableListOf<Todo>()
-        internal var deckListIE : List<Deck> = mutableListOf<Deck>()
-        internal var noteListIE : List<Note> = mutableListOf<Note>()
-        internal var categoryListIE : List<Category> = mutableListOf<Category>()
+        internal var todoListIE : List<Todo> = mutableListOf()
+        internal var deckListIE : List<Deck> = mutableListOf()
+        internal var noteListIE : List<Note> = mutableListOf()
+        internal var categoryListIE : List<Category> = mutableListOf()
         internal var EXPORT_DATA : MutableStateFlow<String> = MutableStateFlow("")
     }
 }
