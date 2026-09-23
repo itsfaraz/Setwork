@@ -453,10 +453,18 @@ class HomeFragment : Fragment(), TaskListener {
                                 TopPaddingComponent()
                                 AnimatedVisibility(visible = viewType != ViewType.SETTING) {
                                     HeaderComponent(
+                                        notificationCount = 121,
                                         onEventClick = {
-                                            scope.launch {
-                                                highlightToday()
-                                            }
+
+                                            findNavController().navigate(
+                                                resId = R.id.calendarFragment,
+                                                args = null,
+                                                navOptions = NavOptions.navOptionsFluidSlide
+                                            )
+
+//                                            scope.launch {
+//                                                highlightToday()
+//                                            }
                                         },
                                         currentDate = Date(System.currentTimeMillis()),
                                         viewType = viewType,
@@ -469,6 +477,13 @@ class HomeFragment : Fragment(), TaskListener {
                                                 R.id.OChatFragment,
                                                 null,
                                                 NavOptions.navOptionStack
+                                            )
+                                        },
+                                        onNotificationIconEvent = {
+                                            findNavController().navigate(
+                                                resId = R.id.notificationFragment,
+                                                args = null,
+                                                navOptions = NavOptions.navOptionStack
                                             )
                                         }
                                     )

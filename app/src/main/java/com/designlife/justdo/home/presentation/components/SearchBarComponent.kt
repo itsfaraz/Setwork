@@ -22,6 +22,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.designlife.justdo.R
@@ -91,4 +92,10 @@ fun SearchBarComponent(
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun SearchBarComponentPreview(){
+    SearchBarComponent("",{}) { }
 }

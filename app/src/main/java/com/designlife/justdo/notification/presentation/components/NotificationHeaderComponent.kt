@@ -1,4 +1,4 @@
-package com.designlife.justdo.home.presentation.components
+package com.designlife.justdo.notification.presentation.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.designlife.justdo.R
 import com.designlife.justdo.common.utils.enums.ViewType
+import com.designlife.justdo.home.presentation.components.SelectedHeaderTitle
 import com.designlife.justdo.ui.theme.ButtonPrimary
 import com.designlife.justdo.ui.theme.ComponentBackground
 import com.designlife.justdo.ui.theme.Shapes
@@ -43,7 +44,7 @@ import java.util.Calendar
 import java.util.Date
 
 @Composable
-fun HeaderComponent(
+fun NotificationHeaderComponent(
     notificationCount : Int,
     onEventClick : () -> Unit,
     currentDate : Date,
@@ -116,7 +117,6 @@ fun HeaderComponent(
             SelectedHeaderTitle(
                 viewType = viewType
             )
-
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End
@@ -163,8 +163,8 @@ private fun getDateInt(currentDate: Date) : String{
 
 @Preview
 @Composable
-fun HeaderComponentPreview(){
-    HeaderComponent(
+fun NotificationHeaderComponentPreview(){
+    NotificationHeaderComponent(
         notificationCount = 121,
         onEventClick = {},
         currentDate = Date(System.currentTimeMillis()),

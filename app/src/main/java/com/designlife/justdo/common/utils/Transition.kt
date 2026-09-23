@@ -19,6 +19,14 @@ object NavOptions{
         .setPopExitAnim(R.anim.screen_slide_pop_exit)
         .build()
 
+
+    val navOptionsFluidSlide =  androidx.navigation.NavOptions.Builder()
+        .setEnterAnim(R.anim.slide_in_left)
+        .setExitAnim(R.anim.slide_out_right)
+        .setPopEnterAnim(R.anim.slide_in_right)
+        .setPopExitAnim(R.anim.slide_out_left)
+        .build()
+
     fun navigatePop(@IdRes resId : Int) : androidx.navigation.NavOptions{
         return androidx.navigation.NavOptions
             .Builder()

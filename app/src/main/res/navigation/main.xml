@@ -38,4 +38,14 @@
         android:id="@+id/OChatFragment"
         android:name="com.designlife.justdo.chat.OChatFragment"
         android:label="OChatFragment" />
+    <fragment
+        android:id="@+id/calendarFragment"
+        android:name="com.designlife.justdo.calendar.CalendarFragment"
+        android:label="CalendarFragment">
+    </fragment>
+    <fragment
+        android:id="@+id/notificationFragment"
+        android:name="com.designlife.justdo.notification.NotificationFragment"
+        android:label="NotificationFragment" />
+
 </navigation>
