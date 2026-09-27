@@ -5,5 +5,6 @@ enum class ViewType {
     NOTE,
     DECK,
     SETTING,
+    CALENDAR,
     UNKNOWN
 }

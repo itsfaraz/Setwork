@@ -1,6 +1,5 @@
 package com.designlife.justdo.calendar.presentation.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,7 +15,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -25,10 +27,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,27 +40,28 @@ import com.designlife.justdo.home.presentation.components.SelectedHeaderTitle
 import com.designlife.justdo.ui.theme.ButtonPrimary
 import com.designlife.justdo.ui.theme.ComponentBackground
 import com.designlife.justdo.ui.theme.Shapes
-import com.designlife.justdo.ui.theme.commonStyleSize
 import com.designlife.justdo.ui.theme.cutBottomRoundedCorners
+import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
+import java.util.Locale
 
 @Composable
 fun CalendarHeaderComponent(
-    notificationCount : Int,
-    onEventClick : () -> Unit,
-    currentDate : Date,
-    searchIconVisibility : Boolean,
-    onSearchIconClick : () -> Unit,
-    viewType : ViewType,
-    onChatIconEvent : () -> Unit,
-    onNotificationIconEvent : () -> Unit
+    viewType: ViewType,
+    today : Date,
+    isLoading : Boolean,
+    dateList : List<Date>,
+    listState: LazyListState,
+    onMenuEvent : () -> Unit,
+    onTodayEvent : () -> Unit,
+    onDateEvent : (index : Int) -> Unit
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
-            .clip(Shapes.cutBottomRoundedCorners(15.dp))
+            .clip(Shapes.cutBottomRoundedCorners(12.dp))
             .background(ComponentBackground.value),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
@@ -84,30 +87,13 @@ fun CalendarHeaderComponent(
                     modifier = Modifier
                         .height(46.dp)
                         .width(60.dp)
-                        .background(color = ButtonPrimary.value, shape = RoundedCornerShape(topEnd = 100.dp, bottomEnd = 100.dp))
                     ,
                     contentAlignment = Alignment.Center
                 ) {
                     IconButton(onClick = {
-                        onEventClick()
+                        onMenuEvent()
                     }) {
-                        Column(
-                            modifier = Modifier
-                                .size(26.dp)
-                                .background(color = Color.White, RoundedCornerShape(100)),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Text(
-                                text = getDateInt(currentDate),
-                                color = ButtonPrimary.value,
-                                style = TextStyle(
-                                    fontSize = commonStyleSize.value,
-                                    fontWeight = FontWeight.ExtraBold
-                                ),
-                                textAlign = TextAlign.Center
-                            )
-                        }
+                       Icon(painter = painterResource(R.drawable.ic_hamburger_menu), contentDescription = "Menu Icon", tint = ButtonPrimary.value)
                     }
                 }
 
@@ -121,56 +107,95 @@ fun CalendarHeaderComponent(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End
             ) {
-                if (viewType == ViewType.TASK){
-                    IconButton(onClick = {
-                        onChatIconEvent()
-                    }) {
-                        Image(modifier = Modifier.size(20.dp), painter = painterResource(id = R.drawable.ic_ai_chat),contentDescription = "AI Chat Icon")
-                    }
-                }else{
-                    if (searchIconVisibility){
-                        IconButton(onClick = {
-                            onSearchIconClick()
-                        }) {
-                            Icon(modifier = Modifier.size(20.dp), painter = painterResource(id = R.drawable.ic_search),contentDescription = "Search Icon", tint = ButtonPrimary.value)
-                        }
-                    }
-                }
                 IconButton(onClick = {
-                    onNotificationIconEvent()
+                    onTodayEvent()
                 }) {
-                    Box(modifier = Modifier
-                        .wrapContentSize()
-                        .padding(end = 6.dp),
-                        contentAlignment = Alignment.Center) {
-                        Icon(modifier = Modifier.size(24.dp), painter = painterResource(id = R.drawable.ic_notification),contentDescription = "Notification Icon",tint = ButtonPrimary.value)
-                        if (notificationCount > 0){
-                            Text(modifier = Modifier.fillMaxWidth().padding(start = 4.dp, bottom = 22.dp), text = "●", style = TextStyle(color = ButtonPrimary.value, fontSize = 12.sp), textAlign = TextAlign.End)
-                        }
-                    }
+                    Icon(modifier = Modifier.size(20.dp), painter = painterResource(id = R.drawable.ic_target),contentDescription = "Search Icon", tint = ButtonPrimary.value)
                 }
             }
             Spacer(modifier = Modifier.width(6.dp))
         }
+        Spacer(modifier = Modifier.height(6.dp))
+        Row(
+            modifier = Modifier
+                .height(30.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Spacer(modifier = Modifier.width(18.dp))
+            Text(text = getDate(today), style = TextStyle(fontSize = 26.sp, color = Color.Black, fontWeight = FontWeight.SemiBold))
+            Spacer(modifier = Modifier.width(6.dp))
+            Text(text = getYear(today), style = TextStyle(fontSize = 10.sp, color = Color.Black, fontWeight = FontWeight.SemiBold))
+        }
+        Spacer(modifier = Modifier.height(14.dp))
+        LazyRow(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentSize()
+                .padding(horizontal = 8.dp),
+            state = listState
+        ) {
+            items(
+                count = dateList.size,
+            ) { index ->
+
+                CalendarDateItem(
+                    isCurrent = dateList[index].time.equals(today.time),
+                    date = dateList[index]
+                ) {
+                    onDateEvent(index)
+                }
+            }
+        }
+        if (isLoading){
+            Spacer(modifier = Modifier.height(6.dp))
+            LinearProgressIndicator(
+                modifier = Modifier.fillMaxWidth(),
+                color = ButtonPrimary.value,
+                trackColor = ButtonPrimary.value.copy(alpha = 0.15f),
+                strokeCap = StrokeCap.Round
+            )
+        }
+
     }
 }
 
-private fun getDateInt(currentDate: Date) : String{
+private fun getDate(currentDate: Date) : String{
     val calendar = Calendar.getInstance()
     calendar.time = currentDate
-    return calendar.get(Calendar.DAY_OF_MONTH).toString()
+    return SimpleDateFormat("MMM dd", Locale.getDefault()).format(calendar.time)
 }
+
+private fun getYear(currentDate: Date) : String{
+    val calendar = Calendar.getInstance()
+    calendar.time = currentDate
+    return "${calendar.get(Calendar.YEAR)}"
+}
+
 
 @Preview
 @Composable
 fun CalendarHeaderComponentPreview(){
+    val dateListState = rememberLazyListState()
+
+    val calendar = Calendar.getInstance()
+
+    val dateList: List<Date> = (1..calendar.getActualMaximum(Calendar.DAY_OF_MONTH))
+        .map { day ->
+            Calendar.getInstance().apply {
+                set(Calendar.DAY_OF_MONTH, day)
+            }.time
+        }
+
     CalendarHeaderComponent(
-        notificationCount = 121,
-        onEventClick = {},
-        currentDate = Date(System.currentTimeMillis()),
-        searchIconVisibility = true,
-        onSearchIconClick = {},
-        ViewType.TASK, onChatIconEvent = {},
-        onNotificationIconEvent = {}
+        today = Date(System.currentTimeMillis()),
+        viewType = ViewType.CALENDAR,
+        dateList = dateList,
+        listState = dateListState,
+        isLoading = true,
+        onMenuEvent  = {},
+        onTodayEvent  = {},
+        onDateEvent = {}
     )
 }

@@ -14,7 +14,7 @@ import com.designlife.justdo.ui.theme.TypographyColor
 fun SelectedHeaderTitle(
     viewType: ViewType
 ) {
-    val typeList = listOf<String>("All Tasks", "All Notes", "All Decks", "Settings")
+    val typeList = listOf<String>("All Tasks", "All Notes", "All Decks", "Settings", "Calendar")
     Row(
         modifier = Modifier
             .wrapContentWidth(),
@@ -31,6 +31,7 @@ fun getViewTypeText(viewType: ViewType, typeList: List<String>): String {
         ViewType.NOTE -> typeList[1]
         ViewType.DECK -> typeList[2]
         ViewType.SETTING -> typeList[3]
+        ViewType.CALENDAR -> typeList[4]
         ViewType.UNKNOWN -> typeList[0]
     }
 }
