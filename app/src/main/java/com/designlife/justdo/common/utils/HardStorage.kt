@@ -4,23 +4,33 @@ import android.content.Context
 import android.util.Log
 import com.designlife.justdo.common.data.entities.AppData
 import com.designlife.justdo.common.data.entities.Todo
+import com.designlife.justdo.common.domain.repeat.RepeatRepository
+import com.designlife.justdo.common.domain.repositories.CategoryRepository
+import com.designlife.justdo.common.domain.repositories.DeckRepository
+import com.designlife.justdo.common.domain.repositories.NoteRepository
+import com.designlife.justdo.common.domain.repositories.TodoCategoryRepository
+import com.designlife.justdo.common.domain.repositories.TodoRepository
 import com.designlife.justdo.home.HomeFragment
+import com.designlife.justdo_provider.SetworkProvider
 import com.designlife.orchestrator.SchedulingEngine
 import com.designlife.orchestrator.data.NotificationInfo
 import com.designlife.orchestrator.data.NotificationStatus
 import com.designlife.orchestrator.data.NotificationType
 import com.google.gson.Gson
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import java.io.IOException
 
 
-object HardStorage {
+object HardStorage : KoinComponent {
+
+    private val todoRepository : TodoRepository by inject()
+    private val categoryRepository : CategoryRepository by inject()
+    private val deckRepository : DeckRepository by inject()
+    private val noteRepository : NoteRepository by inject()
     suspend fun backupImport(context : Context,data : String) : Boolean {
         if (data.isEmpty()) return false
         try {
-            val todoRepository = AppServiceLocator.provideTodoRepository(context)
-            val deckRepository = AppServiceLocator.provideDeckRepository(context)
-            val noteRepository = AppServiceLocator.provideNoteRepository(context)
-            val categoryRepository = AppServiceLocator.provideCategoryRepository(context)
 
             val gsonData = Gson().fromJson(data, AppData::class.java)
 

@@ -20,9 +20,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import com.designlife.justdo.common.domain.enums.CategoryState
+import com.designlife.justdo.common.domain.repeat.RepeatRepository
+import com.designlife.justdo.common.domain.repositories.CategoryRepository
 import com.designlife.justdo.common.presentation.components.CategoryHeader
 import com.designlife.justdo.common.presentation.components.TopPaddingComponent
-import com.designlife.justdo.common.utils.AppServiceLocator
+//import com.designlife.justdo.common.utils.AppServiceLocator
 import com.designlife.justdo.common.utils.constants.Constants
 import com.designlife.justdo.common.utils.enums.ScreenType
 import com.designlife.justdo.container.presentation.components.CategoryComponent
@@ -33,18 +35,19 @@ import com.designlife.justdo.container.presentation.viewmodel.ContainerViewModel
 import com.designlife.justdo.container.presentation.viewmodel.ContainerViewModelFactory
 import com.designlife.justdo.ui.theme.PrimaryBackgroundColor
 import kotlinx.coroutines.cancel
+import org.koin.android.ext.android.inject
 
 
 class ContainerFragment : Fragment() {
 
     private lateinit var viewmodel: ContainerViewModel
 
+    private val categoryRepository : CategoryRepository by inject()
+    private val repeatRepository : RepeatRepository by inject()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.i("FRAGMENT_CHECK", "onCreate: ContainerFragment")
-        val categoryRepository =
-            AppServiceLocator.provideCategoryRepository(requireActivity().applicationContext)
-        val repeatRepository = AppServiceLocator.provideRepeatRepository()
         val factory = ContainerViewModelFactory(categoryRepository, repeatRepository)
         viewmodel = ViewModelProvider(requireActivity(), factory)[ContainerViewModel::class.java]
         arguments?.let { bundle ->

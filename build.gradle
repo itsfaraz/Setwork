@@ -9,10 +9,11 @@ buildscript {
         datastore_Version = '1.2.0'
         agp_version = '8.9.1'
         kotlinx_serialization_json = '1.6.3'
+        koin_version = '3.5.6'
     }
     // modules
     ext{
-        orchestrator_version = 'v1.1.1'
+        orchestrator_version = 'v1.1.3'
         provider_version = 'v1.0.9'
         ollm_version = 'v1.0.10'
     }

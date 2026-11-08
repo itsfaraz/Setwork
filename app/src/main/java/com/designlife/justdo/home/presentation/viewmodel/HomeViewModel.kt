@@ -126,9 +126,10 @@ class HomeViewModel(
     fun onEvent(event : HomeEvents){
         when(event){
             is HomeEvents.OnIndexSelected -> {
-                if (event.index != -1){
-                    _selectedIndex.value = event.index
+                if (event.index < 0) {
+                    return
                 }
+                _selectedIndex.value = event.index
             }
             is HomeEvents.OnTodoEvent -> {
                 _todoIndex.value = event.index
@@ -357,10 +358,11 @@ class HomeViewModel(
     }
 
     private fun currentTodoIndex() {
-        val calendar = Calendar.getInstance()
-        calendar.time = _currentDate.value
-        val index =  getTodoIndexByDate(calendar.time)
-        _todoIndex.value = if (index-1 >= 0) index-1 else _todoIndex.value
+        val calendar = Calendar.getInstance().apply {
+            time = _currentDate.value
+        }
+        val index = getTodoIndexByDate(calendar.time)
+        _todoIndex.value = (index - 1).coerceAtLeast(0)
     }
 
     private fun getTodoIndexByDate(selectedDate : Date): Int {

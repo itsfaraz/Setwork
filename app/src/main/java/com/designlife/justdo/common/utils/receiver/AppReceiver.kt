@@ -5,7 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.compose.ui.graphics.Color
-import com.designlife.justdo.common.utils.AppServiceLocator
+import com.designlife.justdo.common.domain.repositories.TodoRepository
+//import com.designlife.justdo.common.utils.AppServiceLocator
 import com.designlife.justdo_provider.SetworkProvider
 import com.designlife.justdo_provider.data.ProviderTask
 import kotlinx.coroutines.CoroutineScope
@@ -13,16 +14,20 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-class AppReceiver() : BroadcastReceiver() {
+class AppReceiver() : BroadcastReceiver(), KoinComponent {
+    private val provider : SetworkProvider by inject()
+    private val todoRepository : TodoRepository by inject()
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action == Intent.ACTION_BOOT_COMPLETED) {
-            val provider = AppServiceLocator.provideSetworkProvider(context)
             val pendingResult = goAsync()
             val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
             scope.launch {
                 try {
-                    AppServiceLocator.provideTodoRepository(context).getAllTodo().collectLatest { todos ->
+                    todoRepository.getAllTodo().collectLatest { todos ->
                         val task = todos
                             .filter { todo -> !todo.isCompleted }
                             .map {

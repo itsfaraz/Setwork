@@ -116,18 +116,19 @@ fun DateComponent(
             LazyRow(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .wrapContentSize()
                     .padding(horizontal = 12.dp),
                 state = listState
             ) {
                 items(
                     count = dateList.size,
+                    key = { index -> dateList[index].time }
                 ) { index ->
+                    val date = dateList[index]
 
                     DateItem(
-                        isCurrent = dateList[index].time.equals(currentDate.time),
+                        isCurrent = date.time.equals(currentDate.time),
                         isSelected = index == selectedIndex,
-                        date = dateList[index]
+                        date = date
                     ) {
                         onEventClick(index)
                     }
@@ -145,7 +146,7 @@ fun DateComponent(
                             onDispose { }
                         }
                     }
-                    onChangeVisibleDate(dateList[index])
+                    onChangeVisibleDate(date)
                 }
             }
         }

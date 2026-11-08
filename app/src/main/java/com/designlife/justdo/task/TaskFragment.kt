@@ -31,10 +31,16 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import com.designlife.justdo.R
 import com.designlife.justdo.common.domain.calendar.IDateGenerator
+import com.designlife.justdo.common.domain.repeat.RepeatRepository
+import com.designlife.justdo.common.domain.repositories.CategoryRepository
+import com.designlife.justdo.common.domain.repositories.DeckRepository
+import com.designlife.justdo.common.domain.repositories.NoteRepository
+import com.designlife.justdo.common.domain.repositories.TodoCategoryRepository
+import com.designlife.justdo.common.domain.repositories.TodoRepository
 import com.designlife.justdo.common.presentation.components.CommonCustomHeader
 import com.designlife.justdo.common.presentation.components.ProgressBar
 import com.designlife.justdo.common.presentation.components.TopPaddingComponent
-import com.designlife.justdo.common.utils.AppServiceLocator
+//import com.designlife.justdo.common.utils.AppServiceLocator
 import com.designlife.justdo.common.utils.camelCase
 import com.designlife.justdo.common.utils.constants.Constants
 import com.designlife.justdo.common.utils.enums.RepeatType
@@ -50,6 +56,7 @@ import com.designlife.justdo.task.presentation.viewmodel.TaskViewModel
 import com.designlife.justdo.task.presentation.viewmodel.TaskViewModelFactory
 import com.designlife.justdo.ui.theme.ButtonPrimary
 import com.designlife.justdo.ui.theme.PrimaryBackgroundColor
+import com.designlife.justdo_provider.SetworkProvider
 import com.designlife.orchestrator.NotificationScheduler
 import com.designlife.orchestrator.SchedulingEngine
 import kotlinx.coroutines.Dispatchers
@@ -57,6 +64,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.koin.android.ext.android.inject
 import java.util.Calendar
 
 class TaskFragment : Fragment() {
@@ -69,15 +77,17 @@ class TaskFragment : Fragment() {
     private var isOverview : Boolean = false
     private var taskId : Int = -1
 
+
+    private val todoRepository : TodoRepository by inject()
+    private val categoryRepository : CategoryRepository by inject()
+    private val todoCategoryRepository : TodoCategoryRepository by inject()
+    private val repeatRepository : RepeatRepository by inject()
+    private val setworkProvider : SetworkProvider by inject()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         alarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
         notificationManager = requireContext().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val setworkProvider = AppServiceLocator.provideSetworkProvider(requireContext())
-        val repeatRepository = AppServiceLocator.provideRepeatRepository()
-        val todoRepository = AppServiceLocator.provideTodoRepository(requireActivity().applicationContext)
-        val categoryRepository = AppServiceLocator.provideCategoryRepository(requireActivity().applicationContext)
-        val todoCategoryRepository = AppServiceLocator.provideTodoCategoryRepository(requireActivity().applicationContext)
         notificationScheduler = SchedulingEngine(requireActivity().applicationContext).notificationScheduler()
 //        taskNotificationRepository = NotificationServiceLocator.provideNotificationRepository(requireContext(),alarmManager)
 //        NotificationClickManager.setListener(this)

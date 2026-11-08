@@ -64,7 +64,7 @@ import com.designlife.justdo.common.domain.entities.Todo
 import com.designlife.justdo.common.domain.repositories.appstore.AppStoreRepository
 import com.designlife.justdo.common.presentation.components.BottomSheet
 import com.designlife.justdo.common.presentation.components.ProgressBar
-import com.designlife.justdo.common.utils.AppServiceLocator
+//import com.designlife.justdo.common.utils.AppServiceLocator
 import com.designlife.justdo.common.utils.NavOptions
 import com.designlife.justdo.common.utils.constants.Constants
 import com.designlife.justdo.common.utils.entity.BottomNavItem
@@ -109,8 +109,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import java.util.Date
 import androidx.core.net.toUri
+import com.designlife.justdo.common.domain.repositories.CategoryRepository
+import com.designlife.justdo.common.domain.repositories.DeckRepository
+import com.designlife.justdo.common.domain.repositories.NoteRepository
+import com.designlife.justdo.common.domain.repositories.TodoRepository
 import com.designlife.justdo.common.presentation.components.TopPaddingComponent
 import com.designlife.justdo.common.presentation.components.appBackground
+import com.designlife.justdo_provider.SetworkProvider
+import kotlinx.coroutines.Job
+import org.koin.android.ext.android.inject
 import kotlin.time.Duration.Companion.milliseconds
 
 class HomeFragment : Fragment(), TaskListener {
@@ -121,13 +128,19 @@ class HomeFragment : Fragment(), TaskListener {
     private lateinit var dateListState: LazyListState
     private lateinit var todoListState: LazyListState
     private lateinit var scope: CoroutineScope
-    private lateinit var appStoreRepository: AppStoreRepository
-    private lateinit var softwareUpdateManager: SoftwareUpdateManager
 
     private lateinit var openFileLauncher: ActivityResultLauncher<Array<String>>
     private lateinit var createFileLauncher: ActivityResultLauncher<String>
 
 
+    private val todoRepository : TodoRepository by inject()
+    private val categoryRepository : CategoryRepository by inject()
+    private val noteRepository : NoteRepository by inject()
+    private val deckRepository : DeckRepository by inject()
+    private val setworkProvider : SetworkProvider by inject()
+    private val appStoreRepository : AppStoreRepository by inject()
+
+    private val softwareUpdateManager : SoftwareUpdateManager by inject()
     private val settingIcons: List<SettingItem> = initSettingIcons()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -137,15 +150,6 @@ class HomeFragment : Fragment(), TaskListener {
         val loadDatesUseCase = LoadIntialDatesUseCase(dateGenerator)
         val loadNextDatesUseCase = LoadNextDatesSetUseCase(dateGenerator)
         val loadPreviousDatesUseCase = LoadPreviousDatesSetUseCase(dateGenerator)
-        val todoRepository =
-            AppServiceLocator.provideTodoRepository(requireActivity().applicationContext)
-        val categoryRepository =
-            AppServiceLocator.provideCategoryRepository(requireActivity().applicationContext)
-        val noteRepository =
-            AppServiceLocator.provideNoteRepository(requireActivity().applicationContext)
-        val deckRepository =
-            AppServiceLocator.provideDeckRepository(requireActivity().applicationContext)
-        val setworkProvider = AppServiceLocator.provideSetworkProvider(requireContext())
         val factory = HomeViewModelFactory(
             setworkProvider,
             dateGenerator,
@@ -158,8 +162,6 @@ class HomeFragment : Fragment(), TaskListener {
             loadPreviousDatesUseCase
         )
         viewModel = ViewModelProvider(this, factory)[HomeViewModel::class.java]
-        appStoreRepository = AppServiceLocator.provideAppStoreRepository(requireContext())
-        softwareUpdateManager = AppServiceLocator.provideSoftwareUpdateManager(requireContext())
         onNotificationAvailable()
         onSetworkProviderInitialise()
         val settingFactory = SettingViewModelFactory(appStoreRepository)
@@ -176,6 +178,7 @@ class HomeFragment : Fragment(), TaskListener {
             }
             viewModel.onEvent(HomeEvents.OnProgressBarToggle(false))
         }
+        Log.i("_CRASHCHECK", "onCreate: loading all lists")
     }
 
     private fun onSetworkProviderInitialise() {
@@ -261,6 +264,8 @@ class HomeFragment : Fragment(), TaskListener {
     }
 
     private fun initialSlide() {
+        Log.i("_CRASHCHECK", "initialSlide: before call of list index")
+
         val dateList = viewModel.dateList.value
         val currentDate = viewModel.currentDate.value
         val computeIndex = dateList.indexOf(currentDate)
@@ -278,6 +283,7 @@ class HomeFragment : Fragment(), TaskListener {
                 scrollToRollItem(viewModel.todoIndex.value, todoListState)
             }
         }
+        Log.i("_CRASHCHECK", "initialSlide: during call of list index")
     }
 
     fun onUserProviderEvent(actionId: Int,taskId : Int) {
@@ -334,20 +340,6 @@ class HomeFragment : Fragment(), TaskListener {
             }
         }
     }
-
-    suspend fun highlightToday() {
-        val date = viewModel.currentDate.value
-        val index = viewModel.dateList.value.indexOf(date)
-        if (index!=-1){
-            viewModel.onEvent(HomeEvents.OnIndexSelected(index))
-            dateListState.scrollToItem(index)
-            viewModel.onEvent(HomeEvents.HighlightTodoByDate(index))
-        }
-        if (viewModel.todoIndex.value != -1){
-            todoListState.scrollToItem(viewModel.todoIndex.value)
-        }
-    }
-
     @OptIn(
         ExperimentalMaterialApi::class, ExperimentalFoundationApi::class,
         ExperimentalAnimationApi::class, ExperimentalAnimationApi::class
@@ -405,18 +397,6 @@ class HomeFragment : Fragment(), TaskListener {
                         initialSlide()
                     }
                 }
-
-                LaunchedEffect(legacyScroll.value) {
-                    try {
-                        scope.launch {
-                            delay(300.milliseconds)
-                            legacyScroll.value = false
-                            highlightToday()
-                        }
-                    }catch (e : Exception){
-                        e.printStackTrace()
-                    }
-                }
                 Box(
                     modifier = Modifier.fillMaxSize(),
                 ) {
@@ -461,10 +441,6 @@ class HomeFragment : Fragment(), TaskListener {
                                                 args = null,
                                                 navOptions = NavOptions.navOptionsFluidSlide
                                             )
-
-//                                            scope.launch {
-//                                                highlightToday()
-//                                            }
                                         },
                                         currentDate = Date(System.currentTimeMillis()),
                                         viewType = viewType,

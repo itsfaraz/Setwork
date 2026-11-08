@@ -38,8 +38,11 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.designlife.justdo.R
 import com.designlife.justdo.common.domain.entities.FlashCard
+import com.designlife.justdo.common.domain.repositories.CategoryRepository
+import com.designlife.justdo.common.domain.repositories.DeckRepository
+import com.designlife.justdo.common.domain.repositories.NoteRepository
 import com.designlife.justdo.common.presentation.components.TopPaddingComponent
-import com.designlife.justdo.common.utils.AppServiceLocator
+//import com.designlife.justdo.common.utils.AppServiceLocator
 import com.designlife.justdo.common.utils.constants.Constants
 import com.designlife.justdo.common.utils.enums.ScreenType
 import com.designlife.justdo.deck.presentation.components.CreateCardListComponent
@@ -53,18 +56,20 @@ import com.designlife.justdo.deck.presentation.viewmodel.DeckViewModel
 import com.designlife.justdo.deck.presentation.viewmodel.DeckViewModelFactory
 import com.designlife.justdo.note.presentation.enums.DeckMode
 import com.designlife.justdo.ui.theme.UIComponentBackground
+import com.designlife.orchestrator.SchedulingEngine
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
 
 class DeckFragment : Fragment() {
     private lateinit var viewModel: DeckViewModel
+    private val deckRepository : DeckRepository by inject()
+    private val categoryRepository : CategoryRepository by inject()
     private var deckMode = DeckMode.CREATE
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val deckRepository =
-            AppServiceLocator.provideDeckRepository(requireActivity().applicationContext)
-        val categoryRepository =
-            AppServiceLocator.provideCategoryRepository(requireActivity().applicationContext)
+
+
         val factory = DeckViewModelFactory(deckRepository, categoryRepository)
         viewModel = ViewModelProvider(this, factory)[DeckViewModel::class.java]
 

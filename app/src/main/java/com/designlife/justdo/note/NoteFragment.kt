@@ -31,12 +31,17 @@ import androidx.navigation.fragment.findNavController
 import com.designlife.justdo.MainActivity
 import com.designlife.justdo.R
 import com.designlife.justdo.common.domain.calendar.IDateGenerator
+import com.designlife.justdo.common.domain.repeat.RepeatRepository
+import com.designlife.justdo.common.domain.repositories.CategoryRepository
+import com.designlife.justdo.common.domain.repositories.NoteRepository
+import com.designlife.justdo.common.domain.repositories.TodoCategoryRepository
+import com.designlife.justdo.common.domain.repositories.TodoRepository
 import com.designlife.justdo.common.presentation.components.CommonCustomHeader
 import com.designlife.justdo.common.presentation.components.CustomAttachmentsTab
 import com.designlife.justdo.common.presentation.components.ProgressBar
 import com.designlife.justdo.common.presentation.components.ToolBarPopUpComponent
 import com.designlife.justdo.common.presentation.components.TopPaddingComponent
-import com.designlife.justdo.common.utils.AppServiceLocator
+//import com.designlife.justdo.common.utils.AppServiceLocator
 import com.designlife.justdo.common.utils.constants.Constants
 import com.designlife.justdo.common.utils.enums.ScreenType
 import com.designlife.justdo.common.utils.enums.ViewType
@@ -46,7 +51,9 @@ import com.designlife.justdo.note.presentation.viewmodel.NoteViewModel
 import com.designlife.justdo.note.presentation.viewmodel.NoteViewModelFactory
 import com.designlife.justdo.setworkllm.SetworkOLLM
 import com.designlife.justdo.ui.theme.UIComponentBackground
+import com.designlife.justdo_provider.SetworkProvider
 import com.designlife.orchestrator.SchedulingEngine
+import org.koin.android.ext.android.inject
 import java.util.Calendar
 import java.util.Date
 
@@ -54,13 +61,18 @@ class NoteFragment : Fragment(), SetworkOLLM.SetworkMessage {
 
     private lateinit var viewModel: NoteViewModel
 
+    private val noteRepository : NoteRepository by inject()
+    private val categoryRepository : CategoryRepository by inject()
+    private val schedulingEngine : SchedulingEngine by inject()
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         MainActivity.ollmSDK?.protocol(this)
         val factory = NoteViewModelFactory(
-            AppServiceLocator.provideNoteRepository(requireContext()),
-            AppServiceLocator.provideCategoryRepository(requireContext()),
-            SchedulingEngine(requireContext()).notificationScheduler()
+            noteRepository,
+            categoryRepository,
+            schedulingEngine.notificationScheduler()
         )
 
         viewModel = ViewModelProvider(this, factory)[NoteViewModel::class.java]

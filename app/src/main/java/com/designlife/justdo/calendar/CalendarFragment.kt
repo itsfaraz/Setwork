@@ -69,7 +69,8 @@ class CalendarFragment : Fragment() {
                             localEvents = localEvents
                         ){ eventId ->
                             when(eventId){
-                                else -> {}
+                                else -> { // Todo
+                                }
                             }
                         }
 

@@ -7,15 +7,16 @@ import android.content.UriMatcher
 import android.database.Cursor
 import android.net.Uri
 import com.designlife.justdo.common.domain.repositories.WidgetRepository
-import com.designlife.justdo.common.utils.AppServiceLocator
+//import com.designlife.justdo.common.utils.AppServiceLocator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import org.koin.android.ext.android.inject
 
 class TodoProvider : ContentProvider() {
 
     private val MATCHER : UriMatcher = UriMatcher(UriMatcher.NO_MATCH)
-    private var widgetRepository : WidgetRepository? = null
+    private val widgetRepository : WidgetRepository by inject()
     companion object{
         private const val AUTHORITY = "com.designlife.justdo.common.data.provider"
 
@@ -38,9 +39,9 @@ class TodoProvider : ContentProvider() {
     }
 
     override fun onCreate(): Boolean {
-        context?.let {
-            widgetRepository = AppServiceLocator.provideWidgetRepository(it)
-        }
+//        context?.let {
+//            widgetRepository = AppServiceLocator.provideWidgetRepository(it)
+//        }
         return context != null
     }
 
@@ -53,7 +54,7 @@ class TodoProvider : ContentProvider() {
     ): Cursor? {
        return when(MATCHER.match(uri)){
          ALL_TODO -> {
-             runBlocking(Dispatchers.IO) { widgetRepository?.getAllTodo() }
+             runBlocking(Dispatchers.IO) { widgetRepository.getAllTodo() }
          }
          else -> null
        }

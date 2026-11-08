@@ -20,7 +20,9 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
-import com.designlife.justdo.common.utils.AppServiceLocator
+import com.designlife.justdo.common.domain.repositories.appstore.AppStoreRepository
+//import com.designlife.justdo.common.utils.AppServiceLocator
+import com.designlife.justdo.common.utils.update.SoftwareUpdateManager
 import com.designlife.justdo.permission.PermissionHandler
 import com.designlife.justdo.settings.presentation.viewmodel.SettingViewModel
 import com.designlife.justdo.settings.presentation.viewmodel.SettingViewModel.Companion.getAppThemeFromOrdinal
@@ -31,12 +33,14 @@ import com.designlife.justdo.ui.theme.updateSystemColor
 import com.designlife.justdo.ui.theme.updateSystemFont
 import com.designlife.justdo.ui.theme.updateSystemListSize
 import com.designlife.justdo.ui.theme.updateSystemUIMode
+import com.designlife.justdo_provider.SetworkProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.serialization.InternalSerializationApi
+import org.koin.android.ext.android.inject
 import java.lang.reflect.Field
 import java.util.Calendar
 
@@ -55,15 +59,14 @@ class MainActivity : AppCompatActivity() {
 
     private var isStorageReadPermissionGranted = false
 
+    private val setworkProvider : SetworkProvider by inject()
+    private val appStoreRepository : AppStoreRepository by inject()
+    private val softwareUpdateManager : SoftwareUpdateManager by inject()
+
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
-            throwable.printStackTrace()
-            Log.i(TAG, "onCreate: SETWORK CRASH :: Crash happened on thread ${thread.name} ::  ${throwable.cause?.message}")
-
-        }
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         if (!PermissionHandler.checkAllPermissions(this)){
@@ -109,7 +112,7 @@ class MainActivity : AppCompatActivity() {
                 val isFresh = System.currentTimeMillis() - it.time < 10 * 60 * 1000
 
                 if (isFresh) {
-                    AppServiceLocator.provideSetworkProvider(this)
+                    setworkProvider
                         .addLocation(it.latitude, it.longitude)
                 }
             }
@@ -119,7 +122,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
     private fun checkSoftwareUpdates() {
-        AppServiceLocator.provideAppStoreRepository(this).let { appStore ->
+        appStoreRepository.let { appStore ->
             lifecycleScope.launch {
                 val calendar = Calendar.getInstance()
                 val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
@@ -128,7 +131,7 @@ class MainActivity : AppCompatActivity() {
                 if (dayOfWeek == Calendar.SUNDAY) {
                     val updateChecked = appStore.getUpdateCheck()
                     if (!updateChecked){
-                        AppServiceLocator.provideSoftwareUpdateManager(this@MainActivity).checkForUpdate()
+                        softwareUpdateManager.checkForUpdate()
                         appStore.setUpdateCheck(true)
                     }
                 }else{
@@ -141,9 +144,9 @@ class MainActivity : AppCompatActivity() {
     // Preference Changes Observe
     @OptIn(InternalSerializationApi::class)
     private fun observeSettingChanges() {
-        val appStore = AppServiceLocator.provideAppStoreRepository(this)
+
         CoroutineScope(Dispatchers.IO).launch {
-            appStore.observerSettingPreferences().collectLatest {
+            appStoreRepository.observerSettingPreferences().collectLatest {
                 updateSystemFont(getFontSizeFromOrdinal(it.selectedFontSize))
                 updateSystemListSize(getListItemHeightFromOrdinal(it.selectedListItemHeight))
                 updateSystemUIMode(getAppThemeFromOrdinal(it.selectedAppTheme))
@@ -265,7 +268,7 @@ class MainActivity : AppCompatActivity() {
             SetworkOLLM.destroy()
             lifecycleScope.cancel()
             this.viewModelStore.clear()
-            AppServiceLocator.clear()
+//            AppServiceLocator.clear()
         }catch (e : Exception){
             Log.e("CLEAN_FLOW", "onDestroy: MainActivity ::Exception during state clearing")
         }

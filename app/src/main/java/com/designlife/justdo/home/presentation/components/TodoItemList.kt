@@ -48,7 +48,7 @@ fun TodoItemList(
     ) {
         items(
             items = todoList,
-            key = { todo -> todo.date },
+            key = { todo -> todo.todoId },
             contentType = { todo -> todo.categoryId }
         ) { todo ->
             todo.let { item ->
