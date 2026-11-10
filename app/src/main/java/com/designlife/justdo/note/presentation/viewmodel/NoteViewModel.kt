@@ -97,7 +97,7 @@ class NoteViewModel(
                 it.id == note.categoryId
             },
             coverImage = ImageConverter.getBitMapFromByteArray(note.coverImage),
-            isLoading = false
+            isLoading = false,
         )
     }
 
@@ -185,7 +185,8 @@ class NoteViewModel(
                         emoji = category.emoji,
                         coverImage = coverBytes,
                         createdTime = Date(s.createdTime),
-                        lastModified = Date()
+                        lastModified = Date(),
+                        isArchive = false
                     )
                 )
 
@@ -202,7 +203,8 @@ class NoteViewModel(
                         emoji = category.emoji,
                         coverImage = coverBytes,
                         createdTime = Date(s.createdTime),
-                        lastModified = Date()
+                        lastModified = Date(),
+                        isArchive = false
                     )
                 )
             }
@@ -238,6 +240,15 @@ class NoteViewModel(
         }
     }
 
+    fun archiveNote() {
+        val id = _state.value.noteId
+        if (id == 0L) return
+
+        viewModelScope.launch(Dispatchers.IO) {
+            noteRepository.archiveNote(id)
+        }
+    }
+
     fun duplicateNote() {
         viewModelScope.launch(Dispatchers.IO) {
             val s = _state.value
@@ -253,7 +264,8 @@ class NoteViewModel(
                     emoji = category.emoji,
                     coverImage = cover,
                     createdTime = Date(),
-                    lastModified = Date()
+                    lastModified = Date(),
+                    isArchive = false
                 )
             )
         }

@@ -4,9 +4,9 @@ import com.designlife.justdo.common.utils.enums.ViewType
 
 sealed class CalendarEvents{
     data class OnIndexSelected(val index : Int) : CalendarEvents()
-    data class OnTodoEvent(val index : Int) : CalendarEvents()
+    data object OnTodayEvent : CalendarEvents()
     data class HighlightTodoByDate(val visibleIndex : Int) : CalendarEvents()
-    data class HighlightDateByTodo(val visibleIndex : Int) : CalendarEvents()
+    data class HighlightDateByEvent(val epoch : Long) : CalendarEvents()
     data class OnCategorySortSelected(val categoryIndex : Int) : CalendarEvents()
     data class OnProgressBarToggle(val toggleValue : Boolean) : CalendarEvents()
     data class OnViewChange(val view : ViewType) : CalendarEvents()

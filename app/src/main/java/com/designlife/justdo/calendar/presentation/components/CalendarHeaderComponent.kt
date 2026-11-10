@@ -1,6 +1,5 @@
 package com.designlife.justdo.calendar.presentation.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,8 +18,9 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,24 +28,26 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.designlife.justdo.R
 import com.designlife.justdo.common.utils.enums.ViewType
 import com.designlife.justdo.home.presentation.components.SelectedHeaderTitle
-import com.designlife.justdo.home.presentation.components.getViewTypeText
 import com.designlife.justdo.ui.theme.ButtonPrimary
 import com.designlife.justdo.ui.theme.ComponentBackground
 import com.designlife.justdo.ui.theme.Shapes
 import com.designlife.justdo.ui.theme.TypographyColor
 import com.designlife.justdo.ui.theme.cutBottomRoundedCorners
+import com.designlife.justdo.ui.theme.fontFamily
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -55,10 +57,13 @@ import java.util.Locale
 fun CalendarHeaderComponent(
     viewType: ViewType,
     today : Date,
+    currentDate: Date,
+    currentMonth: String,
+    currentYear: String,
+    selectedIndex : Int,
     isLoading : Boolean,
     dateList : List<Date>,
     listState: LazyListState,
-    onMenuEvent : () -> Unit,
     onTodayEvent : () -> Unit,
     onDateEvent : (index : Int) -> Unit,
     onChangeVisibleDate: (date: Date) -> Unit,
@@ -83,14 +88,12 @@ fun CalendarHeaderComponent(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-
             Row(
                 modifier = Modifier
                     .fillMaxHeight()
                     .wrapContentWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-
                 Box(
                     modifier = Modifier
                         .height(46.dp)
@@ -98,15 +101,13 @@ fun CalendarHeaderComponent(
                     ,
                     contentAlignment = Alignment.Center
                 ) {
-                    IconButton(onClick = {
-                        onMenuEvent()
+                    IconButton(modifier = Modifier.wrapContentSize().clip(CircleShape), onClick = {
+                        onTodayEvent()
                     }) {
-                       Image(painter = painterResource(R.drawable.app_icon_setwork_foreground), contentDescription = "App Icon", contentScale = ContentScale.Fit)
+                        Icon(modifier = Modifier.size(22.dp), painter = painterResource(R.drawable.ic_today), contentDescription = "App Icon", tint = ButtonPrimary.value)
                     }
                 }
-
             }
-
             Spacer(modifier = Modifier.width(6.dp))
             SelectedHeaderTitle(
                 viewType = viewType
@@ -121,9 +122,40 @@ fun CalendarHeaderComponent(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Spacer(modifier = Modifier.width(18.dp))
-            Text(text = getDate(today), style = TextStyle(fontSize = 26.sp, color = TypographyColor.value, fontWeight = FontWeight.SemiBold))
-            Spacer(modifier = Modifier.width(6.dp))
-            Text(text = getYear(today), style = TextStyle(fontSize = 10.sp, color = TypographyColor.value, fontWeight = FontWeight.SemiBold))
+            androidx.compose.material.Text(text = buildAnnotatedString {
+                withStyle(
+                    style = SpanStyle(
+                        color = TypographyColor.value,
+                        fontSize = 10.sp,
+                        fontFamily = fontFamily,
+                        fontWeight = FontWeight.Light
+                    )
+                ) {
+                    append("MONTHLY ")
+                }
+
+                withStyle(
+                    style = SpanStyle(
+                        color = TypographyColor.value,
+                        fontSize = 12.sp,
+                        fontFamily = fontFamily,
+                        fontWeight = FontWeight.Bold
+                    )
+                ) {
+                    append("$currentMonth ")
+                }
+
+                withStyle(
+                    style = SpanStyle(
+                        color = TypographyColor.value,
+                        fontSize = 10.sp,
+                        fontFamily = fontFamily,
+                        fontWeight = FontWeight.Bold
+                    )
+                ) {
+                    append(currentYear)
+                }
+            })
         }
         Spacer(modifier = Modifier.height(8.dp))
         LazyRow(
@@ -140,6 +172,7 @@ fun CalendarHeaderComponent(
                 val date = dateList[index]
                 CalendarDateItem(
                     isCurrent = date.time.equals(today.time),
+                    isSelected = selectedIndex == index,
                     date = date
                 ) {
                     onDateEvent(index)
@@ -170,22 +203,8 @@ fun CalendarHeaderComponent(
                 strokeCap = StrokeCap.Round
             )
         }
-
     }
 }
-
-private fun getDate(currentDate: Date) : String{
-    val calendar = Calendar.getInstance()
-    calendar.time = currentDate
-    return SimpleDateFormat("MMM dd", Locale.getDefault()).format(calendar.time)
-}
-
-private fun getYear(currentDate: Date) : String{
-    val calendar = Calendar.getInstance()
-    calendar.time = currentDate
-    return "${calendar.get(Calendar.YEAR)}"
-}
-
 
 @Preview
 @Composable
@@ -201,13 +220,18 @@ fun CalendarHeaderComponentPreview(){
             }.time
         }
 
+    val date = Date(System.currentTimeMillis())
+
     CalendarHeaderComponent(
         today = Date(System.currentTimeMillis()),
         viewType = ViewType.CALENDAR,
         dateList = dateList,
         listState = dateListState,
+        selectedIndex = 1,
         isLoading = true,
-        onMenuEvent  = {},
+        currentDate = date,
+        currentMonth = "",
+        currentYear = "",
         onTodayEvent  = {},
         onDateEvent = {},
         onChangeVisibleDate = {},

@@ -132,9 +132,9 @@ class TaskViewModel(
                 _progressBar.value = true
                 viewModelScope.launch(Dispatchers.IO) {
                     if (event.allOccurrence){
-                        deleteAllTodoOccurrenceById(event.taskId)
+                        archiveAllTodoOccurrenceById(event.taskId)
                     }else{
-                        deleteTodoById(event.taskId)
+                        archiveTodoById(event.taskId)
                     }
                     withContext(Dispatchers.Main.immediate){
                         _progressBar.value = false
@@ -152,6 +152,22 @@ class TaskViewModel(
     }
 
     @Transaction
+    private suspend fun archiveAllTodoOccurrenceById(taskId: Int) {
+        if (taskId != -1){
+            val rawTodo = todoRepository.getRawTodoById(taskId)
+            _rawTodos
+                .value
+                .filter { todo ->
+                    rawTodo.date.equals(todo.date) || rawTodo.createdOn.equals(todo.createdOn)
+                }.forEachIndexed { _, todo ->
+                    todo.let {
+                        archiveTodoById(todo.todoId.toInt())
+                    }
+                }
+        }
+    }
+
+    @Transaction
     private suspend fun deleteAllTodoOccurrenceById(taskId: Int) {
         if (taskId != -1){
             val rawTodo = todoRepository.getRawTodoById(taskId)
@@ -166,6 +182,18 @@ class TaskViewModel(
                 }
         }
     }
+
+
+    private suspend fun archiveTodoById(todoId : Int) : Boolean {
+        try {
+            todoRepository.archiveTodo(todoId)
+        }catch (e : Exception){
+            e.printStackTrace()
+            return false
+        }
+        return true
+    }
+
     @SuppressWarnings
     private suspend fun deleteTodoById(todoId: Int) : Boolean {
             try {
@@ -230,6 +258,7 @@ class TaskViewModel(
                 createdOn = System.currentTimeMillis(),
                 todoId = System.currentTimeMillis().hashCode().absoluteValue,
                 repeatIndex = shareViewModel.selectedRepeatIndex.value,
+                isArchive = false
             )
             Log.i("ERROR_CHECK","createTask: createRepeatedEvents")
             val taskList = repeatRepository.createRepeatedEvents(todo,repeatType,_rawTaskDateTimeInstance.value.time)

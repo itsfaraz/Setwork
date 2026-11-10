@@ -143,7 +143,7 @@ fun HeaderComponent(
                         .wrapContentSize()
                         .padding(end = 6.dp),
                         contentAlignment = Alignment.Center) {
-                        Icon(modifier = Modifier.size(24.dp), painter = painterResource(id = R.drawable.ic_notification),contentDescription = "Notification Icon",tint = ButtonPrimary.value)
+                        Icon(modifier = Modifier.size(24.dp), painter = painterResource(id = R.drawable.ic_archive),contentDescription = "Notification Icon",tint = ButtonPrimary.value)
                         if (notificationCount > 0){
                             Text(modifier = Modifier.fillMaxWidth().padding(start = 4.dp, bottom = 22.dp), text = "●", style = TextStyle(color = ButtonPrimary.value, fontSize = 12.sp), textAlign = TextAlign.End)
                         }

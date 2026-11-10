@@ -44,8 +44,8 @@
         android:label="CalendarFragment">
     </fragment>
     <fragment
-        android:id="@+id/notificationFragment"
-        android:name="com.designlife.justdo.notification.NotificationFragment"
-        android:label="NotificationFragment" />
+        android:id="@+id/archiveFragment"
+        android:name="com.designlife.justdo.archive.ArchiveFragment"
+        android:label="ArchiveFragment" />
 
 </navigation>

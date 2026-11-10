@@ -108,7 +108,7 @@ class DeckViewModel(
                 setupColor(event.value)
             }
             is DeckEvents.OnDeckDeleteEvent -> {
-                deleteDeckById()
+                archiveDeckById()
             }
             is DeckEvents.OnInsert -> {
                 insertDeck()
@@ -133,6 +133,19 @@ class DeckViewModel(
             viewModelScope.launch(Dispatchers.IO) {
                 try {
                     deckRepository.deleteDeck(_deckId.value)
+                }catch (e : Exception){
+                    Log.e(TAG,"deleteDeckById: ${e.message}" )
+                    e.printStackTrace()
+                }
+            }
+        }
+    }
+
+    private fun archiveDeckById() {
+        if (_deckId.value != -1L){
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    deckRepository.archiveDeck(_deckId.value)
                 }catch (e : Exception){
                     Log.e(TAG,"deleteDeckById: ${e.message}" )
                     e.printStackTrace()
@@ -182,6 +195,7 @@ class DeckViewModel(
                 totalCards = _cardList.value.size,
                 modifiedDate = Date(System.currentTimeMillis()),
                 cards = _cardList.value,
+                isArchive = false,
                 categoryId = id
             ).also { newDeck ->
                 deckRepository.insertDeck(newDeck)
@@ -214,6 +228,7 @@ class DeckViewModel(
                 totalCards = _cardList.value.size,
                 modifiedDate = Date(System.currentTimeMillis()),
                 cards = _cardList.value,
+                isArchive = false,
                 categoryId = id
             )
 

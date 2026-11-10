@@ -47,4 +47,8 @@ class DeckRepository(private val deckDao: DeckDao) {
         deckDao.deleteDeckById(deckId)
     }
 
+    suspend fun archiveDeck(deckId: Long): Unit {
+        deckDao.archiveDeckById(deckId)
+    }
+
 }

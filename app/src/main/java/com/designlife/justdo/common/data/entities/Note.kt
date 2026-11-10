@@ -23,6 +23,7 @@ data class Note(
     @Serializable(with = LongSerializer::class)
     @SerializedName("lastModified")
     val lastModified : Long,
+    val isArchive : Boolean = false,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

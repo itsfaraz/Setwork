@@ -73,4 +73,8 @@ class TodoRepository(private val todoDao: TodoDao) {
         todoDao.deleteTodoById(todoId.toLong())
     }
 
+    suspend fun archiveTodo(todoId : Int) : Unit {
+        todoDao.archiveTodoById(todoId.toLong())
+    }
+
 }

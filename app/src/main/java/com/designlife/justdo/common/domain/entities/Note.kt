@@ -9,6 +9,7 @@ data class Note(
     val emoji : String = "📓",
     val categoryId : Long = 0L,
     val coverImage : ByteArray? = null,
+    val isArchive : Boolean = false,
     val createdTime: Date = Date(System.currentTimeMillis()),
     val lastModified : Date = Date(System.currentTimeMillis()),
 ) : SearchMarker(referenceId = noteId) {
@@ -40,6 +41,7 @@ data class Note(
              coverImage = this.coverImage,
              createdTime = this.createdTime.time,
              lastModified = this.lastModified.time,
+             isArchive = this.isArchive
             )
     }
 }

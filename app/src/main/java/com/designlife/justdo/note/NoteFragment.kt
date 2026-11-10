@@ -214,7 +214,7 @@ class NoteFragment : Fragment(), SetworkOLLM.SetworkMessage {
                                 viewModel.exportPng(requireContext())
                             },
                             onDeleteEvent = {
-                                viewModel.deleteNote()
+                                viewModel.archiveNote()
                                 findNavController().navigateUp()
                             }
                         )

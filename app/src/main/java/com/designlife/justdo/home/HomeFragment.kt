@@ -454,7 +454,7 @@ class HomeFragment : Fragment(), TaskListener {
                                         },
                                         onNotificationIconEvent = {
                                             findNavController().navigate(
-                                                resId = R.id.notificationFragment,
+                                                resId = R.id.archiveFragment,
                                                 args = null,
                                                 navOptions = NavOptions.navOptionStack
                                             )

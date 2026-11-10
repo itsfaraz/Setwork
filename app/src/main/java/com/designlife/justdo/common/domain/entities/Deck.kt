@@ -11,6 +11,7 @@ data class Deck(
     val totalCards : Int = 0,
     val modifiedDate : Date,
     val categoryId : Long,
+    val isArchive : Boolean,
     val cards : List<FlashCard> = emptyList()
 ) : SearchMarker(referenceId = deckId){
     fun toDeck() : Deck{
@@ -20,6 +21,7 @@ data class Deck(
             totalCards = this.totalCards,
             modifiedDate = this.modifiedDate.time,
             categoryId = this.categoryId,
+            isArchive = this.isArchive,
             cards = this.cards.map { it.toFlashCard() }
         )
     }

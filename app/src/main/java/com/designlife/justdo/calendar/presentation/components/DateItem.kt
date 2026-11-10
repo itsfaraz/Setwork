@@ -26,6 +26,7 @@ import java.util.Date
 @Composable
 fun CalendarDateItem(
     isCurrent: Boolean,
+    isSelected : Boolean,
     date: Date,
     onEventClick: () -> Unit
 ) {
@@ -36,7 +37,7 @@ fun CalendarDateItem(
             .width(48.dp)
             .height(48.dp)
             .background(
-                color = if (isCurrent) ButtonPrimary.value else UIComponentBackground.value,
+                color = if (isSelected || isCurrent) ButtonPrimary.value else UIComponentBackground.value,
                 shape = RoundedCornerShape(100)
             )
             .rippleClickable() {

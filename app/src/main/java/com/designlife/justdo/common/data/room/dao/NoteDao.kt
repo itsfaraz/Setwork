@@ -35,6 +35,10 @@ interface NoteDao {
     suspend fun updateNoteById(noteId : Long,title : String,content : String,emoji : String,categoryId : Long,coverImage : ByteArray?)
 
     @Transaction
+    @Query("UPDATE NOTE SET isArchive=:isArchive  WHERE noteId=:noteId")
+    suspend fun archiveNoteById(noteId : Long, isArchive : Boolean = true)
+
+    @Transaction
     @Query("DELETE FROM NOTE WHERE noteId=:noteId")
     suspend fun deleteNoteById(noteId : Long)
 

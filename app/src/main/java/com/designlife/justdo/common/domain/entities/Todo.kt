@@ -14,6 +14,7 @@ data class Todo(
     val repeatIndex : Int,
     val isCompleted : Boolean,
     val createdOn : Long,
+    val isArchive : Boolean,
 ){
     fun toTodo() : Todo{
         return Todo(
@@ -25,7 +26,8 @@ data class Todo(
             repeatIndex = this.repeatIndex,
             isCompleted = this.isCompleted,
             categoryId = this.categoryId,
-            createdOn = this.createdOn
+            createdOn = this.createdOn,
+            isArchive = this.isArchive
         )
     }
 }

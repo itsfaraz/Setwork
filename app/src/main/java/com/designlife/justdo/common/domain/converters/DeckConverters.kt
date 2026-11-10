@@ -23,7 +23,8 @@ object DeckConverters {
             totalCards = deck.totalCards,
             cards = cards,
             modifiedDate = Date(deck.modifiedDate),
-            categoryId = deck.categoryId
+            categoryId = deck.categoryId,
+            isArchive = deck.isArchive
         )
     }
 }

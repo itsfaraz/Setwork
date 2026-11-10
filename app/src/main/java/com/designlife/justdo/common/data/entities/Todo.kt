@@ -21,5 +21,6 @@ data class Todo(
     val repeatIndex : Int,
     val isCompleted : Boolean,
     val categoryId : Long,
-    val createdOn : Long
+    val createdOn : Long,
+    val isArchive : Boolean = false
 )

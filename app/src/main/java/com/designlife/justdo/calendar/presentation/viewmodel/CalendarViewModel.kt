@@ -28,6 +28,7 @@ import com.designlife.justdo.ui.theme.TaskItemLabelColor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import java.util.Calendar
 import java.util.Date
 
 class CalendarViewModel(
@@ -64,6 +65,18 @@ class CalendarViewModel(
 
     private val _colorMap : MutableState<Map<Long, Color>> = mutableStateOf(mapOf());
 
+    private var _eventIndex : MutableState<Int> = mutableStateOf(0)
+    val eventIndex  = _eventIndex
+
+
+    private var _selectedIndex : MutableState<Int> = mutableStateOf(0)
+    val selectedIndex  = _selectedIndex
+
+    private var _isLoaded : MutableState<Boolean> = mutableStateOf(false)
+    val isLoaded  = _isLoaded
+
+    private val _currentDate : MutableState<Date> = mutableStateOf(IDateGenerator.getToday())
+    val currentDate = _currentDate
     val TAG = "CVM"
 
     init {
@@ -194,6 +207,21 @@ class CalendarViewModel(
             is CalendarEvents.OnProgressBarToggle -> {
                 _progressBarVisibility.value = event.toggleValue
             }
+            is CalendarEvents.HighlightDateByEvent -> {
+                try{
+                    val todoDate = Date(event.epoch)
+                    val index = _dateList.value.indexOf(IDateGenerator.getDateFromDate(todoDate))
+                    if(index != -1){
+                        _selectedIndex.value = index
+                        _currentDateIndex.value = index
+                    }
+                }catch (e : Exception){
+                    Log.e(TAG, "onEvent: ${e.message}")
+                }
+            }
+            is CalendarEvents.OnTodayEvent -> {
+
+            }
             else -> {}
         }
     }
@@ -221,6 +249,4 @@ class CalendarViewModel(
         setPreviousMonthIndex()
         _dateList.value = list.toOrderedUniqueList()
     }
-
-
 }

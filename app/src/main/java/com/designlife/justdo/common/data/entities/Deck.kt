@@ -18,5 +18,6 @@ data class Deck(
     @SerializedName("modifiedDate")
     val modifiedDate : Long = 0,
     val categoryId : Long,
-    val cards : List<FlashCard>
+    val cards : List<FlashCard>,
+    val isArchive : Boolean = false,
 )

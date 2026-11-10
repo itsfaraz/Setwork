@@ -34,4 +34,7 @@ interface TodoDao {
     @Query("DELETE FROM TODO WHERE todoId=:todoId")
     suspend fun deleteTodoById(todoId : Long)
 
+    @Transaction
+    @Query("UPDATE TODO SET isArchive=:isArchive WHERE todoId=:todoId")
+    suspend fun archiveTodoById(todoId : Long,isArchive : Boolean = true)
 }

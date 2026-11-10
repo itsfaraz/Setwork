@@ -44,6 +44,10 @@ class NoteRepository(
         }
     }
 
+    suspend fun archiveNote(noteId: Long) {
+        noteDao.archiveNoteById(noteId,isArchive = true)
+    }
+
     suspend fun deleteNote(noteId: Long) {
         noteDao.deleteNoteById(noteId)
     }

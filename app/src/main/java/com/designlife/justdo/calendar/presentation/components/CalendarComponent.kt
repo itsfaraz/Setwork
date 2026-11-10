@@ -1,11 +1,12 @@
 package com.designlife.justdo.calendar.presentation.components
 
-import androidx.appcompat.R
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -13,12 +14,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,9 +52,11 @@ private data class EventDay(
 
 @Composable
 fun CalendarComponent(
+    listState: LazyListState,
     localEvents: List<LocalEvent>,
-    onLocalEvent: (eventId: Long) -> Unit
-) {
+    onLocalEvent: (event: LocalEvent) -> Unit,
+    onFirstIndexChangeEvent: (epoch: Long) -> Unit,
+    ) {
     val eventDays = remember(localEvents) {
         localEvents
             .groupBy { event ->
@@ -67,10 +74,10 @@ fun CalendarComponent(
     }
 
     LazyColumn(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize(),
+        state = listState
     ) {
-        eventDays.forEach { day ->
-
+        eventDays.forEachIndexed { _,  day ->
             item(
                 key = "header-${day.date}"
             ) {
@@ -79,13 +86,18 @@ fun CalendarComponent(
                 )
             }
 
-            items(
+            itemsIndexed(
                 items = day.events,
-                key = { it.eventId + it.eventInfo.epoch }
-            ) { event ->
+                key = { _, item -> item.eventId + item.eventInfo.epoch }
+            ) { _ , event ->
                 CalendarEventItem(
-                    event = event
-                ) { onLocalEvent(it) }
+                    event = event,
+                ) {
+                    onLocalEvent(event)
+                }
+                LaunchedEffect(listState.firstVisibleItemIndex) {
+                    onFirstIndexChangeEvent(event.eventInfo.epoch)
+                }
             }
         }
     }
@@ -180,7 +192,7 @@ private fun CalendarEventItem(
                 .height(128.dp),
             colors = CardDefaults.cardColors(
                 containerColor =
-                    event?.eventInfo?.categoryColor ?: Color.DarkGray
+                    event.eventInfo.categoryColor ?: Color.DarkGray
             ),
             elevation = CardDefaults.elevatedCardElevation(
                 defaultElevation = 12.dp
@@ -192,12 +204,13 @@ private fun CalendarEventItem(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(start = 12.dp),
-                horizontalAlignment = Alignment.Start,
-                verticalArrangement = Arrangement.Center
-            ) {
+                    modifier = Modifier
+                        .fillMaxWidth(.8F)
+                        .fillMaxHeight()
+                        .padding(start = 12.dp),
+                    horizontalAlignment = Alignment.Start,
+                    verticalArrangement = Arrangement.Center
+                ) {
                 Text(
                     text = event.eventInfo.title
                         .take(36)
@@ -223,14 +236,19 @@ private fun CalendarEventItem(
                     )
                 )
             }
-                Spacer(modifier = Modifier.size(8.dp))
-                Icon(modifier = Modifier.size(18.dp), painter = painterResource(when(event.eventInfo.eventType){
-                    EventType.DECK -> { com.designlife.justdo.R.drawable.ic_mini_deck }
-                    EventType.NOTE -> { com.designlife.justdo.R.drawable.ic_mini_note }
-                    EventType.TASK -> { com.designlife.justdo.R.drawable.ic_mini_check }
-                    else -> { com.designlife.justdo.R.drawable.ic_mini_check }
-                }), contentDescription = "Icon")
-                Spacer(modifier = Modifier.size(6.dp))
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Image(modifier = Modifier.size(18.dp), painter = painterResource(when(event.eventInfo.eventType){
+                        EventType.DECK -> { com.designlife.justdo.R.drawable.ic_mini_deck }
+                        EventType.NOTE -> { com.designlife.justdo.R.drawable.ic_mini_note }
+                        EventType.TASK -> { com.designlife.justdo.R.drawable.ic_mini_check }
+                        else -> { com.designlife.justdo.R.drawable.ic_mini_check }
+                    }), contentDescription = "Icon")
+                }
+
             }
 
         }
@@ -355,7 +373,7 @@ fun CalendarComponentPreview() {
             )
         )
     )
-
-    CalendarComponent(localEvents = events) { }
+    val listState = rememberLazyListState()
+    CalendarComponent(listState = listState, localEvents = events, onFirstIndexChangeEvent = {_ -> }, onLocalEvent = { _ -> })
 }
 

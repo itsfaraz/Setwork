@@ -9,5 +9,6 @@ data class RawTodo(
     val isRepeated : Boolean = false,
     val repeatIndex : Int = 0,
     val isCompleted : Boolean = false,
-    val createdOn : Long = 0L
+    val createdOn : Long = 0L,
+    val isArchive : Boolean = false,
 )

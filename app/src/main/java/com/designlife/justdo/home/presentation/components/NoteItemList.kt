@@ -52,7 +52,7 @@ fun NoteItemList(
         state = listState
     ) {
         itemsIndexed(
-            items = noteList,
+            items = noteList.filterNot { it.isArchive },
             contentType = { _, note -> note.noteId },
             key = { _, note -> note.noteId },
         ) { index, note ->

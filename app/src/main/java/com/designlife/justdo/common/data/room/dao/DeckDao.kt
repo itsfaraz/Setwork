@@ -37,4 +37,8 @@ interface DeckDao {
     @Query("DELETE FROM DECK WHERE deckId=:deckId")
     suspend fun deleteDeckById(deckId : Long)
 
+    @Transaction
+    @Query("UPDATE DECK SET isArchive=:isArchive  WHERE deckId=:deckId")
+    suspend fun archiveDeckById(deckId : Long,isArchive : Boolean = true)
+
 }

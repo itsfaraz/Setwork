@@ -32,6 +32,7 @@ object TodoConverters {
             categoryId = todo.categoryId,
             createdOn = todo.createdOn,
             repeatIndex = todo.repeatIndex,
+            isArchive = todo.isArchive
         )
     }
 
