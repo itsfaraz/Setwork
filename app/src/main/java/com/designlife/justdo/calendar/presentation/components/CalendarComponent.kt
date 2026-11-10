@@ -1,8 +1,6 @@
 package com.designlife.justdo.calendar.presentation.components
 
-import android.os.Build
-import androidx.annotation.RequiresApi
-import androidx.compose.foundation.clickable
+import androidx.appcompat.R
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,18 +10,20 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -40,15 +40,15 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-private  data class EventDay(
+private data class EventDay(
     val date: LocalDate,
     val events: List<LocalEvent>
 )
 
 @Composable
 fun CalendarComponent(
-    localEvents : List<LocalEvent>,
-    onLocalEvent : (eventId : Long) -> Unit
+    localEvents: List<LocalEvent>,
+    onLocalEvent: (eventId: Long) -> Unit
 ) {
     val eventDays = remember(localEvents) {
         localEvents
@@ -81,11 +81,11 @@ fun CalendarComponent(
 
             items(
                 items = day.events,
-                key = { it.eventId }
+                key = { it.eventId + it.eventInfo.epoch }
             ) { event ->
                 CalendarEventItem(
                     event = event
-                ){ onLocalEvent(it) }
+                ) { onLocalEvent(it) }
             }
         }
     }
@@ -131,7 +131,7 @@ private fun CalendarDayHeader(
 @Composable
 private fun CalendarEventItem(
     event: LocalEvent,
-    onEvent : (eventId : Long) -> Unit
+    onEvent: (eventId: Long) -> Unit
 ) {
     val eventDateTime = remember(event.eventInfo.epoch) {
         Instant.ofEpochMilli(event.eventInfo.epoch)
@@ -152,7 +152,7 @@ private fun CalendarEventItem(
             .padding(vertical = 8.dp)
             .fillMaxWidth()
             .wrapContentHeight()
-            .rippleClickable(onClick = {onEvent(event.eventId)}),
+            .rippleClickable(onClick = { onEvent(event.eventId) }),
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -186,7 +186,12 @@ private fun CalendarEventItem(
                 defaultElevation = 12.dp
             )
         ) {
-            Column(
+            Row(
+                modifier = Modifier.fillMaxSize(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(start = 12.dp),
@@ -218,13 +223,24 @@ private fun CalendarEventItem(
                     )
                 )
             }
+                Spacer(modifier = Modifier.size(8.dp))
+                Icon(modifier = Modifier.size(18.dp), painter = painterResource(when(event.eventInfo.eventType){
+                    EventType.DECK -> { com.designlife.justdo.R.drawable.ic_mini_deck }
+                    EventType.NOTE -> { com.designlife.justdo.R.drawable.ic_mini_note }
+                    EventType.TASK -> { com.designlife.justdo.R.drawable.ic_mini_check }
+                    else -> { com.designlife.justdo.R.drawable.ic_mini_check }
+                }), contentDescription = "Icon")
+                Spacer(modifier = Modifier.size(6.dp))
+            }
+
         }
     }
 }
 
 
 @Preview
-@Composable fun CalendarComponentPreview() {
+@Composable
+fun CalendarComponentPreview() {
     val now = System.currentTimeMillis()
 
     val events = listOf(
@@ -340,6 +356,6 @@ private fun CalendarEventItem(
         )
     )
 
-    CalendarComponent(localEvents = events){ }
+    CalendarComponent(localEvents = events) { }
 }
 

@@ -1,5 +1,6 @@
 package com.designlife.justdo.calendar.presentation.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,11 +24,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -37,9 +40,11 @@ import androidx.compose.ui.unit.sp
 import com.designlife.justdo.R
 import com.designlife.justdo.common.utils.enums.ViewType
 import com.designlife.justdo.home.presentation.components.SelectedHeaderTitle
+import com.designlife.justdo.home.presentation.components.getViewTypeText
 import com.designlife.justdo.ui.theme.ButtonPrimary
 import com.designlife.justdo.ui.theme.ComponentBackground
 import com.designlife.justdo.ui.theme.Shapes
+import com.designlife.justdo.ui.theme.TypographyColor
 import com.designlife.justdo.ui.theme.cutBottomRoundedCorners
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -55,7 +60,10 @@ fun CalendarHeaderComponent(
     listState: LazyListState,
     onMenuEvent : () -> Unit,
     onTodayEvent : () -> Unit,
-    onDateEvent : (index : Int) -> Unit
+    onDateEvent : (index : Int) -> Unit,
+    onChangeVisibleDate: (date: Date) -> Unit,
+    loadPreviousTrigger: () -> Unit,
+    loadNextTrigger: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -66,7 +74,7 @@ fun CalendarHeaderComponent(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(12.dp))
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -93,29 +101,18 @@ fun CalendarHeaderComponent(
                     IconButton(onClick = {
                         onMenuEvent()
                     }) {
-                       Icon(painter = painterResource(R.drawable.ic_hamburger_menu), contentDescription = "Menu Icon", tint = ButtonPrimary.value)
+                       Image(painter = painterResource(R.drawable.app_icon_setwork_foreground), contentDescription = "App Icon", contentScale = ContentScale.Fit)
                     }
                 }
 
             }
 
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(6.dp))
             SelectedHeaderTitle(
                 viewType = viewType
             )
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
-            ) {
-                IconButton(onClick = {
-                    onTodayEvent()
-                }) {
-                    Icon(modifier = Modifier.size(20.dp), painter = painterResource(id = R.drawable.ic_target),contentDescription = "Search Icon", tint = ButtonPrimary.value)
-                }
-            }
-            Spacer(modifier = Modifier.width(6.dp))
         }
-        Spacer(modifier = Modifier.height(6.dp))
+        Spacer(modifier = Modifier.height(2.dp))
         Row(
             modifier = Modifier
                 .height(30.dp)
@@ -124,11 +121,11 @@ fun CalendarHeaderComponent(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Spacer(modifier = Modifier.width(18.dp))
-            Text(text = getDate(today), style = TextStyle(fontSize = 26.sp, color = Color.Black, fontWeight = FontWeight.SemiBold))
+            Text(text = getDate(today), style = TextStyle(fontSize = 26.sp, color = TypographyColor.value, fontWeight = FontWeight.SemiBold))
             Spacer(modifier = Modifier.width(6.dp))
-            Text(text = getYear(today), style = TextStyle(fontSize = 10.sp, color = Color.Black, fontWeight = FontWeight.SemiBold))
+            Text(text = getYear(today), style = TextStyle(fontSize = 10.sp, color = TypographyColor.value, fontWeight = FontWeight.SemiBold))
         }
-        Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(8.dp))
         LazyRow(
             modifier = Modifier
                 .fillMaxWidth()
@@ -138,18 +135,34 @@ fun CalendarHeaderComponent(
         ) {
             items(
                 count = dateList.size,
+                key = { index -> dateList[index].time }
             ) { index ->
-
+                val date = dateList[index]
                 CalendarDateItem(
-                    isCurrent = dateList[index].time.equals(today.time),
-                    date = dateList[index]
+                    isCurrent = date.time.equals(today.time),
+                    date = date
                 ) {
                     onDateEvent(index)
                 }
+
+                if (index == 0) {
+                    DisposableEffect(Unit) {
+                        loadPreviousTrigger()
+                        onDispose { }
+                    }
+                }
+
+                if (index == dateList.size - 1) {
+                    DisposableEffect(Unit) {
+                        loadNextTrigger()
+                        onDispose { }
+                    }
+                }
+                onChangeVisibleDate(date)
             }
         }
         if (isLoading){
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(4.dp))
             LinearProgressIndicator(
                 modifier = Modifier.fillMaxWidth(),
                 color = ButtonPrimary.value,
@@ -196,6 +209,9 @@ fun CalendarHeaderComponentPreview(){
         isLoading = true,
         onMenuEvent  = {},
         onTodayEvent  = {},
-        onDateEvent = {}
+        onDateEvent = {},
+        onChangeVisibleDate = {},
+        loadNextTrigger = {},
+        loadPreviousTrigger = {}
     )
 }

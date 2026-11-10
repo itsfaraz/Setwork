@@ -52,6 +52,7 @@ import com.designlife.justdo.note.presentation.viewmodel.NoteViewModelFactory
 import com.designlife.justdo.setworkllm.SetworkOLLM
 import com.designlife.justdo.ui.theme.UIComponentBackground
 import com.designlife.justdo_provider.SetworkProvider
+import com.designlife.orchestrator.NotificationScheduler
 import com.designlife.orchestrator.SchedulingEngine
 import org.koin.android.ext.android.inject
 import java.util.Calendar
@@ -63,7 +64,7 @@ class NoteFragment : Fragment(), SetworkOLLM.SetworkMessage {
 
     private val noteRepository : NoteRepository by inject()
     private val categoryRepository : CategoryRepository by inject()
-    private val schedulingEngine : SchedulingEngine by inject()
+    private val notificationScheduler : NotificationScheduler  by inject()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,7 +73,7 @@ class NoteFragment : Fragment(), SetworkOLLM.SetworkMessage {
         val factory = NoteViewModelFactory(
             noteRepository,
             categoryRepository,
-            schedulingEngine.notificationScheduler()
+            notificationScheduler
         )
 
         viewModel = ViewModelProvider(this, factory)[NoteViewModel::class.java]

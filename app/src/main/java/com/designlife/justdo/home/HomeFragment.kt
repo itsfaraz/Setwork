@@ -350,9 +350,6 @@ class HomeFragment : Fragment(), TaskListener {
     ): View {
         return ComposeView(requireContext()).apply {
             setContent {
-                val legacyScroll = remember {
-                    mutableStateOf(true)
-                }
                 dateListState = rememberLazyListState()
                 scope = rememberCoroutineScope()
                 val selectedIndex = viewModel.selectedIndex.value
@@ -837,11 +834,6 @@ class HomeFragment : Fragment(), TaskListener {
         super.onResume()
         settingViewModel.onEvent(SettingEvents.OnLoaderToggle(false))
         viewModel.archiveTodos(viewModel.todoList.value)
-        if (::scope.isInitialized){
-            scope.launch {
-                highlightToday()
-            }
-        }
     }
 
     private fun navigateToTaskViewById(todoId: Int) {
