@@ -12,7 +12,8 @@ object NoteConverters {
             emoji = note.emoji,
             coverImage = note.coverImage,
             createdTime = note.createdTime.time,
-            lastModified = note.lastModified.time
+            lastModified = note.lastModified.time,
+            isArchive = note.isArchive
         )
     }
 
@@ -26,6 +27,7 @@ object NoteConverters {
             coverImage = note.coverImage,
             createdTime = Date(note.createdTime),
             lastModified = Date(note.lastModified),
+            isArchive = note.isArchive
         )
     }
 
