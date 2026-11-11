@@ -110,57 +110,63 @@ class CalendarViewModel(
                     buildList {
 
                         todos.forEach {
-                            val color = colors[it.categoryId]
-                                ?: TaskItemLabelColor.value
+                            if (!it.isArchive){
+                                val color = colors[it.categoryId]
+                                    ?: TaskItemLabelColor.value
 
-                            add(
-                                LocalEvent(
-                                    eventId = it.todoId.toLong(),
-                                    eventInfo = LocalEvent.EventInfo(
-                                        epoch = it.date.time,
-                                        title = it.title,
-                                        description = it.note,
-                                        eventType = EventType.TASK,
-                                        categoryColor = color
+                                add(
+                                    LocalEvent(
+                                        eventId = it.todoId.toLong(),
+                                        eventInfo = LocalEvent.EventInfo(
+                                            epoch = it.date.time,
+                                            title = it.title,
+                                            description = it.note,
+                                            eventType = EventType.TASK,
+                                            categoryColor = color
+                                        )
                                     )
                                 )
-                            )
+                            }
                         }
 
                         notes.forEach {
-                            val color = colors[it.categoryId]
-                                ?: TaskItemLabelColor.value
+                            if (!it.isArchive){
+                                val color = colors[it.categoryId]
+                                    ?: TaskItemLabelColor.value
 
-                            add(
-                                LocalEvent(
-                                    eventId = it.noteId,
-                                    eventInfo = LocalEvent.EventInfo(
-                                        epoch = it.lastModified.time,
-                                        title = it.title,
-                                        description = it.content,
-                                        eventType = EventType.NOTE,
-                                        categoryColor = color
+                                add(
+                                    LocalEvent(
+                                        eventId = it.noteId,
+                                        eventInfo = LocalEvent.EventInfo(
+                                            epoch = it.lastModified.time,
+                                            title = it.title,
+                                            description = it.content,
+                                            eventType = EventType.NOTE,
+                                            categoryColor = color
+                                        )
                                     )
                                 )
-                            )
+                            }
                         }
 
                         decks.forEach {
-                            val color = colors[it.categoryId]
-                                ?: TaskItemLabelColor.value
+                            if (!it.isArchive){
+                                val color = colors[it.categoryId]
+                                    ?: TaskItemLabelColor.value
 
-                            add(
-                                LocalEvent(
-                                    eventId = it.deckId,
-                                    eventInfo = LocalEvent.EventInfo(
-                                        epoch = it.modifiedDate.time,
-                                        title = it.deckName,
-                                        description = "Open ${it.totalCards} cards in this deck",
-                                        eventType = EventType.DECK,
-                                        categoryColor = color
+                                add(
+                                    LocalEvent(
+                                        eventId = it.deckId,
+                                        eventInfo = LocalEvent.EventInfo(
+                                            epoch = it.modifiedDate.time,
+                                            title = it.deckName,
+                                            description = "Open ${it.totalCards} cards in this deck",
+                                            eventType = EventType.DECK,
+                                            categoryColor = color
+                                        )
                                     )
                                 )
-                            )
+                            }
                         }
                     }
 

@@ -47,7 +47,7 @@ fun TodoItemList(
         state = listState
     ) {
         items(
-            items = todoList.filterNot { it.isArchive },
+            items = todoList.filter { !it.isArchive },
             key = { todo -> todo.todoId },
             contentType = { todo -> todo.categoryId }
         ) { todo ->

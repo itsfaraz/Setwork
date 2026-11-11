@@ -26,6 +26,8 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.designlife.justdo.MainActivity
@@ -54,6 +56,8 @@ import com.designlife.justdo.ui.theme.UIComponentBackground
 import com.designlife.justdo_provider.SetworkProvider
 import com.designlife.orchestrator.NotificationScheduler
 import com.designlife.orchestrator.SchedulingEngine
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import java.util.Calendar
 import java.util.Date
@@ -214,8 +218,14 @@ class NoteFragment : Fragment(), SetworkOLLM.SetworkMessage {
                                 viewModel.exportPng(requireContext())
                             },
                             onDeleteEvent = {
-                                viewModel.archiveNote()
-                                findNavController().navigateUp()
+                                viewModel.toggleToolbar()
+                                lifecycleScope.launch {
+                                    viewModel.toggleLoading(true)
+                                    viewModel.archiveNote()
+                                    delay(500)
+                                    viewModel.toggleLoading(false)
+                                    findNavController().navigateUp()
+                                }
                             }
                         )
                     }

@@ -267,7 +267,7 @@ class CalendarFragment : Fragment() {
     private fun navigateToDeckViewById(deckId: Int) {
         val bundle = bundleOf()
         bundle.putBoolean(Constants.DECK_VIEW, true)
-        bundle.putInt(Constants.DECK_VIEW_ID, deckId)
+        bundle.putLong("deckId", deckId.toLong())
         Log.i("NOTIFICATION_FLOW", "HomeFragment :: navigateToNoteViewById: navigated to todoId : $deckId")
         findNavController().navigate(
             R.id.deckFragment,

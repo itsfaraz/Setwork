@@ -194,6 +194,7 @@ fun CalendarHeaderComponent(
                 onChangeVisibleDate(date)
             }
         }
+        Spacer(modifier = Modifier.height(4.dp))
         if (isLoading){
             Spacer(modifier = Modifier.height(4.dp))
             LinearProgressIndicator(

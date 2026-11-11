@@ -43,7 +43,7 @@ fun DeckItemList(
         state = listState
     ) {
         itemsIndexed(
-            items = deckList.filterNot { it.isArchive },
+            items = deckList.filter { !it.isArchive },
             contentType = { _, deck -> deck.categoryId },
             key = { _, deck -> deck.deckId },
         ) { index, deck ->

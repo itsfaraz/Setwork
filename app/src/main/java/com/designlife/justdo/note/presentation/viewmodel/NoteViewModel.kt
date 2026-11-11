@@ -243,7 +243,6 @@ class NoteViewModel(
     fun archiveNote() {
         val id = _state.value.noteId
         if (id == 0L) return
-
         viewModelScope.launch(Dispatchers.IO) {
             noteRepository.archiveNote(id)
         }
@@ -283,5 +282,9 @@ class NoteViewModel(
             val s = _state.value
             AppOutput.exportAsPng(context, s.title, s.content)
         }
+    }
+
+    fun toggleLoading(value : Boolean){
+        _state.value = _state.value.copy(isLoading = value)
     }
 }
