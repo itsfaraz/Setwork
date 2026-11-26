@@ -45,6 +45,7 @@ The Setwork ecosystem is composed of three repositories:
 | [`Setwork`](https://github.com/itsfaraz/Setwork) | Main application — UI, navigation, settings, feature screens |
 | [`Setwork-Orchestrator`](https://github.com/itsfaraz/Setwork-Orchestrator) | Library module — notification scheduling and date rendering |
 | [`Setwork-Provider`](https://github.com/itsfaraz/Setwork-Provider) | Library module — data provision and content sourcing |
+| [`Setwork-OLLM`](https://github.com/itsfaraz/Setwork-Ollm) | Library module — chat interface for note, and deck summary and basic searches |
 
 Each module is independently versioned and independently releasable. The Orchestrator is currently at `v1.0.7`, which means it has already iterated beyond the main app's `v1.0.0` — a incapsulated multi-module systems.
 
@@ -135,8 +136,10 @@ A note on the 100MB CursorWindow: the default SQLite cursor window in Android is
 
 **Distribution — coming soon:**
 
-[![F-Droid](https://img.shields.io/badge/F--Droid-Pending-1976D2?style=flat-square&logo=f-droid&logoColor=white)](#)
+[![F-Droid](https://img.shields.io/badge/F--Droid-Pending-1976D2?style=flat-square&logo=f-droid&logoColor=white)]()
+[![F-Droid Version](https://shields.io)](https://f-droid.org/en/packages/com.designlife.justdo/)
 [![Static Badge](https://img.shields.io/badge/Amazon%20-%20App%20Store%20-%20Orange?logo=streamrunners&labelColor=%23006340)](https://www.amazon.com/gp/product/B0CR83YYW1)
+[![Google Play](https://img.shields.io/badge/Google_Play-414141?style=for-the-badge&logo=google-play&logoColor=white)]()
 
 
 When installing from a GitHub release APK, you will need to permit installation from unknown sources on your device: Settings > Apps > Special App Access > Install Unknown Apps.
