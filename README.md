@@ -135,9 +135,9 @@ A note on the 100MB CursorWindow: the default SQLite cursor window in Android is
 [![GitHub Releases](https://img.shields.io/badge/Download-GitHub%20Releases-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/itsfaraz/Setwork/releases/tag/1.0.0)
 
 **Distribution — coming soon:**
-
-[![F-Droid](https://img.shields.io/badge/F--Droid-Pending-1976D2?style=flat-square&logo=f-droid&logoColor=white)]()
-[![F-Droid Version](https://shields.io)](https://f-droid.org/en/packages/com.designlife.justdo/)
+[<img src="https://f-droid.org/badge/get-it-on.png"
+    alt="Get it on F-Droid"
+    height="80">](https://f-droid.org/packages/com.designlife.justdo)
 [![Static Badge](https://img.shields.io/badge/Amazon%20-%20App%20Store%20-%20Orange?logo=streamrunners&labelColor=%23006340)](https://www.amazon.com/gp/product/B0CR83YYW1)
 [![Google Play](https://img.shields.io/badge/Google_Play-414141?style=for-the-badge&logo=google-play&logoColor=white)]()
 
