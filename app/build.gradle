@@ -24,9 +24,9 @@ android {
     defaultConfig {
         applicationId "com.designlife.justdo"
         minSdk 25
-        targetSdk 35
-        versionCode 3
-        versionName "1.0.3"
+        targetSdk 36
+        versionCode 4
+        versionName "1.0.4"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
