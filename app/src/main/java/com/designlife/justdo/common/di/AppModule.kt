@@ -14,7 +14,6 @@ import com.designlife.justdo.common.domain.repositories.TodoRepository
 import com.designlife.justdo.common.domain.repositories.WidgetRepository
 import com.designlife.justdo.common.domain.repositories.appstore.AppStoreRepository
 import com.designlife.justdo.common.domain.repositories.appstore.IAppStoreRepository
-import com.designlife.justdo.common.utils.update.SoftwareUpdateManager
 import com.designlife.justdo_provider.SetworkProvider
 import com.designlife.orchestrator.SchedulingEngine
 import kotlinx.coroutines.CoroutineScope
@@ -102,16 +101,6 @@ val appModule = module{
         SchedulingEngine(
             androidContext().applicationContext
         ).notificationScheduler()
-    }
-
-    // Software update manager
-    single {
-        SoftwareUpdateManager(
-            context = androidContext().applicationContext,
-            scope = get(named("softwareUpdateScope")),
-            updateRepository = get(),
-            notificationScheduler = get()
-        )
     }
 
     // Setwork provider

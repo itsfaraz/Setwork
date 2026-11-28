@@ -71,7 +71,6 @@ import com.designlife.justdo.common.utils.entity.BottomNavItem
 import com.designlife.justdo.common.utils.entity.SettingItem
 import com.designlife.justdo.common.utils.enums.ViewType
 import com.designlife.justdo.common.utils.getFormattedTimestamp
-import com.designlife.justdo.common.utils.update.SoftwareUpdateManager
 import com.designlife.justdo.home.domain.usecase.LoadIntialDatesUseCase
 import com.designlife.justdo.home.domain.usecase.LoadNextDatesSetUseCase
 import com.designlife.justdo.home.domain.usecase.LoadPreviousDatesSetUseCase
@@ -140,7 +139,6 @@ class HomeFragment : Fragment(), TaskListener {
     private val setworkProvider : SetworkProvider by inject()
     private val appStoreRepository : AppStoreRepository by inject()
 
-    private val softwareUpdateManager : SoftwareUpdateManager by inject()
     private val settingIcons: List<SettingItem> = initSettingIcons()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -330,9 +328,6 @@ class HomeFragment : Fragment(), TaskListener {
                 }
 
                 NotificationType.APP_UPDATE -> {
-                    if (title == "Software Update" && id == 10001) {
-                        softwareUpdateManager.installUpdate()
-                    }
                 }
 
                 NotificationType.COMMON_NOTIFY -> {
@@ -681,12 +676,6 @@ class HomeFragment : Fragment(), TaskListener {
                                             feedbackMailToOrangeBytes()
                                         },
                                         onSoftwareUpdateEvent = {
-                                            softwareUpdateManager.checkForUpdate()
-                                            Toast.makeText(
-                                                requireContext(),
-                                                "Checking Software Updates",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
                                         },
                                         onGeneralSettingItemClick = {
                                             settingViewModel.onEvent(

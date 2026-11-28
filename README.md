@@ -75,7 +75,7 @@ com.designlife.justdo
 |   +-- data/                  # Repositories, Room database, DataStore
 |   +-- domain/                # Use cases, domain models, business rules
 |   +-- presentation/          # Reusable Compose components
-|   +-- utils/                 # AppServiceLocator, SoftwareUpdateManager
+|   +-- utils/                 # AppServiceLocator
 |
 +-- container/presentation/    # Navigation shell, ContainerFragment
 +-- deck/presentation/         # Deck/board view feature
@@ -123,7 +123,7 @@ The Orchestrator is the most interesting module architecturally. Notification sc
 | Local Storage | Room (SQLite) | CursorWindow resized to 100MB |
 | Preferences | DataStore | Typed async preference storage |
 | Scheduling | Setwork-Orchestrator | Notifications, alarms, date logic |
-| Updates | SoftwareUpdateManager | In-app update detection |
+| Calendar | Fragment | Infinite calendar for task, note and deck |
 | Build System | Gradle (Groovy DSL) | Multi-module configuration |
 
 A note on the 100MB CursorWindow: the default SQLite cursor window in Android is 2MB. The explicit resize in `MainActivity` suggests that the application deals with potentially large result sets — possibly from bulk task imports, long task histories, or note content. This is worth understanding before contributing any code that touches the database layer.
@@ -198,7 +198,7 @@ app/build/outputs/apk/release/app-release.apk
 | `READ_EXTERNAL_STORAGE` | Required to import task backups from device storage |
 | `WRITE_EXTERNAL_STORAGE` | Required to write task export files to device storage |
 
-The application requests no location, camera, microphone, or network permissions. The only network activity is the in-app update check via `SoftwareUpdateManager`. There are no analytics SDKs, no crash reporters that phone home, and no advertising identifiers.
+The application requests no location, camera, microphone, or network permissions. The only network activity is for weather update in the widget. There are no analytics SDKs, no crash reporters that phone home, and no advertising identifiers.
 
 ---
 

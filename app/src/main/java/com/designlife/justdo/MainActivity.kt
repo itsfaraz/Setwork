@@ -22,7 +22,6 @@ import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import com.designlife.justdo.common.domain.repositories.appstore.AppStoreRepository
 //import com.designlife.justdo.common.utils.AppServiceLocator
-import com.designlife.justdo.common.utils.update.SoftwareUpdateManager
 import com.designlife.justdo.permission.PermissionHandler
 import com.designlife.justdo.settings.presentation.viewmodel.SettingViewModel
 import com.designlife.justdo.settings.presentation.viewmodel.SettingViewModel.Companion.getAppThemeFromOrdinal
@@ -61,8 +60,6 @@ class MainActivity : AppCompatActivity() {
 
     private val setworkProvider : SetworkProvider by inject()
     private val appStoreRepository : AppStoreRepository by inject()
-    private val softwareUpdateManager : SoftwareUpdateManager by inject()
-
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -90,7 +87,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         observeDarkModeChanges()
         observeSettingChanges()
-        checkSoftwareUpdates()
         deviceKnown()
     }
 
@@ -121,26 +117,6 @@ class MainActivity : AppCompatActivity() {
             e.printStackTrace()
         }
     }
-    private fun checkSoftwareUpdates() {
-        appStoreRepository.let { appStore ->
-            lifecycleScope.launch {
-                val calendar = Calendar.getInstance()
-                val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
-
-                // run only on Sunday (last day of week)
-                if (dayOfWeek == Calendar.SUNDAY) {
-                    val updateChecked = appStore.getUpdateCheck()
-                    if (!updateChecked){
-                        softwareUpdateManager.checkForUpdate()
-                        appStore.setUpdateCheck(true)
-                    }
-                }else{
-                    appStore.setUpdateCheck(false)
-                }
-            }
-        }
-    }
-
     // Preference Changes Observe
     @OptIn(InternalSerializationApi::class)
     private fun observeSettingChanges() {
