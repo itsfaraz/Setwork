@@ -12,12 +12,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.designlife.justdo.BuildConfig
 import com.designlife.justdo.common.presentation.components.appBackground
 import com.designlife.justdo.common.utils.entity.SettingItem
 import com.designlife.justdo.ui.theme.ButtonHighLightPrimary
@@ -46,6 +50,9 @@ fun Settings(
     onGeneralSettingItemClick: () -> Unit,
     onBackupSettingItemClick: () -> Unit
 ) {
+    val versionName by remember {
+        mutableStateOf(BuildConfig.VERSION_NAME)
+    }
     Box(
         modifier = Modifier
             .pointerInput(Unit) {
@@ -185,7 +192,7 @@ fun Settings(
 
                 item {
                     Spacer(modifier = Modifier.height(20.dp))
-                    SettingHeader(headerTitle = "VERSION 1.0.1")
+                    SettingHeader(headerTitle = "VERSION $versionName")
                     Spacer(modifier = Modifier.height(32.dp))
                 }
             }
