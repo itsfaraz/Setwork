@@ -1,11 +1,11 @@
--keepnames class com.designlife.justdo.common.utils.enums.ScreenType
+-keepnames class com.designlife.setwork.common.utils.enums.ScreenType
 -keepattributes Signature
 -keepattributes *Annotation*
 
 -keep class com.google.gson.reflect.TypeToken { *; }
 -keep class * extends com.google.gson.reflect.TypeToken
 
--keep class com.designlife.justdo.** { *; }
+-keep class com.designlife.setwork.** { *; }
 
 -keepattributes Signature
 -keepattributes Exceptions
@@ -13,7 +13,7 @@
 -keep class retrofit2.** { *; }
 -keep interface retrofit2.** { *; }
 
--keep interface com.designlife.justdo.** { *; }
+-keep interface com.designlife.setwork.** { *; }
 
 -keep class okhttp3.** { *; }
 -keep interface okhttp3.** { *; }
@@ -32,7 +32,7 @@
 -keepattributes EnclosingMethod
 -keepattributes InnerClasses
 
--keepclassmembers interface com.designlife.justdo.** {
+-keepclassmembers interface com.designlife.setwork.** {
     @retrofit2.http.* <methods>;
 }
 

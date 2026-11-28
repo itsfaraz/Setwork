@@ -1,0 +1,54 @@
+package com.designlife.setwork.common.domain.repositories
+
+import com.designlife.setwork.common.data.room.dao.DeckDao
+import com.designlife.setwork.common.domain.converters.CardConverters
+import com.designlife.setwork.common.domain.converters.DeckConverters
+import com.designlife.setwork.common.domain.entities.Deck
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+
+class DeckRepository(private val deckDao: DeckDao) {
+
+    suspend fun insertDeck(deck: Deck): Long {
+        return deckDao.insertDeck(DeckConverters.getDeckEntity(deck))
+    }
+
+    suspend fun insertAllImportedDeck(deckList: List<com.designlife.setwork.common.data.entities.Deck>){
+        return deckDao.insertAllDeck(deckList)
+    }
+
+    suspend fun getAllRawDecks(): Flow<List<com.designlife.setwork.common.data.entities.Deck>> {
+        return deckDao.getAllDecks()
+    }
+    fun getAllDecks(): Flow<List<Deck>> {
+        return deckDao.getAllDecks().map { rawDeckList ->
+            rawDeckList.map { rawDeck ->
+                DeckConverters.getDeck(rawDeck)
+            }
+        }
+    }
+
+    suspend fun getDeckById(deckId: Long): Deck {
+        return DeckConverters.getDeck(deckDao.getDeckById(deckId))
+    }
+
+    suspend fun updateDeck(deckId: Long, deck: Deck): Unit {
+        deckDao.updateDeckById(
+            deckId = deckId,
+            deckName = deck.deckName,
+            totalCards = deck.totalCards,
+            modifiedDate = deck.modifiedDate.time,
+            categoryId = deck.categoryId,
+            cards = CardConverters.getFlashCardEntity(deck.cards),
+        )
+    }
+
+    suspend fun deleteDeck(deckId: Long): Unit {
+        deckDao.deleteDeckById(deckId)
+    }
+
+    suspend fun archiveDeck(deckId: Long): Unit {
+        deckDao.archiveDeckById(deckId)
+    }
+
+}

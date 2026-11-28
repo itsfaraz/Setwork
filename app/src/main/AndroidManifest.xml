@@ -37,11 +37,11 @@
         </activity>
         <provider android:name=".common.data.provider.TodoProvider"
             android:exported="true"
-            android:authorities="com.designlife.justdo.common.data.provider"
-            android:permission="com.designlife.justdo.common.data.provider">
+            android:authorities="com.designlife.setwork.common.data.provider"
+            android:permission="com.designlife.setwork.common.data.provider">
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT"/>
-                <action android:name="com.designlife.justdo.common.data.provider.SETWORK_TODO_ACTION_1"/>
+                <action android:name="com.designlife.setwork.common.data.provider.SETWORK_TODO_ACTION_1"/>
             </intent-filter>
         </provider>
         <provider

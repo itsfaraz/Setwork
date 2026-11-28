@@ -69,7 +69,7 @@ The dependency injection strategy is a **Service Locator** via `AppServiceLocato
 ### Main App Package Structure
 
 ```
-com.designlife.justdo
+com.designlife.setwork
 |
 +-- common/
 |   +-- data/                  # Repositories, Room database, DataStore
@@ -137,7 +137,7 @@ A note on the 100MB CursorWindow: the default SQLite cursor window in Android is
 **Distribution — coming soon:**
 [<img src="https://f-droid.org/badge/get-it-on.png"
     alt="Get it on F-Droid"
-    height="80">](https://f-droid.org/packages/com.designlife.justdo)
+    height="80">](https://f-droid.org/packages/com.designlife.setwork)
 [![Static Badge](https://img.shields.io/badge/Amazon%20-%20App%20Store%20-%20Orange?logo=streamrunners&labelColor=%23006340)](https://www.amazon.com/gp/product/B0CR83YYW1)
 [![Google Play](https://img.shields.io/badge/Google_Play-414141?style=for-the-badge&logo=google-play&logoColor=white)]()
 

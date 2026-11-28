@@ -7,23 +7,23 @@
 
     <fragment
         android:id="@+id/homeFragment"
-        android:name="com.designlife.justdo.home.HomeFragment"
+        android:name="com.designlife.setwork.home.HomeFragment"
         android:label="HomeFragment" />
     <fragment
         android:id="@+id/taskFragment"
-        android:name="com.designlife.justdo.task.TaskFragment"
+        android:name="com.designlife.setwork.task.TaskFragment"
         android:label="fragment_task" />
     <fragment
         android:id="@+id/containerFragment"
-        android:name="com.designlife.justdo.container.presentation.ContainerFragment"
+        android:name="com.designlife.setwork.container.presentation.ContainerFragment"
         android:label="fragment_container" >
         <argument
             android:name="ScreentType"
-            app:argType="com.designlife.justdo.common.utils.enums.ScreenType" />
+            app:argType="com.designlife.setwork.common.utils.enums.ScreenType" />
     </fragment>
     <fragment
         android:id="@+id/noteFragment"
-        android:name="com.designlife.justdo.note.NoteFragment"
+        android:name="com.designlife.setwork.note.NoteFragment"
         android:label="NoteFragment" >
         <argument
             android:name="NoteId"
@@ -32,20 +32,20 @@
     </fragment>
     <fragment
         android:id="@+id/deckFragment"
-        android:name="com.designlife.justdo.deck.DeckFragment"
+        android:name="com.designlife.setwork.deck.DeckFragment"
         android:label="DeckFragment" />
     <fragment
         android:id="@+id/OChatFragment"
-        android:name="com.designlife.justdo.chat.OChatFragment"
+        android:name="com.designlife.setwork.chat.OChatFragment"
         android:label="OChatFragment" />
     <fragment
         android:id="@+id/calendarFragment"
-        android:name="com.designlife.justdo.calendar.CalendarFragment"
+        android:name="com.designlife.setwork.calendar.CalendarFragment"
         android:label="CalendarFragment">
     </fragment>
     <fragment
         android:id="@+id/archiveFragment"
-        android:name="com.designlife.justdo.archive.ArchiveFragment"
+        android:name="com.designlife.setwork.archive.ArchiveFragment"
         android:label="ArchiveFragment" />
 
 </navigation>
